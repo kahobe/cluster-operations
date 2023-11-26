@@ -1,0 +1,10 @@
+all:
+  vars:
+    ansible_user: ansible
+
+cluster:
+  hosts:
+    controller:
+      ansible_host: vm-controller
+    worker01:
+      ansible_host: vm-worker01
