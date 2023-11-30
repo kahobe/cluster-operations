@@ -1,0 +1,56 @@
+---
+- name: Install and Configure Hadoop
+  hosts: hadoop_nodes
+  become: true
+  vars:
+    hadoop_version: "3.3.0"  # Change this to the desired Hadoop version
+    java_package: "openjdk-8-jdk"  # Change this if you prefer a different Java version
+    hadoop_tarball_local_path: "/path/to/hadoop-{{ hadoop_version }}.tar.gz"  # Change this to your local path
+
+  tasks:
+    - name: Update apt package cache
+      apt:
+        update_cache: yes
+
+    - name: Install Java
+      apt:
+        name: "{{ java_package }}"
+        state: present
+
+    - name: Copy Hadoop tarball to remote hosts
+      ansible.builtin.copy:
+        src: "{{ hadoop_tarball_local_path }}"
+        dest: "/tmp/hadoop-{{ hadoop_version }}.tar.gz"
+
+    - name: Extract Hadoop tarball
+      ansible.builtin.unarchive:
+        src: "/tmp/hadoop-{{ hadoop_version }}.tar.gz"
+        dest: "/opt/"
+        remote_src: yes
+
+    - name: Create a symbolic link for Hadoop
+      command: ln -s /opt/hadoop-{{ hadoop_version }} /opt/hadoop
+
+    - name: Set Hadoop environment variables
+      lineinfile:
+        path: /etc/environment
+        line: 'export HADOOP_HOME=/opt/hadoop'
+      become: true
+
+    - name: Configure Hadoop core-site.xml
+      template:
+        src: templates/core-site.xml.j2
+        dest: /opt/hadoop/etc/hadoop/core-site.xml
+      notify: Restart Hadoop
+
+    - name: Configure Hadoop hdfs-site.xml
+      template:
+        src: templates/hdfs-site.xml.j2
+        dest: /opt/hadoop/etc/hadoop/hdfs-site.xml
+      notify: Restart Hadoop
+
+    # Add additional configuration tasks for other Hadoop components (e.g., mapred-site.xml, yarn-site.xml)
+
+  handlers:
+    - name: Restart Hadoop
+      command: "{{ hadoop_home }}/sbin/stop-all.sh && {{ hadoop_home }}/sbin/start-all.sh"
