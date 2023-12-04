@@ -1,0 +1,14 @@
+---
+- name: Create Linux User
+  hosts: cluster
+  become: yes
+
+  vars:
+    new_username: hadoop
+
+  tasks:
+    - name: Add the user '{{ new_username }}'
+      ansible.builtin.user:
+        name: '{{ new_username }}'
+        shell: /bin/bash
+        create_home: true
