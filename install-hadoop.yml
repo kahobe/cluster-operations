@@ -1,4 +1,7 @@
 ---
+
+
+
 - name: Install and Configure Hadoop
   hosts: controllers
   become: true
@@ -45,24 +48,18 @@
         line: 'export HADOOP_HOME=/opt/hadoop'
       become: true
 
-    - name: Add Hadoop to PATH
-      lineinfile:
-        path: /etc/environment
-        line: 'export HADOOP_HOME=/opt/hadoop'
+    - name: Add Hadoop to PATH for all Users
+      copy:
+        content: "export PATH=$PATH:$HADOOP_HOME/bin"
+        dest: "/etc/profile.d/hadoop_path.sh"
       become: true
 
-    - name: Check if HADOOP_HOME/bin is in PATH
-      command: echo $PATH
-      register: current_path
-      changed_when: false
-      failed_when: false
-
-    - name: Add HADOOP_HOME/bin to PATH if not present
+    - name: Set JAVA_HOME in hadoop-env.sh User
       lineinfile:
-        path: "/home/{{ hadoop_user }}/.bashrc"
-        line: "export PATH=$PATH:$HADOOP_HOME/bin"
-        insertafter: EOF
-      when: "'$HADOOP_HOME' not in current_path.stdout"
+        path: /opt/hadoop/etc/hadoop/hadoop-env.sh
+        search_string: '# export JAVA_HOME='
+        line: 'export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64'
+
 
     - name: Configure Hadoop core-site.xml
       template:
@@ -70,7 +67,6 @@
         dest: /opt/hadoop/etc/hadoop/core-site.xml
         owner: "{{ hadoop_user }}"
         group: "{{ hadoop_user }}"
-      # notify: Restart Hadoop
 
     - name: Configure Hadoop hdfs-site.xml
       template:
@@ -78,10 +74,9 @@
         dest: /opt/hadoop/etc/hadoop/hdfs-site.xml
         owner: "{{ hadoop_user }}"
         group: "{{ hadoop_user }}"
-  #     notify: Restart Hadoop
 
-  #   # Add additional configuration tasks for other Hadoop components (e.g., mapred-site.xml, yarn-site.xml)
-
-  # handlers:
-  #   - name: Restart Hadoop
-  #     command: "{{ hadoop_home }}/sbin/stop-all.sh && {{ hadoop_home }}/sbin/start-all.sh"
+    - name: Add hosts to HADOOP_HOME/etc/hadoop/workers
+      lineinfile:
+        dest: "/opt/hadoop/etc/hadoop/workers"
+        line: "{{ item }}"
+      loop: "{{ groups['workers'] }}"

@@ -7,7 +7,12 @@ all:
         controllers:
           hosts:
             vm-controller:
-        workers:  
+
+        namenodes:
+          hosts:
+            vm-namenode:
+
+        workers:
           hosts:
             vm-worker01:
             vm-worker02:
