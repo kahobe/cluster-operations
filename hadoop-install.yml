@@ -1,9 +1,6 @@
 ---
-
-
-
 - name: Install and Configure Hadoop
-  hosts: controllers
+  hosts: namenodes, workernodes
   become: true
   vars:
     hadoop_user: "hadoop"
@@ -42,6 +39,22 @@
         group: "{{ hadoop_user }}"
         state: link
 
+    - name: Create Data Directory
+      ansible.builtin.file:
+        path: /srv/hadoop/hdfs/data
+        owner: "{{ hadoop_user }}"
+        group: "{{ hadoop_user }}"
+        state: directory
+        mode: '0755'
+
+    - name: Create NameNode Directory
+      ansible.builtin.file:
+        path: /srv/hadoop/hdfs/name
+        owner: "{{ hadoop_user }}"
+        group: "{{ hadoop_user }}"
+        state: directory
+        mode: '0755'
+
     - name: Set Hadoop environment variables
       lineinfile:
         path: /etc/environment
@@ -75,8 +88,42 @@
         owner: "{{ hadoop_user }}"
         group: "{{ hadoop_user }}"
 
+    - name: Configure systemd datanode service
+      template:
+        src: templates/hadoop-datanode.service.j2
+        dest: /etc/systemd/system/hadoop-datanode.service
+      tags:
+         - configuration
+      become: true
+
+    - name: Configure systemd namenode service
+      template:
+        src: templates/hadoop-namenode.service.j2
+        dest: /etc/systemd/system/hadoop-namenode.service
+      tags:
+         - configuration
+      become: true
+
+    - name: Enable namenode service
+      ansible.builtin.systemd_service:
+        name: hadoop-namenode
+        enabled: true
+      tags:
+         - configuration
+      when:
+        - inventory_hostname in groups["namenodes"]
+
+    - name: Enable datanode service
+      ansible.builtin.systemd_service:
+        name: hadoop-datanode
+        enabled: true
+      tags:
+         - configuration
+      when:
+        - inventory_hostname in groups["workernodes"]
+
     - name: Add hosts to HADOOP_HOME/etc/hadoop/workers
       lineinfile:
         dest: "/opt/hadoop/etc/hadoop/workers"
         line: "{{ item }}"
-      loop: "{{ groups['workers'] }}"
+      loop: "{{ groups['workernodes'] }}"

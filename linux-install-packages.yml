@@ -1,0 +1,17 @@
+
+- name: Install required packages
+  hosts: namenodes, workernodes
+  become: true
+
+  tasks:
+    - name: Update package cache
+      package_facts:
+        manager: auto
+
+    # ACL package is required for ansible to become another user.
+    # other wise ruinning in following error
+    # "Failed to set permissions on the temporary files Ansible needs to create when becoming an unprivileged user ... "
+    - name: Install acl package
+      package:
+        name: acl
+        state: present
