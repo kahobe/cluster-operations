@@ -1,5 +1,5 @@
 [Unit]
-Description=Hadoop DFS datanode
+Description=YARN nodemanager
 After=syslog.target network.target remote-fs.target nss-lookup.target network-online.target
 Requires=network-online.target
 
@@ -7,9 +7,9 @@ Requires=network-online.target
 User=hadoop
 Group=hadoop
 Type=forking
-ExecStart=/opt/hadoop/bin/hdfs --daemon start datanode
-ExecStop=/opt/hadoop/bin/hdfs --daemon stop datanode
-ExecStopPost=/opt/hadoop/bin/hdfs --daemon stop datanode
+ExecStart=/opt/hadoop/bin/yarn --daemon start nodemanager
+ExecStop=/opt/hadoop/bin/yarn --daemon stop nodemanager
+ExecStopPost=/opt/hadoop/yarn --daemon stop nodemanager
 WorkingDirectory=/opt/hadoop
 TimeoutStartSec=1min
 Restart=no

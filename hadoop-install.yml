@@ -80,6 +80,8 @@
         dest: /opt/hadoop/etc/hadoop/core-site.xml
         owner: "{{ hadoop_user }}"
         group: "{{ hadoop_user }}"
+      tags:
+         - configuration
 
     - name: Configure Hadoop hdfs-site.xml
       template:
@@ -87,6 +89,17 @@
         dest: /opt/hadoop/etc/hadoop/hdfs-site.xml
         owner: "{{ hadoop_user }}"
         group: "{{ hadoop_user }}"
+      tags:
+         - configuration
+
+    - name: Configure Yarn yarn-site.xml
+      template:
+        src: templates/yarn-site.xml.j2
+        dest: /opt/hadoop/etc/hadoop/yarn-site.xml
+        owner: "{{ hadoop_user }}"
+        group: "{{ hadoop_user }}"
+      tags:
+         - configuration
 
     - name: Configure systemd datanode service
       template:
@@ -104,6 +117,22 @@
          - configuration
       become: true
 
+    - name: Configure systemd resourcemanager service
+      template:
+        src: templates/yarn-resourcemanager.service.j2
+        dest: /etc/systemd/system/yarn-resourcemanager.service
+      tags:
+         - configuration
+      become: true
+
+    - name: Configure systemd nodemanager service
+      template:
+        src: templates/yarn-nodemanager.service.j2
+        dest: /etc/systemd/system/yarn-nodemanager.service
+      tags:
+         - configuration
+      become: true
+
     - name: Enable namenode service
       ansible.builtin.systemd_service:
         name: hadoop-namenode
@@ -116,6 +145,24 @@
     - name: Enable datanode service
       ansible.builtin.systemd_service:
         name: hadoop-datanode
+        enabled: true
+      tags:
+         - configuration
+      when:
+        - inventory_hostname in groups["workernodes"]
+
+    - name: Enable resourcemanager service
+      ansible.builtin.systemd_service:
+        name: yarn-resourcemanager
+        enabled: true
+      tags:
+         - configuration
+      when:
+        - inventory_hostname in groups["namenodes"]
+
+    - name: Enable nodemanager service
+      ansible.builtin.systemd_service:
+        name: yarn-nodemanager
         enabled: true
       tags:
          - configuration
