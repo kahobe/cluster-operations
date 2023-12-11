@@ -2,8 +2,7 @@
 - name: Stop Standalone Spark Cluster
   hosts: namenodes, workernodes
   become: true
-  vars:
-    spark_user: "spark"
+  become_user: spark
 
   tasks:
     - name: Check SPARK_HOME

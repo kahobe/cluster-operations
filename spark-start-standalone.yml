@@ -1,9 +1,8 @@
 ---
 - name: Start Standalone Spark Cluster
-  hosts: namenodes, workernodes
+  hosts: controllers, workernodes
   become: true
-  vars:
-    spark_user: "spark"
+  become_user: spark
 
   tasks:
     - name: Check SPARK_HOME
@@ -14,9 +13,9 @@
     - name: Start Spark Master
       command: "$SPARK_HOME/sbin/start-master.sh"
       when:
-        - inventory_hostname in groups["namenodes"]
+        - inventory_hostname in groups["controllers"]
 
     - name: Start Spark Worker
-      command: "$SPARK_HOME/sbin/start-worker.sh spark://vm-controller:7077"
+      command: "$SPARK_HOME/sbin/start-worker.sh spark://controller:7077"
       when:
         - inventory_hostname in groups["workernodes"]

@@ -1,6 +1,6 @@
 ---
 - name: Create Linux User
-  hosts: cluster
+  hosts: controllers, workernodes
   become: yes
 
   vars:

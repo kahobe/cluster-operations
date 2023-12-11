@@ -14,4 +14,4 @@ all:
 
         workernodes:
           hosts:
-            worker:
+            worker01:
