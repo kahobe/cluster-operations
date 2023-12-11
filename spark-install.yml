@@ -1,6 +1,6 @@
 ---
 - name: Install and Configure Spark
-  hosts: namenodes, workernodes
+  hosts: controllers, workernodes
   become: true
   vars:
     spark_user: "spark"

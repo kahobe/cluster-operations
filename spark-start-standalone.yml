@@ -16,6 +16,7 @@
         - inventory_hostname in groups["controllers"]
 
     - name: Start Spark Worker
-      command: "$SPARK_HOME/sbin/start-worker.sh spark://controller:7077"
+      command: "$SPARK_HOME/sbin/start-worker.sh spark://{{ groups['controllers'][0] }}:7077"
       when:
         - inventory_hostname in groups["workernodes"]
+    
