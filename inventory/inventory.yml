@@ -1,0 +1,17 @@
+all:
+  vars:
+    ansible_user: ansible
+  children:
+    cluster:
+      children:
+        controllers:
+          hosts:
+            controller:
+
+        namenodes:
+          hosts:
+            namenode:
+
+        workernodes:
+          hosts:
+            worker:
