@@ -1,0 +1,22 @@
+---
+- name: Start Standalone Spark Cluster
+  hosts: namenodes, workernodes
+  become: true
+  vars:
+    spark_user: "spark"
+
+  tasks:
+    - name: Check SPARK_HOME
+      shell: echo $SPARK_HOME
+      register: spark_home
+      failed_when: spark_home.stdout == ""
+
+    - name: Start Spark Master
+      command: "$SPARK_HOME/sbin/start-master.sh"
+      when:
+        - inventory_hostname in groups["namenodes"]
+
+    - name: Start Spark Worker
+      command: "$SPARK_HOME/sbin/start-worker.sh spark://vm-controller:7077"
+      when:
+        - inventory_hostname in groups["workernodes"]

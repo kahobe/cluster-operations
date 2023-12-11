@@ -1,0 +1,52 @@
+---
+- name: Install and Configure Spark
+  hosts: namenodes, workernodes
+  become: true
+  vars:
+    spark_user: "spark"
+    spark_version: "3.5.0"  # Change this to the desired Hadoop version
+    java_package: "openjdk-8-jdk"  # Change this if you prefer a different Java version
+    spark_tarball_local_path: "files/common/spark-{{ spark_version }}-bin-hadoop3.tgz"  # Change this to your local path
+
+  tasks:
+    # - name: Update apt package cache
+    #   apt:
+    #     update_cache: yes
+
+    # - name: Install Java
+    #   apt:
+    #     name: "{{ java_package }}"
+    #     state: present
+
+    - name: Copy Spark tarball to remote hosts
+      ansible.builtin.copy:
+        src: "{{ spark_tarball_local_path }}"
+        dest: "/tmp/spark-{{ spark_version }}-bin-hadoop3.tgz"
+
+    - name: Extract Spark tarball
+      ansible.builtin.unarchive:
+        src: "/tmp/spark-{{ spark_version }}-bin-hadoop3.tgz"
+        dest: "/opt/"
+        owner: "{{ spark_user }}"
+        group: "{{ spark_user }}"
+        remote_src: yes
+
+    - name: Create a symbolic link
+      ansible.builtin.file:
+        src: /opt/spark-{{ spark_version }}-bin-hadoop3
+        dest: /opt/spark
+        owner: "{{ spark_user }}"
+        group: "{{ spark_user }}"
+        state: link
+
+    - name: Set Spark environment variables
+      lineinfile:
+        path: /etc/environment
+        line: 'export SPARK_HOME=/opt/spark'
+      become: true
+
+    - name: Add Spark to PATH for all Users
+      copy:
+        content: "export PATH=$PATH:$SPARK_HOME/bin"
+        dest: "/etc/profile.d/spark_path.sh"
+      become: true
