@@ -10,8 +10,8 @@
       register: hadoop_home
       failed_when: hadoop_home.stdout == ""
       tags:
-         - datanode
-         - namenode
+         - nn
+         - dn
 
     - name: Stop DataNode
       command: "$HADOOP_HOME/bin/hdfs --daemon stop datanode"
@@ -19,13 +19,13 @@
       when:
         - inventory_hostname in groups["workernodes"]
       tags:
-         - datanode
+         - dn
 
     - name: Display result
       debug:
         var: datanode_start_result
       tags:
-         - datanode
+         - dn
 
     - name: Stop NameNode
       command: "$HADOOP_HOME/bin/hdfs --daemon stop namenode"
@@ -33,10 +33,10 @@
       when:
         - inventory_hostname in groups["controllers"]
       tags:
-         - namenode
+         - nn
         
     - name: Display result
       debug:
         var: namenode_format_result
       tags:
-         - namenode
+         - nn
