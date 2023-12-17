@@ -1,0 +1,43 @@
+---
+- name: Stop YARN
+  hosts: controllers, workernodes
+  become: true
+  become_user: hadoop
+
+  tasks:
+    - name: Check HADOOP_HOME
+      shell: echo $HADOOP_HOME
+      register: hadoop_home
+      failed_when: hadoop_home.stdout == ""
+      tags:
+         - rm
+         - nm
+
+    - name: Stop Resourcemanager
+      command: "$HADOOP_HOME/bin/yarn --daemon stop resourcemanager"
+      register: stop_rm
+      when:
+        - inventory_hostname in groups["controllers"]
+      tags:
+         - rm
+
+    - name: Display result
+      debug:
+        var: stop_rm
+      tags:
+         - rm
+         
+    - name: Stop Nodemanager
+      command: "$HADOOP_HOME/bin/yarn --daemon stop nodemanager"
+      register: stop_nm
+      when:
+        - inventory_hostname in groups["workernodes"]
+      tags:
+         - nm
+
+    - name: Display result
+      debug:
+        var: stop_nm
+      tags:
+         - nm
+
