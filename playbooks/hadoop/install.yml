@@ -1,12 +1,12 @@
 ---
 - name: Install and Configure Hadoop
-  hosts: namenodes, workernodes
+  hosts: controllers, workernodes
   become: true
   vars:
     hadoop_user: "hadoop"
     hadoop_version: "3.3.6"  # Change this to the desired Hadoop version
     java_package: "openjdk-8-jdk"  # Change this if you prefer a different Java version
-    hadoop_tarball_local_path: "files/common/hadoop-{{ hadoop_version }}.tar.gz"  # Change this to your local path
+    filename: "hadoop-{{ hadoop_version }}.tar.gz" 
 
   tasks:
     - name: Update apt package cache
@@ -20,7 +20,7 @@
 
     - name: Copy Hadoop tarball to remote hosts
       ansible.builtin.copy:
-        src: "{{ hadoop_tarball_local_path }}"
+        src: "{{ filename }}"
         dest: "/tmp/hadoop-{{ hadoop_version }}.tar.gz"
 
     - name: Extract Hadoop tarball
@@ -76,7 +76,7 @@
 
     - name: Configure Hadoop core-site.xml
       template:
-        src: templates/core-site.xml.j2
+        src: core-site.xml.j2
         dest: /opt/hadoop/etc/hadoop/core-site.xml
         owner: "{{ hadoop_user }}"
         group: "{{ hadoop_user }}"
@@ -85,7 +85,7 @@
 
     - name: Configure Hadoop hdfs-site.xml
       template:
-        src: templates/hdfs-site.xml.j2
+        src: hdfs-site.xml.j2
         dest: /opt/hadoop/etc/hadoop/hdfs-site.xml
         owner: "{{ hadoop_user }}"
         group: "{{ hadoop_user }}"
@@ -94,7 +94,7 @@
 
     - name: Configure Yarn yarn-site.xml
       template:
-        src: templates/yarn-site.xml.j2
+        src: yarn-site.xml.j2
         dest: /opt/hadoop/etc/hadoop/yarn-site.xml
         owner: "{{ hadoop_user }}"
         group: "{{ hadoop_user }}"
@@ -103,7 +103,7 @@
 
     - name: Configure Hadoop mapred-site.xml
       template:
-        src: templates/mapred-site.xml.j2
+        src: mapred-site.xml.j2
         dest: /opt/hadoop/etc/hadoop/mapred-site.xml
         owner: "{{ hadoop_user }}"
         group: "{{ hadoop_user }}"
@@ -112,7 +112,7 @@
 
     - name: Configure systemd datanode service
       template:
-        src: templates/hadoop-datanode.service.j2
+        src: hadoop-datanode.service.j2
         dest: /etc/systemd/system/hadoop-datanode.service
       tags:
          - configuration
@@ -120,7 +120,7 @@
 
     - name: Configure systemd namenode service
       template:
-        src: templates/hadoop-namenode.service.j2
+        src: hadoop-namenode.service.j2
         dest: /etc/systemd/system/hadoop-namenode.service
       tags:
          - configuration
@@ -128,7 +128,7 @@
 
     - name: Configure systemd resourcemanager service
       template:
-        src: templates/yarn-resourcemanager.service.j2
+        src: yarn-resourcemanager.service.j2
         dest: /etc/systemd/system/yarn-resourcemanager.service
       tags:
          - configuration
@@ -136,7 +136,7 @@
 
     - name: Configure systemd nodemanager service
       template:
-        src: templates/yarn-nodemanager.service.j2
+        src: yarn-nodemanager.service.j2
         dest: /etc/systemd/system/yarn-nodemanager.service
       tags:
          - configuration
@@ -149,7 +149,7 @@
       tags:
          - configuration
       when:
-        - inventory_hostname in groups["namenodes"]
+        - inventory_hostname in groups["controllers"]
 
     - name: Enable datanode service
       ansible.builtin.systemd_service:
@@ -167,7 +167,7 @@
       tags:
          - configuration
       when:
-        - inventory_hostname in groups["namenodes"]
+        - inventory_hostname in groups["controllers"]
 
     - name: Enable nodemanager service
       ansible.builtin.systemd_service:

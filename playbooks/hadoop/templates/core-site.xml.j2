@@ -3,7 +3,7 @@
 <configuration>
     <property>
         <name>fs.defaultFS</name>
-        <value>hdfs://{{ groups['namenodes'][0] }}:9000</value>
+        <value>hdfs://{{ groups['controllers'][0] }}:9000</value>
     </property>
     <property>
         <name>io.file.buffer.size</name>
