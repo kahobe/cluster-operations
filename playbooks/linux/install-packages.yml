@@ -1,6 +1,6 @@
 
 - name: Install required packages
-  hosts: namenodes, workernodes
+  hosts: controllers, workernodes
   become: true
 
   tasks:
