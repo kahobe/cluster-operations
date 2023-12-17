@@ -1,6 +1,6 @@
 ---
 - name: Start Hadoop Namenode
-  hosts: namenodes
+  hosts: controllers
   become: true
   become_user: hadoop
 
