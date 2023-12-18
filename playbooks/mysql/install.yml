@@ -1,0 +1,40 @@
+---
+- name: Install and Configure MySQL
+  hosts: controllers
+  become: true
+
+  tasks:
+    - name: Update apt package cache
+      apt:
+        update_cache: yes
+
+    - name: Install MySQL Server
+      apt:
+        name: mysql-server
+        state: present
+
+
+    - name: Enable MySQL Service
+      ansible.builtin.systemd_service:
+        name: mysql.service
+        state: started
+        enabled: true
+
+    - name: Install Virtualenv
+      ansible.builtin.pip:
+        name: virtualenv==20.25.0
+
+    - name: Install PyMySQL python package for Ansible management
+      ansible.builtin.pip:
+        name: PyMySQL==1.1.0
+
+    - name: Allow remote connections
+      lineinfile:
+         path: /etc/mysql/mysql.conf.d/mysqld.cnf
+         regexp: '^bind-address'
+         line: 'bind-address = 0.0.0.0'
+
+    - name: Restart MySQL Service
+      ansible.builtin.service:
+        name: mysql.service
+        state: restarted

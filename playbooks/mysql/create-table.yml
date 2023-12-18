@@ -1,0 +1,15 @@
+---
+- name: Create MySQL Database
+  hosts: controllers
+  become: true
+
+  tasks:
+    - name: Ensure MySQL Service is started
+      ansible.builtin.systemd_service:
+        name: mysql.service
+        state: started
+
+    - name: Creating Database
+      mysql_db:
+        name: "{{ name }}"
+        state: present

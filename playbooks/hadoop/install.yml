@@ -21,11 +21,11 @@
     - name: Copy Hadoop tarball to remote hosts
       ansible.builtin.copy:
         src: "{{ filename }}"
-        dest: "/tmp/hadoop-{{ hadoop_version }}.tar.gz"
+        dest: "/tmp/{{ filename }}"
 
     - name: Extract Hadoop tarball
       ansible.builtin.unarchive:
-        src: "/tmp/hadoop-{{ hadoop_version }}.tar.gz"
+        src: "/tmp/{{ filename }}"
         dest: "/opt/"
         owner: "{{ hadoop_user }}"
         group: "{{ hadoop_user }}"
