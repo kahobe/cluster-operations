@@ -45,8 +45,8 @@
         line: 'export SPARK_HOME=/opt/spark'
       become: true
 
-    - name: Add Spark to PATH for all Users
-      copy:
-        content: "export PATH=$PATH:$SPARK_HOME/bin"
-        dest: "/etc/profile.d/spark_path.sh"
+    - name: Set Spark environment variables
+      lineinfile:
+        path: /etc/bash.bashrc
+        line: 'export PATH=$PATH:$SPARK_HOME/bin'
       become: true

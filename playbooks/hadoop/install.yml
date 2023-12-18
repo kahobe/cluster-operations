@@ -62,17 +62,20 @@
       become: true
 
     - name: Add Hadoop to PATH for all Users
-      copy:
-        content: "export PATH=$PATH:$HADOOP_HOME/bin"
-        dest: "/etc/profile.d/hadoop_path.sh"
+      lineinfile:
+        path: /etc/bash.bashrc
+        line: 'export PATH=$PATH:$HADOOP_HOME/bin'
       become: true
+      tags:
+         - configuration
 
     - name: Set JAVA_HOME in hadoop-env.sh User
       lineinfile:
         path: /opt/hadoop/etc/hadoop/hadoop-env.sh
         search_string: '# export JAVA_HOME='
         line: 'export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64'
-
+      tags:
+         - configuration
 
     - name: Configure Hadoop core-site.xml
       template:
@@ -112,16 +115,16 @@
 
     - name: Configure systemd datanode service
       template:
-        src: hadoop-datanode.service.j2
-        dest: /etc/systemd/system/hadoop-datanode.service
+        src: hdfs-datanode.service.j2
+        dest: /etc/systemd/system/hdfs-datanode.service
       tags:
          - configuration
       become: true
 
     - name: Configure systemd namenode service
       template:
-        src: hadoop-namenode.service.j2
-        dest: /etc/systemd/system/hadoop-namenode.service
+        src: hdfs-namenode.service.j2
+        dest: /etc/systemd/system/hdfs-namenode.service
       tags:
          - configuration
       become: true
@@ -144,7 +147,7 @@
 
     - name: Enable namenode service
       ansible.builtin.systemd_service:
-        name: hadoop-namenode
+        name: hdfs-namenode
         enabled: true
       tags:
          - configuration
@@ -153,7 +156,7 @@
 
     - name: Enable datanode service
       ansible.builtin.systemd_service:
-        name: hadoop-datanode
+        name: hdfs-datanode
         enabled: true
       tags:
          - configuration
