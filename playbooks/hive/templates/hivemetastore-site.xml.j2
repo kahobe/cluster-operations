@@ -7,7 +7,7 @@
   </property>
   <property>
     <name>javax.jdo.option.ConnectionDriverName</name>
-    <value>com.mysql.cj.jdbc.Driver</value>
+    <value>com.mysql.jdbc.Driver</value>
   </property>
   <property>
     <name>javax.jdo.option.ConnectionUserName</name>
@@ -16,10 +16,6 @@
   <property>
     <name>javax.jdo.option.ConnectionPassword</name>
     <value>dx33vnss!</value>
-  </property>
-  <property>
-    <name>hive.metastore.uris</name>
-    <value></value>
   </property>
   <property>
    <name>datanucleus.autoStartMechanism</name>
@@ -35,6 +31,22 @@
   </property>
   <property>
    <name>hive.metastore.warehouse.dir</name>
-   <value>/warehouse</value>
+   <value>/warehouse/managed</value>
+  </property>
+  <property>
+    <name>hive.metastore.warehouse.external.dir</name>
+    <value>/warehouse/external</value>
+  </property>
+  <property>
+   <name>hive.server2.thrift.bind.host</name>
+   <value>{{ groups['controllers'][0] }}</value>
+  </property>
+  <property>
+   <name>hive.server2.enable.doAs</name>
+   <value>false</value>
+  </property>
+  <property>
+    <name>hive.metastore.event.db.notification.api.auth</name>
+    <value>false</value>
   </property>
 </configuration>

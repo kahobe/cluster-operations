@@ -61,6 +61,18 @@
         line: 'export HADOOP_HOME=/opt/hadoop'
       become: true
 
+    - name: Set Hadoop environment variables
+      lineinfile:
+        path: /etc/bash.bashrc
+        line: 'export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop'
+      become: true
+    
+    - name: Set Hadoop environment variables
+      lineinfile:
+        path: /etc/bash.bashrc
+        line: 'export YARN_CONF_DIR=$HADOOP_CONF_DIR'
+      become: true
+
     - name: Add Hadoop to PATH for all Users
       lineinfile:
         path: /etc/bash.bashrc

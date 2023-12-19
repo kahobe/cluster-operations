@@ -1,6 +1,6 @@
 ---
 - name: Stop Standalone Spark Cluster
-  hosts: namenodes, workernodes
+  hosts: controllers, workernodes
   become: true
   become_user: spark
 

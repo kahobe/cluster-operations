@@ -1,0 +1,13 @@
+[Unit]
+Description=Hive Metastore Service
+After=network.target
+After=hive-server2.service
+Requires=hive-server2.service
+
+[Service]
+Type=simple
+User=hive
+ExecStart=/opt/hive/bin/hive --service metastore
+
+[Install]
+WantedBy=multi-user.target

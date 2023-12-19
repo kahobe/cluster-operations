@@ -4,7 +4,7 @@
   become: true
   vars:
     hive_user: "hive"
-    hive_version: "3.1.3"  # Change this to the desired Hadoop version
+    hive_version: "4.0.0-beta-1"  # Change this to the desired Hadoop version
     java_package: "openjdk-8-jdk"  # Change this if you prefer a different Java version
     filename: "apache-hive-{{ hive_version }}-bin.tar.gz"
     jdbc_file: "mysql-connector-j-8.2.0.jar"
@@ -30,7 +30,7 @@
         src: "{{ filename }}"
         dest: "/tmp/{{ filename }}"
 
-    - name: Extract Hadoop tarball
+    - name: Extract Hive tarball
       ansible.builtin.unarchive:
         src: "/tmp/{{ filename }}"
         dest: "/opt/"
@@ -52,10 +52,10 @@
         line: 'export HIVE_HOME=/opt/hive'
       become: true
 
-    - name: Add hive to PATH for all Users
-      copy:
-        content: "export PATH=$PATH:$HIVE_HOME/bin"
-        dest: "/etc/profile.d/hive_path.sh"
+    - name: Add Hive to PATH for all Users
+      lineinfile:
+        path: /etc/bash.bashrc
+        line: 'export PATH=$PATH:$HIVE_HOME/bin'
       become: true
 
     - name: Configure Hadoop hivemetastore-site.xml
@@ -95,3 +95,64 @@
       become: true
       become_user: hive
 
+
+    - name: Create HDFS /warehouse dir
+      shell: $HADOOP_HOME/bin/hdfs dfs -mkdir /warehouse
+      become: true
+      become_user: hadoop
+      ignore_errors: true
+      tags:
+         - configuration
+
+    - name: Set HDFS permissions for /warehouse dir
+      shell: $HADOOP_HOME/bin/hdfs dfs -chown hive:hive /warehouse
+      become: true
+      become_user: hadoop
+      tags:
+         - configuration
+
+    - name: Create HDFS /tmp dir
+      shell: $HADOOP_HOME/bin/hdfs dfs -mkdir /tmp
+      become: true
+      become_user: hadoop
+      ignore_errors: true
+      tags:
+         - configuration
+
+    - name: Set HDFS permissions for /tmp dir
+      shell: $HADOOP_HOME/bin/hdfs dfs -chown hive:hive /tmp
+      become: true
+      become_user: hadoop
+      ignore_errors: true
+      tags:
+         - configuration
+
+    - name: Configure systemd Hive Metastore Service
+      template:
+        src: hive-metastore.service.j2
+        dest: /etc/systemd/system/hive-metastore.service
+      tags:
+         - configuration
+      become: true
+
+    - name: Enable Hive Metastore Service
+      ansible.builtin.systemd_service:
+        name: hive-metastore
+        enabled: true
+      tags:
+         - configuration
+
+    - name: Configure systemd Hive Server2 Service
+      template:
+        src: hive-server2.service.j2
+        dest: /etc/systemd/system/hive-server2.service
+      tags:
+         - configuration
+      become: true
+
+    - name: Enable Hive Server2 Service
+      ansible.builtin.systemd_service:
+        name: hive-server2
+        enabled: true
+      tags:
+         - configuration

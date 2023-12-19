@@ -6,7 +6,7 @@
     spark_user: "spark"
     spark_version: "3.5.0"  # Change this to the desired Hadoop version
     java_package: "openjdk-8-jdk"  # Change this if you prefer a different Java version
-    spark_tarball_local_path: "files/common/spark-{{ spark_version }}-bin-hadoop3.tgz"  # Change this to your local path
+    filename: "spark-{{ spark_version }}-bin-hadoop3.tgz"  # Change this to your local path
 
   tasks:
     # - name: Update apt package cache
@@ -20,7 +20,7 @@
 
     - name: Copy Spark tarball to remote hosts
       ansible.builtin.copy:
-        src: "{{ spark_tarball_local_path }}"
+        src: "{{ filename }}"
         dest: "/tmp/spark-{{ spark_version }}-bin-hadoop3.tgz"
 
     - name: Extract Spark tarball
