@@ -1,0 +1,13 @@
+[Unit]
+Description=Hive Metastore Service
+After=network.target
+
+[Service]
+Type=simple
+User=bernhard
+WorkingDirectory=/home/bernhard/
+Environment="PATH=$PATH:/home/bernhard/{{ venv_name }}/bin:%h/.local/bin:%h/bin:%h/.local/bin:/usr/local/bin:/usr/bin:/bin"
+ExecStart=/home/bernhard/{{ venv_name }}/bin/jupyter notebook --ip "*" --no-browser --port=8888 --NotebookApp.password='' --NotebookApp.token=''
+
+[Install]
+WantedBy=multi-user.target

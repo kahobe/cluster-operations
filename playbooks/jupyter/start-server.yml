@@ -1,0 +1,10 @@
+---
+- name: Start Notebook Server
+  hosts: controllers
+  become: true
+
+  tasks:
+    - name: Start Notebook Server
+      ansible.builtin.service:
+        name: jupyter-notebook.service
+        state: restarted

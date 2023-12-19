@@ -1,0 +1,19 @@
+---
+- name: Start Spark Services
+  hosts: controllers, workernodes
+  become: true
+
+  tasks:
+    - name: Start Spark Master
+      ansible.builtin.service:
+        name: spark-master.service
+        state: restarted
+      when:
+        - inventory_hostname in groups["controllers"]
+
+    - name: Start Spark Worker
+      ansible.builtin.service:
+        name: spark-worker.service
+        state: restarted
+      when:
+        - inventory_hostname in groups["workernodes"]

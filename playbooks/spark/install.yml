@@ -50,3 +50,41 @@
         path: /etc/bash.bashrc
         line: 'export PATH=$PATH:$SPARK_HOME/bin'
       become: true
+
+    - name: Configure systemd Spark Master Service
+      template:
+        src: spark-master.service.j2
+        dest: /etc/systemd/system/spark-master.service
+      tags:
+         - configuration
+      become: true
+      when:
+        - inventory_hostname in groups["controllers"]
+
+    - name: Enable Spark Master Service
+      ansible.builtin.systemd_service:
+        name: spark-master
+        enabled: true
+      tags:
+         - configuration
+      when:
+        - inventory_hostname in groups["controllers"]
+
+    - name: Configure systemd Spark Worker Service
+      template:
+        src: spark-worker.service.j2
+        dest: /etc/systemd/system/spark-worker.service
+      tags:
+         - configuration
+      become: true
+      when:
+        - inventory_hostname in groups["workernodes"]
+
+    - name: Enable Spark Worker Service
+      ansible.builtin.systemd_service:
+        name: spark-worker
+        enabled: true
+      tags:
+         - configuration
+      when:
+        - inventory_hostname in groups["workernodes"]

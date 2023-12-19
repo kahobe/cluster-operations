@@ -1,0 +1,36 @@
+---
+- name: Install Jupyter Notebook Server
+  hosts: controllers
+  become: true
+
+  vars:
+    - venv_name: ".jupyter_venv"
+
+  tasks:
+    - name: Create virtual environment
+      become_user: bernhard
+      command:
+        cmd: "virtualenv ~/{{ venv_name }}"
+        creates: "~/{{ venv_name }}"
+
+    - name: Install Jupyter Notebook
+      become_user: bernhard
+      ansible.builtin.pip:
+        name: notebook
+        virtualenv: "~/{{ venv_name }}"
+
+    - name: Configure Notebook Server Service
+      become: true
+      template:
+        src: jupyter-notebook.service.j2
+        dest: /etc/systemd/system/jupyter-notebook.service
+      tags:
+         - configuration
+
+    - name: Enable Notebook Server Service
+      become: true
+      ansible.builtin.systemd_service:
+        name: jupyter-notebook.service
+        enabled: true
+      tags:
+         - configuration

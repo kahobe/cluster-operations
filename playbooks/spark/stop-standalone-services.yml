@@ -1,0 +1,19 @@
+---
+- name: Stop Spark Services
+  hosts: controllers, workernodes
+  become: true
+
+  tasks:
+    - name: Stop Spark Master
+      ansible.builtin.service:
+        name: spark-master.service
+        state: stopped
+      when:
+        - inventory_hostname in groups["controllers"]
+
+    - name: Stop Spark Worker
+      ansible.builtin.service:
+        name: spark-worker.service
+        state: stopped
+      when:
+        - inventory_hostname in groups["workernodes"]
