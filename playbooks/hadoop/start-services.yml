@@ -1,0 +1,33 @@
+---
+- name: Start Hadoop Services
+  hosts: controllers, workernodes
+  become: true
+
+  tasks:
+    - name: Start NameNode Service
+      ansible.builtin.service:
+        name: hdfs-namenode.service
+        state: restarted
+      when:
+        - inventory_hostname in groups["controllers"]
+    
+    - name: Start DataNode Service
+      ansible.builtin.service:
+        name: hdfs-datanode.service
+        state: restarted
+      when:
+        - inventory_hostname in groups["workernodes"]
+
+    - name: Start YARN ResourceManager Service
+      ansible.builtin.service:
+        name: yarn-resourcemanager.service
+        state: restarted
+      when:
+        - inventory_hostname in groups["controllers"]
+    
+    - name: Start YARN NodeManager Service
+      ansible.builtin.service:
+        name: yarn-nodemanager.service
+        state: restarted
+      when:
+        - inventory_hostname in groups["workernodes"]
