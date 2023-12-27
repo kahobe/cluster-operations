@@ -1,12 +1,14 @@
 all:
   vars:
     ansible_user: ansible
+    kafka_cluster_id: 2BKCbwzCTxyCNEM8XkkU1A
   children:
     cluster:
       children:
         controllers:
           hosts:
             vm-controller:
+              kafka_node_id: 1
 
         namenodes:
           hosts:
@@ -15,5 +17,8 @@ all:
         workernodes:
           hosts:
             vm-worker01:
+              kafka_node_id: 2
             vm-worker02:
+              kafka_node_id: 3
             vm-worker03:
+              kafka_node_id: 4
