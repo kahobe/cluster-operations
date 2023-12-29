@@ -3,7 +3,7 @@
 <configuration>
     <property>
         <name>mapreduce.jobhistory.address</name>
-        <value>hdfs://{{ groups['namenodes'][0] }}:10020</value>
+        <value>{{ groups['namenodes'][0] }}:10020</value>
     </property>
     <property>
         <name>mapreduce.map.memory.mb</name>

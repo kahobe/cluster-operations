@@ -31,3 +31,10 @@
         state: restarted
       when:
         - inventory_hostname in groups["workernodes"]
+
+    - name: Start YARN HistoryServer Service
+      ansible.builtin.service:
+        name: yarn-historyserver.service
+        state: restarted
+      when:
+        - inventory_hostname in groups["controllers"]

@@ -1,5 +1,5 @@
 [Unit]
-Description=YARN resourcemanager
+Description=YARN History Server
 After=syslog.target network.target remote-fs.target nss-lookup.target network-online.target
 Requires=network-online.target
 
@@ -7,9 +7,9 @@ Requires=network-online.target
 User=hadoop
 Group=hadoop
 Type=forking
-ExecStart=/opt/hadoop/bin/yarn --daemon start resourcemanager
-ExecStop=/opt/hadoop/bin/yarn --daemon stop resourcemanager
-ExecStopPost=/opt/hadoop/bin/yarn --daemon stop resourcemanager
+ExecStart=/opt/hadoop/bin/mapred --daemon start historyserver
+ExecStop=/opt/hadoop/bin/mapred --daemon stop historyserver
+ExecStopPost=/opt/hadoop/bin/mapred --daemon stop historyserver
 WorkingDirectory=/opt/hadoop
 TimeoutStartSec=1min
 Restart=no

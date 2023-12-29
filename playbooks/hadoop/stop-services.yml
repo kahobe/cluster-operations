@@ -31,3 +31,10 @@
         state: stopped
       when:
         - inventory_hostname in groups["workernodes"]
+
+    - name: Stop YARN HistoryServer Service
+      ansible.builtin.service:
+        name: yarn-historyserver.service
+        state: stopped
+      when:
+        - inventory_hostname in groups["controllers"]
