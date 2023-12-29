@@ -18,3 +18,5 @@ all:
           hosts:
             worker01:
               kafka_node_id: 2
+            worker02:
+              kafka_node_id: 3            

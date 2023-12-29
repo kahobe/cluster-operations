@@ -1,6 +1,6 @@
 ---
 - name: Install and Configure Kafka
-  hosts: controllers, workernodes
+  hosts: controllers
   become: true
   vars:
     kafka_user: "kafka"
@@ -66,5 +66,19 @@
       ansible.builtin.systemd_service:
         name: kafka-broker
         enabled: true
+      tags:
+         - configuration
+
+    - name: Set Kafka environment variables
+      lineinfile:
+        path: /etc/environment
+        line: 'export KAFKA_HOME=/opt/kafka'
+      become: true
+
+    - name: Add Kafka to PATH for all Users
+      lineinfile:
+        path: /etc/bash.bashrc
+        line: 'export PATH=$PATH:$KAFKA_HOME/bin'
+      become: true
       tags:
          - configuration

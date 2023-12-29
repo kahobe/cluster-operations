@@ -119,8 +119,16 @@
       tags:
          - configuration
 
-    - name: Set HDFS permissions for /tmp dir
+    - name: Set HDFS owner for /tmp dir
       shell: $HADOOP_HOME/bin/hdfs dfs -chown hive:hive /tmp
+      become: true
+      become_user: hadoop
+      ignore_errors: true
+      tags:
+         - configuration
+
+    - name: Set HDFS permissions for /tmp dir
+      shell: $HADOOP_HOME/bin/hdfs dfs -chmod -R 733 /tmp/hive/
       become: true
       become_user: hadoop
       ignore_errors: true
