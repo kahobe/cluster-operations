@@ -112,7 +112,7 @@
          - configuration
 
     - name: Create HDFS /tmp dir
-      shell: $HADOOP_HOME/bin/hdfs dfs -mkdir /tmp
+      shell: $HADOOP_HOME/bin/hdfs dfs -mkdir /tmp/hive
       become: true
       become_user: hadoop
       ignore_errors: true
@@ -120,7 +120,7 @@
          - configuration
 
     - name: Set HDFS owner for /tmp dir
-      shell: $HADOOP_HOME/bin/hdfs dfs -chown hive:hive /tmp
+      shell: $HADOOP_HOME/bin/hdfs dfs -chown hive:hive /tmp/hive
       become: true
       become_user: hadoop
       ignore_errors: true

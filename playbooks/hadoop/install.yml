@@ -4,11 +4,12 @@
   become: true
   vars:
     hadoop_user: "hadoop"
-    hadoop_version: "3.3.6"  # Change this to the desired Hadoop version
-    java_package: "openjdk-8-jdk"  # Change this if you prefer a different Java version
+    hadoop_version: "3.3.6"
+    java_package: "openjdk-8-jdk"
     filename: "hadoop-{{ hadoop_version }}.tar.gz" 
 
   tasks:
+  # Installing Java
     - name: Update apt package cache
       apt:
         update_cache: yes
@@ -18,6 +19,7 @@
         name: "{{ java_package }}"
         state: present
 
+  # Copy and Extract Hadoop to remote
     - name: Copy Hadoop tarball to remote hosts
       ansible.builtin.copy:
         src: "{{ filename }}"
@@ -38,7 +40,8 @@
         owner: "{{ hadoop_user }}"
         group: "{{ hadoop_user }}"
         state: link
-
+  
+  # Setting up Directories
     - name: Create Data Directory
       ansible.builtin.file:
         path: /srv/hadoop/hdfs/data
@@ -55,6 +58,7 @@
         state: directory
         mode: '0755'
 
+  # Setting up environment Variables
     - name: Set Hadoop environment variables
       lineinfile:
         path: /etc/environment
@@ -89,6 +93,7 @@
       tags:
          - configuration
 
+  # Configuring Hadoop
     - name: Configure Hadoop core-site.xml
       template:
         src: core-site.xml.j2
@@ -125,6 +130,7 @@
       tags:
          - configuration
 
+  # Configuring Systemd servicesS
     - name: Configure systemd datanode service
       template:
         src: hdfs-datanode.service.j2
@@ -165,6 +171,7 @@
          - configuration
       become: true
 
+  # Enable Systemd services
     - name: Enable namenode service
       ansible.builtin.systemd_service:
         name: hdfs-namenode
