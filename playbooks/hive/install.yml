@@ -7,7 +7,7 @@
     hive_version: "3.1.3"  # Change this to the desired Hadoop version
     java_package: "openjdk-8-jdk"  # Change this if you prefer a different Java version
     filename: "apache-hive-{{ hive_version }}-bin.tar.gz"
-    jdbc_file: "mysql-connector-j-8.2.0.jar"
+    jdbc_file: "mysql-connector-j-8.3.0.jar"
 
   tasks:
     - name: Ensure MySQL Service for Metastore is running
@@ -128,7 +128,7 @@
          - configuration
 
     - name: Set HDFS permissions for /tmp dir
-      shell: $HADOOP_HOME/bin/hdfs dfs -chmod -R 733 /tmp/hive/
+      shell: $HADOOP_HOME/bin/hdfs dfs -chmod -R 733 /tmp
       become: true
       become_user: hadoop
       ignore_errors: true
