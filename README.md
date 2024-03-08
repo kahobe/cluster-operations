@@ -42,7 +42,7 @@ Then configure YARN directories.
 ansible-playbook -i inventory/vm-inventory.yml playbooks/hadoop/configure-yarn-dir.yml
 ```
 
-## Hive
+## 3. Hive
 ### Setup Metastore
 Install MySQL
 ```bash
