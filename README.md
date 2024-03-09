@@ -1,7 +1,8 @@
 # Instructions
 
 ## Tips
-Run the command with `--diff --check` first to avoid problems.
+* Use the download the versions that are already configured in the playbooks since the installation prcedure might vary for different versions.
+* Run the command with `--diff --check` first to avoid problems.
 
 ## 1. Linux Setup
 
@@ -79,4 +80,15 @@ ansible-playbook -i inventory/vm-inventory.yml playbooks/hive/install.yml
 Start Services.
 ```bash
 ansible-playbook -i inventory/vm-inventory.yml playbooks/hive/start-services.yml
+```
+
+# 4. Kafka
+
+Create kafka user.
+```bash
+ansible-playbook -i inventory/vm-inventory.yml playbooks/linux/create-user.yml -e "new_user=kafka"
+```
+Installing kafka, make sure that the kafka tarball file is located ad `/playbooks/kafka/files/` and the correct version is configured in the playbook. https://kafka.apache.org/downloads
+```bash
+ansible-playbook -i inventory/vm-inventory.yml playbooks/kafka/install.yml
 ```

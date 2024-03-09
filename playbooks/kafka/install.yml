@@ -1,6 +1,6 @@
 ---
 - name: Install and Configure Kafka
-  hosts: controllers
+  hosts: controllers, workernodes
   become: true
   vars:
     kafka_user: "kafka"
