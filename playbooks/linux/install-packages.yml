@@ -23,7 +23,7 @@
       when:
         - inventory_hostname in groups["controllers"]
 
-    - name: Install pip
+    - name: Install venv
       package:
         name: python3.10-venv
         state: present

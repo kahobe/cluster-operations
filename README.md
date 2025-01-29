@@ -12,7 +12,7 @@ ansible-playbook -i inventory/vm-inventory.yml playbooks/linux/install-packages.
 ```
 Generate /etc/hosts file on each host
 ```bash
-ansible-playbook -i inventory/vm-inventory.yml playbooks/linux/install-packages.yml
+ansible-playbook -i inventory/vm-inventory.yml playbooks/linux/generate-hosts-file.yml
 ```
 
 ## 2. Install Hadoop
