@@ -92,3 +92,8 @@ Installing kafka, make sure that the kafka tarball file is located ad `/playbook
 ```bash
 ansible-playbook -i inventory/vm-inventory.yml playbooks/kafka/install.yml
 ```
+
+Starting the cluster.
+```bash
+ansible-playbook -i inventory/vm-inventory.yml playbooks/kafka/start-cluster.yml
+```
