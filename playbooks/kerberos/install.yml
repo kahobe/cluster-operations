@@ -40,15 +40,6 @@
       tags:
         - configuration
 
-    - name: Create kdc database for KAHOVEC.DEV
-      shell: kdb5_util create -r ATHENA.MIT.EDU -s
-      become: true
-      run_once: true
-      when:
-        - inventory_hostname in groups["krb5server"]
-      tags:
-        - configuration
-
     - name: Install krb-user
       apt:
         update_cache: true
