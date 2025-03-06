@@ -1,0 +1,19 @@
+---
+- name: Add Kerberos Principal
+  hosts: krb5server
+  become: true
+
+  tasks:
+    - name: Add Kerberos principal
+      ansible.builtin.expect:
+        command: kadmin.local -q "addprinc {{ user }}/{{ instance }}@KAHOVEC.DEV"
+        responses:
+          "Enter password for principal .*: ": "{{ pass }}"
+          "Re-enter password for principal .*: ": "{{ pass }}"
+      become: yes
+      register: result
+      run_once: true
+
+    - name: Print output
+      debug:
+        var: result.stdout_lines

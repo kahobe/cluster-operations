@@ -8,14 +8,51 @@
   tasks:
     - name: Install krb5-kdc and krb5-admin-server
       apt:
-        name: krb5-kdc krb5-admin-server
+        update_cache: true
+        name: ["krb5-kdc", "krb5-admin-server"]
         state: present
       when:
         - inventory_hostname in groups["krb5server"]
 
-    - name: Install krb-client
+    - name: Configure kdc.conf
+      template:
+        src: kdc.conf.j2
+        dest: /etc/krb5kdc/kdc.conf
+      when:
+        - inventory_hostname in groups["krb5server"]
+      tags:
+        - configuration
+      become: true
+
+    - name: Configure krb5.conf
+      template:
+        src: krb5.conf.j2
+        dest: /etc/krb5.conf
+      tags:
+        - configuration
+
+    - name: Configure kadm5.acl
+      template:
+        src: kadm5.acl.j2
+        dest: /etc/krb5kdc/kadm5.acl
+      when:
+        - inventory_hostname in groups["krb5server"]
+      tags:
+        - configuration
+
+    - name: Create kdc database for KAHOVEC.DEV
+      shell: kdb5_util create -r ATHENA.MIT.EDU -s
+      become: true
+      run_once: true
+      when:
+        - inventory_hostname in groups["krb5server"]
+      tags:
+        - configuration
+
+    - name: Install krb-user
       apt:
-        name: krb5-client
+        update_cache: true
+        name: krb5-user
         state: present
       when:
         - inventory_hostname in groups["krb5client"]

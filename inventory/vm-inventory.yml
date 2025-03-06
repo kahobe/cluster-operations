@@ -22,3 +22,13 @@ all:
               kafka_node_id: 3
             vm-worker03:
               kafka_node_id: 4
+
+        krb5server:
+          hosts:
+            vm-controller:
+
+        krb5client:
+          hosts:
+            vm-worker01:
+            vm-worker02:
+            vm-worker03:

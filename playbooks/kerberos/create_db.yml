@@ -1,0 +1,19 @@
+---
+- name: Create Database
+  hosts: krb5server
+  become: true
+
+  tasks:
+    - name: Add Kerberos principal
+      ansible.builtin.expect:
+        command: "kdb5_util create -r KAHOVEC.DEV -s"
+        responses:
+          "Enter KDC database master key: ": "{{ pass }}"
+          "Re-enter KDC database master key to verify: ": "{{ pass }}"
+      become: yes
+      register: result
+      run_once: true
+
+    - name: Print output
+      debug:
+        var: result.stdout_lines
