@@ -1,0 +1,21 @@
+---
+- name: Install and Configure Kerberos
+  hosts: krb5server, krb5client
+  become: true
+  vars:
+    kerberos_user: "kerberos"
+
+  tasks:
+    - name: Install krb5-kdc and krb5-admin-server
+      apt:
+        name: krb5-kdc krb5-admin-server
+        state: present
+      when:
+        - inventory_hostname in groups["krb5server"]
+
+    - name: Install krb-client
+      apt:
+        name: krb5-client
+        state: present
+      when:
+        - inventory_hostname in groups["krb5client"]
