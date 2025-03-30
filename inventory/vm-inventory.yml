@@ -2,6 +2,9 @@ all:
   vars:
     ansible_user: ansible
     kafka_cluster_id: 2BKCbwzCTxyCNEM8XkkU1A
+    java_package: "openjdk-8-jdk"
+    java_home_path: "/usr/lib/jvm/java-1.8.0-openjdk-amd64"
+    python_version: "3.10"
   children:
     cluster:
       children:
@@ -12,7 +15,7 @@ all:
 
         namenodes:
           hosts:
-            vm-namenode:
+            vm-controller:
 
         workernodes:
           hosts:

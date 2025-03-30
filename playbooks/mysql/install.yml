@@ -20,13 +20,10 @@
         state: started
         enabled: true
 
-    - name: Install Virtualenv
-      ansible.builtin.pip:
-        name: virtualenv==20.25.0
-
     - name: Install PyMySQL python package for Ansible management
       ansible.builtin.pip:
-        name: PyMySQL==1.1.0
+        break_system_packages: true
+        name: PyMySQL
 
     - name: Allow remote connections
       lineinfile:

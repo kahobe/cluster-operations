@@ -9,16 +9,6 @@
     filename: "hadoop-{{ hadoop_version }}.tar.gz" 
 
   tasks:
-  # Installing Java
-    - name: Update apt package cache
-      apt:
-        update_cache: yes
-
-    - name: Install Java
-      apt:
-        name: "{{ java_package }}"
-        state: present
-
   # Copy and Extract Hadoop to remote
     - name: Copy Hadoop tarball to remote hosts
       ansible.builtin.copy:
@@ -89,7 +79,7 @@
       lineinfile:
         path: /opt/hadoop/etc/hadoop/hadoop-env.sh
         search_string: '# export JAVA_HOME='
-        line: 'export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64'
+        line: 'export JAVA_HOME={{ java_home_path }}'
       tags:
          - configuration
 

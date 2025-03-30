@@ -4,29 +4,41 @@
   become: true
 
   tasks:
-    - name: Update package cache
-      package_facts:
-        manager: auto
+    - name: Update apt package cache
+      apt:
+        update_cache: yes
 
     # ACL package is required for ansible to become another user.
     # other wise ruinning in following error
     # "Failed to set permissions on the temporary files Ansible needs to create when becoming an unprivileged user ... "
     - name: Install acl package
-      package:
+      apt:
         name: acl
         state: present
 
     - name: Install pip
-      package:
+      apt:
         name: python3-pip
         state: present
       when:
         - inventory_hostname in groups["controllers"]
 
     - name: Install venv
-      package:
-        name: python3.10-venv
+      apt:
+        name: "python{{ python_version }}-venv"
         state: present
       when:
         - inventory_hostname in groups["controllers"]
+
+    - name: Install Java
+      apt:
+        name: "{{ java_package }}"
+        state: present
+
+    - name: Set JAVA_HOME
+      lineinfile:
+        path: /etc/environment
+        state: present
+        regexp: '^JAVA_HOME'
+        line: 'JAVA_HOME={{ java_home_path }}'
         

@@ -20,11 +20,6 @@
       apt:
         update_cache: yes
 
-    - name: Install Java
-      apt:
-        name: "{{ java_package }}"
-        state: present
-
     - name: Copy Hive tarball to remote hosts
       ansible.builtin.copy:
         src: "{{ filename }}"
