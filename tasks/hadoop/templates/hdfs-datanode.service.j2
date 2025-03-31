@@ -4,7 +4,7 @@ After=syslog.target network.target remote-fs.target nss-lookup.target network-on
 Requires=network-online.target
 
 [Service]
-User=hadoop
+User=hdfs
 Group=hadoop
 Type=forking
 ExecStart=/opt/hadoop/bin/hdfs --daemon start datanode

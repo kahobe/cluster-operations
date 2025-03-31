@@ -42,12 +42,35 @@
   become: true
   vars:
     hadoop_user: "hadoop"
+    hdfs_user: "hdfs"
+    yarn_user: "yarn"
+    mapred_user: "mapred"
+    hadoop_group: "hadoop"
     hadoop_version: "3.3.6"
     filename: "hadoop-{{ hadoop_version }}.tar.gz"
   tasks:
     - name: Create User
       vars:
         new_user: "{{ hadoop_user }}"
+        new_user_group: "{{ hadoop_group }}"
+      ansible.builtin.include_tasks:
+        file: tasks/linux/create-user.yml
+    - name: Create User
+      vars:
+        new_user: "{{ hdfs_user }}"
+        new_user_group: "{{ hadoop_group }}"
+      ansible.builtin.include_tasks:
+        file: tasks/linux/create-user.yml
+    - name: Create User
+      vars:
+        new_user: "{{ yarn_user }}"
+        new_user_group: "{{ hadoop_group }}"
+      ansible.builtin.include_tasks:
+        file: tasks/linux/create-user.yml
+    - name: Create User
+      vars:
+        new_user: "{{ mapred_user }}"
+        new_user_group: "{{ hadoop_group }}"
       ansible.builtin.include_tasks:
         file: tasks/linux/create-user.yml
     - name: Install Hadoop
@@ -56,22 +79,7 @@
     - name: Configure Hadoop
       ansible.builtin.include_tasks:
         file: tasks/hadoop/configure.yml
-    - name: Format HDFS Namenode
-      ansible.builtin.include_tasks:
-        file: tasks/hadoop/format-namenode.yml
-      when:
-        - inventory_hostname in groups["controllers"]
-    - name: Start Hadoop Services
-      ansible.builtin.include_tasks:
-        file: tasks/hadoop/start-services.yml    
-    - name: Waiting 30 Seconds for Services to Start
-      ansible.builtin.pause:
-        seconds: 30  
-    - name: Create Yarn HDFS Directories
-      ansible.builtin.include_tasks:
-        file: tasks/hadoop/create-yarn-dirs.yml
-      when:
-        - inventory_hostname in groups["controllers"]
+
 
 - name: Setup MySQL
   hosts: controllers
@@ -90,6 +98,7 @@
   become: true
   vars:
     hive_user: "hive"
+    hive_user_group: "hadoop"
     hive_version: "4.0.0"
     filename: "apache-hive-{{ hive_version }}-bin.tar.gz"
     jdbc_file: "mysql-connector-j-8.4.0.jar"
@@ -97,12 +106,13 @@
     - name: Create Linux User
       vars:
         new_user: "{{ hive_user }}"
+        new_user_group: "{{ hive_user_group }}"
       ansible.builtin.include_tasks:
         file: tasks/linux/create-user.yml
     - name: Create MySQL User
       vars:
         user: "{{ hive_user }}"
-        password: 'Sup3rS3cur3Pa55w0rd!'
+        password: "Sup3rS3cur3Pa55w0rd!"
         db: "hive_metastore"
         table: "*"
         privileges: "ALL"
@@ -122,7 +132,7 @@
   become: true
   vars:
     kafka_user: "kafka"
-    kafka_version: "2.12-3.7.0" 
+    kafka_version: "2.12-3.7.0"
     filename: "kafka_{{ kafka_version }}.tgz"
   tasks:
     - name: Create Linux User

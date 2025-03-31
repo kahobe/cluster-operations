@@ -14,7 +14,8 @@
     src: "/tmp/{{ filename }}"
     dest: "/opt/"
     owner: "{{ hadoop_user }}"
-    group: "{{ hadoop_user }}"
+    group: "{{ hadoop_group }}"
+    mode: "u=rwx,g=rwx,o=r"
     remote_src: yes
 
 - name: Create a symbolic link
@@ -22,14 +23,22 @@
     src: /opt/hadoop-{{ hadoop_version }}
     dest: /opt/hadoop
     owner: "{{ hadoop_user }}"
-    group: "{{ hadoop_user }}"
+    group: "{{ hadoop_group }}"
     state: link
+
+- name: Creates logs directory
+  ansible.builtin.file:
+    path: /opt/hadoop/logs
+    owner: "{{ hadoop_user }}"
+    group: "{{ hadoop_group }}"
+    mode: "u=rwx,g=rwx,o=r"
+    state: directory
 
 # Setting up Directories
 - name: Create Data Directory
   ansible.builtin.file:
     path: /srv/hadoop/hdfs/data
-    owner: "{{ hadoop_user }}"
+    owner: "{{ hdfs_user }}"
     group: "{{ hadoop_user }}"
     state: directory
     mode: "0755"
@@ -37,7 +46,7 @@
 - name: Create NameNode Directory
   ansible.builtin.file:
     path: /srv/hadoop/hdfs/name
-    owner: "{{ hadoop_user }}"
+    owner: "{{ hdfs_user }}"
     group: "{{ hadoop_user }}"
     state: directory
     mode: "0755"
