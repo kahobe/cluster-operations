@@ -1,0 +1,154 @@
+- name: Setup Linux
+  tags:
+    - linux
+  hosts: controllers, workernodes
+  gather_facts: yes
+  become: true
+  tasks:
+    - name: Install required packages
+      ansible.builtin.include_tasks:
+        file: tasks/linux/install-packages.yml
+    - name: Generate /etc/hosts
+      ansible.builtin.include_tasks:
+        file: tasks/linux/generate-hosts-file.yml
+
+- name: Setup Kerberos
+  tags:
+    - kerberos
+  hosts: krb5server, krb5client
+  become: true
+  vars:
+    realm: "KAHOVEC.DEV"
+    password: "Sup3rS3cur3Pa55w0rd!"
+  tasks:
+    - name: Install Kerberos
+      ansible.builtin.include_tasks:
+        file: tasks/kerberos/install.yml
+    - name: Create Database
+      ansible.builtin.include_tasks:
+        file: tasks/kerberos/create_db.yml
+      when:
+        - inventory_hostname in groups["krb5server"]
+    - name: Start Daemons
+      ansible.builtin.include_tasks:
+        file: tasks/kerberos/start_daemons.yml
+      when:
+        - inventory_hostname in groups["krb5server"]
+
+- name: Setup Hadoop
+  tags:
+    - hadoop
+  hosts: controllers, workernodes
+  become: true
+  vars:
+    hadoop_user: "hadoop"
+    hadoop_version: "3.3.6"
+    filename: "hadoop-{{ hadoop_version }}.tar.gz"
+  tasks:
+    - name: Create User
+      vars:
+        new_user: "{{ hadoop_user }}"
+      ansible.builtin.include_tasks:
+        file: tasks/linux/create-user.yml
+    - name: Install Hadoop
+      ansible.builtin.include_tasks:
+        file: tasks/hadoop/install.yml
+    - name: Configure Hadoop
+      ansible.builtin.include_tasks:
+        file: tasks/hadoop/configure.yml
+    - name: Format HDFS Namenode
+      ansible.builtin.include_tasks:
+        file: tasks/hadoop/format-namenode.yml
+      when:
+        - inventory_hostname in groups["controllers"]
+    - name: Start Hadoop Services
+      ansible.builtin.include_tasks:
+        file: tasks/hadoop/start-services.yml    
+    - name: Waiting 30 Seconds for Services to Start
+      ansible.builtin.pause:
+        seconds: 30  
+    - name: Create Yarn HDFS Directories
+      ansible.builtin.include_tasks:
+        file: tasks/hadoop/create-yarn-dirs.yml
+      when:
+        - inventory_hostname in groups["controllers"]
+
+- name: Setup MySQL
+  hosts: controllers
+  tags:
+    - mysql
+  become: true
+  tasks:
+    - name: Install MySQL
+      ansible.builtin.include_tasks:
+        file: tasks/mysql/install.yml
+
+- name: Setup Hive
+  tags:
+    - hive
+  hosts: controllers
+  become: true
+  vars:
+    hive_user: "hive"
+    hive_version: "4.0.0"
+    filename: "apache-hive-{{ hive_version }}-bin.tar.gz"
+    jdbc_file: "mysql-connector-j-8.4.0.jar"
+  tasks:
+    - name: Create Linux User
+      vars:
+        new_user: "{{ hive_user }}"
+      ansible.builtin.include_tasks:
+        file: tasks/linux/create-user.yml
+    - name: Create MySQL User
+      vars:
+        user: "{{ hive_user }}"
+        password: 'Sup3rS3cur3Pa55w0rd!'
+        db: "hive_metastore"
+        table: "*"
+        privileges: "ALL"
+      ansible.builtin.include_tasks:
+        file: tasks/mysql/create-user.yml
+    - name: Install Hive
+      ansible.builtin.include_tasks:
+        file: tasks/hive/install.yml
+    - name: Configure Hive
+      ansible.builtin.include_tasks:
+        file: tasks/hive/configure.yml
+
+- name: Setup Kafka
+  tags:
+    - kafka
+  hosts: controllers, workernodes
+  become: true
+  vars:
+    kafka_user: "kafka"
+    kafka_version: "2.12-3.7.0" 
+    filename: "kafka_{{ kafka_version }}.tgz"
+  tasks:
+    - name: Create Linux User
+      vars:
+        new_user: "{{ kafka_user }}"
+      ansible.builtin.include_tasks:
+        file: tasks/linux/create-user.yml
+    - name: Install Kafka
+      ansible.builtin.include_tasks:
+        file: tasks/kafka/install.yml
+
+- name: Setup Spark
+  tags:
+    - spark
+  hosts: controllers, workernodes
+  become: true
+  vars:
+    spark_user: "spark"
+    spark_version: "3.5.1"
+    filename: "spark-{{ spark_version }}-bin-hadoop3.tgz"
+  tasks:
+    - name: Create Linux User
+      vars:
+        new_user: "{{ spark_user }}"
+      ansible.builtin.include_tasks:
+        file: tasks/linux/create-user.yml
+    - name: Install Spark
+      ansible.builtin.include_tasks:
+        file: tasks/spark/install.yml

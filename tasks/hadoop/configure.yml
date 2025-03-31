@@ -1,0 +1,152 @@
+- name: Add Hadoop to PATH for all Users
+  lineinfile:
+    path: /etc/bash.bashrc
+    line: "export PATH=$PATH:$HADOOP_HOME/bin"
+  become: true
+  tags:
+    - configuration
+
+- name: Set JAVA_HOME in hadoop-env.sh User
+  lineinfile:
+    path: /opt/hadoop/etc/hadoop/hadoop-env.sh
+    search_string: "# export JAVA_HOME="
+    line: "export JAVA_HOME={{ java_home_path }}"
+  tags:
+    - configuration
+
+# Configuring Hadoop
+- name: Configure Hadoop core-site.xml
+  template:
+    src: core-site.xml.j2
+    dest: /opt/hadoop/etc/hadoop/core-site.xml
+    owner: "{{ hadoop_user }}"
+    group: "{{ hadoop_user }}"
+  tags:
+    - configuration
+
+- name: Configure Hadoop hdfs-site.xml
+  template:
+    src: hdfs-site.xml.j2
+    dest: /opt/hadoop/etc/hadoop/hdfs-site.xml
+    owner: "{{ hadoop_user }}"
+    group: "{{ hadoop_user }}"
+  tags:
+    - configuration
+
+- name: Configure Yarn yarn-site.xml
+  template:
+    src: yarn-site.xml.j2
+    dest: /opt/hadoop/etc/hadoop/yarn-site.xml
+    owner: "{{ hadoop_user }}"
+    group: "{{ hadoop_user }}"
+  tags:
+    - configuration
+
+- name: Configure Hadoop mapred-site.xml
+  template:
+    src: mapred-site.xml.j2
+    dest: /opt/hadoop/etc/hadoop/mapred-site.xml
+    owner: "{{ hadoop_user }}"
+    group: "{{ hadoop_user }}"
+  tags:
+    - configuration
+
+# Configuring Systemd servicesS
+- name: Configure systemd datanode service
+  template:
+    src: hdfs-datanode.service.j2
+    dest: /etc/systemd/system/hdfs-datanode.service
+  tags:
+    - configuration
+  become: true
+
+- name: Configure systemd namenode service
+  template:
+    src: hdfs-namenode.service.j2
+    dest: /etc/systemd/system/hdfs-namenode.service
+  tags:
+    - configuration
+  become: true
+
+- name: Configure systemd resourcemanager service
+  template:
+    src: yarn-resourcemanager.service.j2
+    dest: /etc/systemd/system/yarn-resourcemanager.service
+  tags:
+    - configuration
+  become: true
+
+- name: Configure systemd nodemanager service
+  template:
+    src: yarn-nodemanager.service.j2
+    dest: /etc/systemd/system/yarn-nodemanager.service
+  tags:
+    - configuration
+  become: true
+
+- name: Configure systemd historyserver service
+  template:
+    src: yarn-historyserver.service.j2
+    dest: /etc/systemd/system/yarn-historyserver.service
+  tags:
+    - configuration
+  become: true
+
+# Enable Systemd services
+- name: Enable namenode service
+  ansible.builtin.systemd_service:
+    name: hdfs-namenode
+    enabled: true
+    state: stopped
+  tags:
+    - configuration
+  when:
+    - inventory_hostname in groups["controllers"]
+
+- name: Enable datanode service
+  ansible.builtin.systemd_service:
+    name: hdfs-datanode
+    enabled: true
+    state: stopped
+  tags:
+    - configuration
+  when:
+    - inventory_hostname in groups["workernodes"]
+
+- name: Enable resourcemanager service
+  ansible.builtin.systemd_service:
+    name: yarn-resourcemanager
+    enabled: true
+    state: stopped
+  tags:
+    - configuration
+  when:
+    - inventory_hostname in groups["controllers"]
+
+- name: Enable historyserver service
+  ansible.builtin.systemd_service:
+    name: yarn-historyserver
+    enabled: true
+    state: stopped
+  tags:
+    - configuration
+  when:
+    - inventory_hostname in groups["controllers"]
+
+- name: Enable nodemanager service
+  ansible.builtin.systemd_service:
+    name: yarn-nodemanager
+    enabled: true
+    state: stopped
+  tags:
+    - configuration
+  when:
+    - inventory_hostname in groups["workernodes"]
+
+- name: Add hosts to HADOOP_HOME/etc/hadoop/workers
+  lineinfile:
+    dest: "/opt/hadoop/etc/hadoop/workers"
+    line: "{{ item }}"
+  loop: "{{ groups['workernodes'] }}"
+  tags:
+    - configuration

@@ -1,0 +1,13 @@
+- name: Add Kerberos principal
+  ansible.builtin.expect:
+    command: "kdb5_util create -r {{ realm }} -s"
+    responses:
+      "Enter KDC database master key: ": "{{ password }}"
+      "Re-enter KDC database master key to verify: ": "{{ password }}"
+  become: yes
+  register: result
+  run_once: true
+
+- name: Print output
+  debug:
+    var: result.stdout_lines

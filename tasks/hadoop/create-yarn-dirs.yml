@@ -1,0 +1,14 @@
+- name: Create HDFS /warehouse dir
+  shell: $HADOOP_HOME/bin/hdfs dfs -mkdir -p /tmp/hadoop-yarn
+  become: true
+  become_user: "{{ hadoop_user }}"
+  ignore_errors: true
+  tags:
+    - configuration
+
+- name: Set HDFS permissions for /warehouse dir
+  shell: $HADOOP_HOME/bin/hdfs dfs -chmod -R 777 /tmp/hadoop-yarn
+  become: true
+  become_user: "{{ hadoop_user }}"
+  tags:
+    - configuration

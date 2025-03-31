@@ -1,0 +1,62 @@
+# Copy and Extract Hadoop to remote
+- name: Copy Hadoop tarball to remote hosts
+  ansible.builtin.copy:
+    src: "{{ filename }}"
+    dest: "/tmp/{{ filename }}"
+
+- name: Remove existing Hadoop directory
+  ansible.builtin.file:
+    path: "/opt/hadoop-{{ hadoop_version }}"
+    state: absent
+
+- name: Extract Hadoop tarball
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ filename }}"
+    dest: "/opt/"
+    owner: "{{ hadoop_user }}"
+    group: "{{ hadoop_user }}"
+    remote_src: yes
+
+- name: Create a symbolic link
+  ansible.builtin.file:
+    src: /opt/hadoop-{{ hadoop_version }}
+    dest: /opt/hadoop
+    owner: "{{ hadoop_user }}"
+    group: "{{ hadoop_user }}"
+    state: link
+
+# Setting up Directories
+- name: Create Data Directory
+  ansible.builtin.file:
+    path: /srv/hadoop/hdfs/data
+    owner: "{{ hadoop_user }}"
+    group: "{{ hadoop_user }}"
+    state: directory
+    mode: "0755"
+
+- name: Create NameNode Directory
+  ansible.builtin.file:
+    path: /srv/hadoop/hdfs/name
+    owner: "{{ hadoop_user }}"
+    group: "{{ hadoop_user }}"
+    state: directory
+    mode: "0755"
+
+# Setting up environment Variables
+- name: Set HADOOP_HOME environment variable
+  lineinfile:
+    path: /etc/environment
+    line: "export HADOOP_HOME=/opt/hadoop"
+  become: true
+
+- name: Set HADOOP_CONF_DIR environment variable
+  lineinfile:
+    path: /etc/bash.bashrc
+    line: "export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop"
+  become: true
+
+- name: Set YARN_CONF_DIR environment variable
+  lineinfile:
+    path: /etc/bash.bashrc
+    line: "export YARN_CONF_DIR=$HADOOP_CONF_DIR"
+  become: true

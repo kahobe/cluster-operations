@@ -1,0 +1,19 @@
+- name: Stop Cluster
+  hosts: controllers, workernodes
+  become: true
+
+  tasks:
+    - name: Stop Hadoop Services
+      ansible.builtin.include_tasks:
+        file: tasks/hadoop/stop-services.yml
+    - name: Stop Hive Services
+      ansible.builtin.include_tasks:
+        file: tasks/hive/stop-services.yml
+      when:
+        - inventory_hostname in groups["controllers"]
+    - name: Stop Kafka Services
+      ansible.builtin.include_tasks:
+        file: tasks/kafka/stop-services.yml
+    - name: Stop Spark Services
+      ansible.builtin.include_tasks:
+        file: tasks/spark/stop-standalone-services.yml

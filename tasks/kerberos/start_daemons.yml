@@ -1,0 +1,4 @@
+- name: Start KDC
+  shell: krb5kdc
+- name: Start Admin-Server
+  shell: kadmind

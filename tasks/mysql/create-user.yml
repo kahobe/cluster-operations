@@ -1,0 +1,13 @@
+- name: Ensure MySQL Service is started
+  ansible.builtin.systemd_service:
+    name: mysql.service
+    state: started
+
+- name: Creating MySQL User
+  mysql_user:
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    name: "{{ user }}"
+    password: "{{ password }}"
+    priv: "{{ db }}.{{ table }}:{{ privileges }}"
+    host: "%"
+    state: present

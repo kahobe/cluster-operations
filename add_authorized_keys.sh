@@ -13,4 +13,3 @@ do
     scp ~/.ssh/${KEY_NAME}.pub $USER@$HOST:~/.ssh/${KEY_NAME}.pub
     ssh $USER@$HOST "cat ~/.ssh/$KEY_NAME.pub >> ~/.ssh/authorized_keys"
 done
-

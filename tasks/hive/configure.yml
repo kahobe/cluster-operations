@@ -1,0 +1,106 @@
+- name: Ensure MySQL Service for Metastore is running
+  ansible.builtin.systemd_service:
+    name: mysql.service
+    state: started
+    enabled: true
+
+- name: Configure Hadoop hive-site.xml
+  template:
+    src: hive-site.xml.j2
+    dest: /opt/hive/conf/hive-site.xml
+    owner: "{{ hive_user }}"
+    group: "{{ hive_user }}"
+  tags:
+    - configuration
+
+- name: Copy file
+  ansible.builtin.copy:
+    src: /opt/hive/conf/hive-env.sh.template
+    dest: /opt/hive/conf/hive-env.sh
+    remote_src: yes
+  tags:
+    - configuration
+
+- name: Set HADOOP_HOME in hive-env.sh
+  lineinfile:
+    path: /opt/hive/conf/hive-env.sh
+    search_string: "# export HADOOP_HOME"
+    line: "export HADOOP_HOME=/opt/hadoop/"
+  tags:
+    - configuration
+
+- name: Initialize Metastore Schema
+  shell: $HIVE_HOME/bin/schematool --dbType mysql --initSchema
+  become: true
+  become_user: "{{ hive_user }}"
+
+- name: Create HDFS /warehouse dir
+  shell: $HADOOP_HOME/bin/hdfs dfs -mkdir /warehouse
+  become: true
+  become_user: hadoop
+  ignore_errors: true
+  tags:
+    - configuration
+
+- name: Set HDFS permissions for /warehouse dir
+  shell: $HADOOP_HOME/bin/hdfs dfs -chown hive:hive /warehouse
+  become: true
+  become_user: hadoop
+  tags:
+    - configuration
+
+- name: Create HDFS /tmp dir
+  shell: $HADOOP_HOME/bin/hdfs dfs -mkdir /tmp/hive
+  become: true
+  become_user: hadoop
+  ignore_errors: true
+  tags:
+    - configuration
+
+- name: Set HDFS owner for /tmp dir
+  shell: $HADOOP_HOME/bin/hdfs dfs -chown hive:hive /tmp/hive
+  become: true
+  become_user: hadoop
+  ignore_errors: true
+  tags:
+    - configuration
+
+- name: Set HDFS permissions for /tmp dir
+  shell: $HADOOP_HOME/bin/hdfs dfs -chmod -R 733 /tmp
+  become: true
+  become_user: hadoop
+  ignore_errors: true
+  tags:
+    - configuration
+
+- name: Configure systemd Hive Metastore Service
+  template:
+    src: hive-metastore.service.j2
+    dest: /etc/systemd/system/hive-metastore.service
+  tags:
+    - configuration
+  become: true
+
+- name: Enable Hive Metastore Service
+  ansible.builtin.systemd_service:
+    name: hive-metastore
+    enabled: true
+    state: stopped
+  tags:
+    - configuration
+
+- name: Configure systemd Hive Server2 Service
+  template:
+    src: hive-server2.service.j2
+    dest: /etc/systemd/system/hive-server2.service
+  tags:
+    - configuration
+  become: true
+
+- name: Enable Hive Server2 Service
+  ansible.builtin.systemd_service:
+    name: hive-server2
+    enabled: true
+    state: stopped
+  tags:
+    - configuration

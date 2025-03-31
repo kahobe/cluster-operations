@@ -1,0 +1,9 @@
+- name: Stop Hive Metastore Service
+  ansible.builtin.service:
+    name: hive-metastore.service
+    state: stopped
+
+- name: Stop Hive Server2 Service
+  ansible.builtin.service:
+    name: hive-server2.service
+    state: stopped

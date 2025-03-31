@@ -1,0 +1,16 @@
+- name: Check HADOOP_HOME
+  become: true
+  become_user: hadoop
+  shell: echo $HADOOP_HOME
+  register: hadoop_home
+  failed_when: hadoop_home.stdout == ""
+
+- name: Format NameNode
+  become: true
+  become_user: hadoop
+  command: "$HADOOP_HOME/bin/hdfs namenode -format -force"
+  register: namenode_format_result
+
+- name: Display result
+  debug:
+    var: namenode_format_result
