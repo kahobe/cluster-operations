@@ -17,4 +17,73 @@
         <name>dfs.blocksize</name>
         <value>268435456</value>
     </property>
+
+
+    <property>
+        <name>dfs.http.policy</name>
+        <value>HTTPS_ONLY</value>
+    </property>
+
+    <property>
+        <name>dfs.block.access.token.enable</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>dfs.data.transfer.protection</name>
+        <value>authentication</value>
+    </property>
+
+    <property>
+        <name>dfs.namenode.kerberos.principal</name>
+        <value>nn/_HOST@KAHOVEC.DEV</value>
+    </property>
+    <property>
+        <name>dfs.namenode.keytab.file</name>
+        <value>/etc/security/keytab/nn.service.keytab</value>
+    </property>
+
+    <property>
+        <name>dfs.journalnode.kerberos.principal</name>
+        <value>jn/_HOST@KAHOVEC.DEV</value>
+    </property>
+    <property>
+        <name>dfs.journalnode.keytab.file</name>
+        <value>/etc/security/keytab/jn.service.keytab</value>
+    </property>
+
+    <property>
+        <name>dfs.datanode.kerberos.principal</name>
+        <value>dn/_HOST@KAHOVEC.DEV</value>
+    </property>
+    <property>
+        <name>dfs.datanode.keytab.file</name>
+        <value>/etc/security/keytab/dn.service.keytab</value>
+    </property>
+
+    <property>
+        <name>mapreduce.jobhistory.principa</name>
+        <value>jhs/_HOST@KAHOVEC.DEV</value>
+    </property>
+    <property>
+        <name>mapreduce.jobhistory.keytab</name>
+        <value>/etc/security/keytab/jhs.service.keytab</value>
+    </property>
+
+    <property>
+        <name>dfs.datanode.data.dir.perm</name>
+        <value>700</value>
+    </property>
+    
+    <property>
+        <name>dfs.datanode.address</name>
+        <value>0.0.0.0:50010</value>
+    </property>
+    <property>
+        <name>dfs.datanode.http.address</name>
+        <value>0.0.0.0:50020</value>
+    </property>
+    <property>
+        <name>dfs.datanode.https.address</name>
+        <value>0.0.0.0:9865</value>
+    </property>
 </configuration>

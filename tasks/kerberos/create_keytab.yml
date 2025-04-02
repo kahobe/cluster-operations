@@ -1,0 +1,10 @@
+- name: Ensure Keytab Directory exists
+  ansible.builtin.file:
+    path: "{{ keytab_dir }}"
+    state: directory
+
+- name: Generate keytab
+  become: true
+  shell: |
+    kadmin.local -q "ktadd -norandkey -k {{ keytab_dir }}/{{ keytab_name }} {{ principal }}"
+  register: keytab_output

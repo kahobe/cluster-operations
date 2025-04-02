@@ -50,13 +50,24 @@
     group: "{{ hadoop_group }}"
   tags:
     - configuration
-    
+
+- name: Configure Hadoop ssl-server.xml
+  template:
+    src: ssl-server.xml.j2
+    dest: /opt/hadoop/etc/hadoop/ssl-server.xml
+    owner: "{{ hadoop_user }}"
+    group: "{{ hadoop_group }}"
+  tags:
+    - configuration
+
 # Formatting the Namenode
 - name: Format NameNode
   become: true
   become_user: "{{ hdfs_user }}"
   command: "$HADOOP_HOME/bin/hdfs namenode -format -force"
   register: namenode_format_result
+  when:
+    - inventory_hostname in groups["controllers"]
 
 - name: Display result
   debug:
@@ -134,25 +145,30 @@
 - name: Create HDFS /tmp dir
   shell: $HADOOP_HOME/bin/hdfs dfs -mkdir -p /tmp/hadoop-yarn
   become: true
-  become_user: "{{ hdfs_user }}"
   ignore_errors: true
   tags:
     - configuration
+  when:
+    - inventory_hostname in groups["controllers"]
 
 - name: Set HDFS permissions for /tmp dir
   shell: $HADOOP_HOME/bin/hdfs dfs -chmod -R 777 /tmp/hadoop-yarn
   become: true
-  become_user: "{{ hdfs_user }}"
+  ignore_errors: true
   tags:
     - configuration
+  when:
+    - inventory_hostname in groups["controllers"]
 
 - name: Set HDFS owner for /tmp dir
   shell: $HADOOP_HOME/bin/hdfs dfs -chown -R {{ hdfs_user }}:{{ hadoop_group }} /tmp/hadoop-yarn
   become: true
-  become_user: "{{ hdfs_user }}"
+  ignore_errors: true
   tags:
     - configuration
-
+  when:
+    - inventory_hostname in groups["controllers"]
+    
 # Enable YARN Services
 - name: Enable resourcemanager service
   ansible.builtin.systemd_service:

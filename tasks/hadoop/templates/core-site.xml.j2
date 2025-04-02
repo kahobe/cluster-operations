@@ -9,4 +9,33 @@
         <name>io.file.buffer.size</name>
         <value>131072</value>
     </property>
+    <property>
+        <name>hadoop.security.authentication</name>
+        <value>kerberos</value>
+    </property>
+    <property>
+        <name>hadoop.security.authorization</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>hadoop.rpc.protection</name>
+        <value>authentication</value>
+    </property>
+    <property>
+        <name>hadoop.security.auth_to_local</name>
+        <value>
+            RULE:[2:$1/$2@$0]([ndj]n/.*@KAHOVEC.\DEV)s/.*/hdfs/
+            RULE:[2:$1/$2@$0]([rn]m/.*@KAHOVEC\.DEV)s/.*/yarn/
+            RULE:[2:$1/$2@$0](jhs/.*@KAHOVEC\.DEV)s/.*/mapred/
+            DEFAULT
+        </value>
+    </property>
+    <property>
+        <name>hadoop.proxyuser.superuser.hosts</name>
+        <value>*</value>
+    </property>
+    <property>
+        <name>hadoop.proxyuser.superuser.groups</name>
+        <value>*</value>
+    </property>
 </configuration>

@@ -1,0 +1,24 @@
+# Copy and Extract Hadoop to remote
+- name: Create  directory
+  ansible.builtin.file:
+    path: /etc/security/hadoop/
+    owner: "{{ hadoop_user }}"
+    group: "{{ hadoop_group }}"
+    mode: "u=rwx,g=rwx,o=r"
+    state: directory
+
+- name: Copy Keystore
+  ansible.builtin.copy:
+    src: "certs/{{ inventory_hostname }}-keystore.jks"
+    dest: "/etc/security/hadoop/keystore.jks"
+    mode: '600'
+    owner: hdfs
+    group: hadoop
+
+- name: Copy Trusstore
+  ansible.builtin.copy:
+    src: "certs/truststore.jks"
+    dest: "/etc/security/hadoop/truststore.jks"
+    mode: '600'
+    owner: hdfs
+    group: hadoop

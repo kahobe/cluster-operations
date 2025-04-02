@@ -33,4 +33,32 @@
         <name>yarn.log.server.url</name>
         <value>http://{{ groups['namenodes'][0] }}:19888/jobhistory/logs</value>
     </property>
+    <property>
+        <name>yarn.resourcemanager.principal</name>
+        <value>rm/_HOST@KAHOVEC.DEV</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.keytab</name>
+        <value>/etc/security/keytab/rm.service.keytab</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.webapp.https.address</name>
+        <value>${yarn.resourcemanager.hostname}:8090</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.keytab</name>
+        <value>/etc/security/keytab/rm.service.keytab</value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.principal</name>
+        <value>nm/_HOST@KAHOVEC.DEV</value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.keytab</name>
+        <value>/etc/security/keytab/nm.service.keytab</value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.webapp.https.address</name>
+        <value>0.0.0.0:8044</value>
+    </property>
 </configuration>

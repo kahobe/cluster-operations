@@ -35,6 +35,92 @@
       when:
         - inventory_hostname in groups["krb5server"]
 
+- name: Kerberize Hadoop
+  tags:
+    - kerberize
+  hosts: controllers, workernodes,
+  become: true
+  vars:
+    hosts: "{{ groups['all'] | unique }}"
+    services:
+      - name: nn
+        user: hdfs
+      - name: sn
+        user: hdfs
+      - name: dn
+        user: hdfs
+      - name: rm
+        user: yarn
+      - name: nm
+        user: yarn
+      - name: jhs
+        user: mapred
+      - name: host
+        user: hadoop
+  tasks:
+    - name: Add Kerberos Principal
+      loop: "{{ hosts | product(services) | list }}"
+      vars:
+        user: "{{ item[1].name }}"
+        instance: "{{ item[0] }}"
+        password: "Sup3rS3cur3Pa55w0rd!"
+      ansible.builtin.include_tasks:
+        file: tasks/kerberos/add_princ.yml
+      when:
+        - inventory_hostname in groups["controllers"]
+    - name: Create Keytab on Kerberos Admin Server
+      loop: "{{ hosts | product(services) | list }}"
+      vars:
+        keytab_user: "{{ item[1].user }}"
+        keytab_dir: "/tmp/keytabs/{{ item[0] }}"
+        keytab_name: "{{ item[1].name }}.service.keytab"
+        principal: "{{ item[1].name }}/{{ item[0] }}@KAHOVEC.DEV host/{{ item[0] }}@KAHOVEC.DEV"
+      ansible.builtin.include_tasks:
+        file: tasks/kerberos/create_keytab.yml
+      when:
+        - inventory_hostname in groups["controllers"]
+    - name: Copy Keytabs to local
+      ansible.posix.synchronize:
+        src: /tmp/keytabs/
+        dest: /tmp/ansible_keytabs
+        owner: true
+        group: true
+        mode: pull
+      when:
+        - inventory_hostname in groups["controllers"]
+    - name: Clear Existing Keytabs
+      ansible.builtin.file:
+        path: /etc/security/keytab/
+        state: absent
+    - name: Distribute Keytabs
+      ansible.posix.synchronize:
+        src: /tmp/ansible_keytabs/{{ inventory_hostname }}/
+        dest: /etc/security/keytab/
+        owner: true
+        group: true
+        mode: push
+    - name: Remove Tempory Keytab Dir on Kerberos Admin Server
+      ansible.builtin.file:
+        path: /tmp/ansible_keytabs/
+        state: absent
+      when:
+        - inventory_hostname in groups["controllers"]
+    - name: Change file ownership, group and permissions
+      loop: "{{ services }}"
+      ansible.builtin.file:
+        path: /etc/security/keytab/{{ item.name }}.service.keytab
+        owner: "{{ item.user }}"
+        group: hadoop
+        mode: '0400'
+
+- name: Remove Temporary Keytabs locally
+  hosts: 127.0.0.1
+  connection: local
+  tags: kerberize
+  tasks:
+    - name: Delete local directory
+      file: path=/tmp/ansible_keytabs/ state=absent
+
 - name: Setup Hadoop
   tags:
     - hadoop
@@ -73,13 +159,21 @@
         new_user_group: "{{ hadoop_group }}"
       ansible.builtin.include_tasks:
         file: tasks/linux/create-user.yml
+    - name: Distribute Certs
+      ansible.builtin.include_tasks:
+        file: tasks/hadoop/distribute_cert.yml
+    - name: Kinit
+      become: true
+      shell: kinit -k -t /etc/security/keytab/dn.service.keytab dn/vm-controller@KAHOVEC.DEV
+      register: keytab_output
+      when:
+        - inventory_hostname in groups["controllers"]
     - name: Install Hadoop
       ansible.builtin.include_tasks:
         file: tasks/hadoop/install.yml
     - name: Configure Hadoop
       ansible.builtin.include_tasks:
         file: tasks/hadoop/configure.yml
-
 
 - name: Setup MySQL
   hosts: controllers
