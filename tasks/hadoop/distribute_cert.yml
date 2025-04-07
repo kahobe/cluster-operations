@@ -11,7 +11,7 @@
   ansible.builtin.copy:
     src: "certs/{{ inventory_hostname }}-keystore.jks"
     dest: "/etc/security/hadoop/keystore.jks"
-    mode: '600'
+    mode: '640'
     owner: hdfs
     group: hadoop
 
@@ -19,6 +19,6 @@
   ansible.builtin.copy:
     src: "certs/truststore.jks"
     dest: "/etc/security/hadoop/truststore.jks"
-    mode: '600'
+    mode: '640'
     owner: hdfs
     group: hadoop

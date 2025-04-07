@@ -42,10 +42,6 @@
    <value>{{ groups['controllers'][0] }}</value>
   </property>
   <property>
-   <name>hive.server2.enable.doAs</name>
-   <value>false</value>
-  </property>
-  <property>
     <name>hive.metastore.event.db.notification.api.auth</name>
     <value>false</value>
   </property>
@@ -100,5 +96,40 @@
     <property>
     <name>mapreduce.reduce.java.opts</name>
     <value>-Xmx3686m</value>
+  </property>
+
+  <property>
+   <name>hive.server2.enable.doAs</name>
+   <value>false</value>
+  </property>
+
+  <property>
+   <name></name>
+   <value></value>
+  </property>
+  <property>
+   <name>hive.server2.authentication</name>
+   <value>KERBEROS</value>
+  </property>
+  <property>
+   <name>hive.server2.authentication.kerberos.principal</name>
+   <value>hive/_HOST@KAHOVEC.DEV</value>
+  </property>
+  <property>
+   <name>hive.server2.authentication.kerberos.keytab</name>
+   <value>/etc/security/keytab/hive.service.keytab</value>
+  </property>
+
+  <property>
+   <name>hive.server2.use.SSL</name>
+   <value>true</value>
+  </property>
+  <property>
+   <name>hive.server2.keystore.path</name>
+   <value>/etc/security/hadoop/keystore.jks</value>
+  </property>
+  <property>
+   <name>hive.server2.keystore.password</name>
+   <value>bigdata</value>
   </property>
 </configuration>

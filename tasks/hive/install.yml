@@ -19,7 +19,7 @@
     src: "/tmp/{{ filename }}"
     dest: "/opt/"
     owner: "{{ hive_user }}"
-    group: "{{ hive_user }}"
+    group: "{{ hive_group }}"
     remote_src: yes
 
 - name: Create a symbolic link
@@ -27,7 +27,7 @@
     src: /opt/apache-hive-{{ hive_version }}-bin
     dest: /opt/hive
     owner: "{{ hive_user }}"
-    group: "{{ hive_user }}"
+    group: "{{ hive_group }}"
     state: link
 
 - name: Set Hadoop environment variables

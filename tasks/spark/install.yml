@@ -13,7 +13,7 @@
     src: "/tmp/spark-{{ spark_version }}-bin-hadoop3.tgz"
     dest: "/opt/"
     owner: "{{ spark_user }}"
-    group: "{{ spark_user }}"
+    group: "{{ spark_group }}"
     remote_src: yes
 
 - name: Create a symbolic link
@@ -21,7 +21,7 @@
     src: /opt/spark-{{ spark_version }}-bin-hadoop3
     dest: /opt/spark
     owner: "{{ spark_user }}"
-    group: "{{ spark_user }}"
+    group: "{{ spark_group }}"
     state: link
 
 - name: Set Spark environment variables

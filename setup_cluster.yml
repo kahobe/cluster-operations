@@ -5,6 +5,48 @@
   gather_facts: yes
   become: true
   tasks:
+    - name: Create User
+      vars:
+        new_user: "hadoop"
+        new_user_group: "hadoop"
+      ansible.builtin.include_tasks:
+        file: tasks/linux/create-user.yml
+    - name: Create User
+      vars:
+        new_user: "hdfs"
+        new_user_group: "hadoop"
+      ansible.builtin.include_tasks:
+        file: tasks/linux/create-user.yml
+    - name: Create User
+      vars:
+        new_user: "yarn"
+        new_user_group: "hadoop"
+      ansible.builtin.include_tasks:
+        file: tasks/linux/create-user.yml
+    - name: Create User
+      vars:
+        new_user: "mapred"
+        new_user_group: "hadoop"
+      ansible.builtin.include_tasks:
+        file: tasks/linux/create-user.yml
+    - name: Create Linux User
+      vars:
+        new_user: "hive"
+        new_user_group: "hadoop"
+      ansible.builtin.include_tasks:
+        file: tasks/linux/create-user.yml
+    - name: Create Linux User
+      vars:
+        new_user: "kafka"
+        new_user_group: "hadoop"
+      ansible.builtin.include_tasks:
+        file: tasks/linux/create-user.yml
+    - name: Create Linux User
+      vars:
+        new_user: "spark"
+        new_user_group: "hadoop"
+      ansible.builtin.include_tasks:
+        file: tasks/linux/create-user.yml
     - name: Install required packages
       ansible.builtin.include_tasks:
         file: tasks/linux/install-packages.yml
@@ -57,6 +99,8 @@
         user: mapred
       - name: host
         user: hadoop
+      - name: hive
+        user: hive
   tasks:
     - name: Add Kerberos Principal
       loop: "{{ hosts | product(services) | list }}"
@@ -135,30 +179,6 @@
     hadoop_version: "3.3.6"
     filename: "hadoop-{{ hadoop_version }}.tar.gz"
   tasks:
-    - name: Create User
-      vars:
-        new_user: "{{ hadoop_user }}"
-        new_user_group: "{{ hadoop_group }}"
-      ansible.builtin.include_tasks:
-        file: tasks/linux/create-user.yml
-    - name: Create User
-      vars:
-        new_user: "{{ hdfs_user }}"
-        new_user_group: "{{ hadoop_group }}"
-      ansible.builtin.include_tasks:
-        file: tasks/linux/create-user.yml
-    - name: Create User
-      vars:
-        new_user: "{{ yarn_user }}"
-        new_user_group: "{{ hadoop_group }}"
-      ansible.builtin.include_tasks:
-        file: tasks/linux/create-user.yml
-    - name: Create User
-      vars:
-        new_user: "{{ mapred_user }}"
-        new_user_group: "{{ hadoop_group }}"
-      ansible.builtin.include_tasks:
-        file: tasks/linux/create-user.yml
     - name: Distribute Certs
       ansible.builtin.include_tasks:
         file: tasks/hadoop/distribute_cert.yml
@@ -192,17 +212,11 @@
   become: true
   vars:
     hive_user: "hive"
-    hive_user_group: "hadoop"
+    hive_group: "hadoop"
     hive_version: "4.0.0"
     filename: "apache-hive-{{ hive_version }}-bin.tar.gz"
     jdbc_file: "mysql-connector-j-8.4.0.jar"
   tasks:
-    - name: Create Linux User
-      vars:
-        new_user: "{{ hive_user }}"
-        new_user_group: "{{ hive_user_group }}"
-      ansible.builtin.include_tasks:
-        file: tasks/linux/create-user.yml
     - name: Create MySQL User
       vars:
         user: "{{ hive_user }}"
@@ -212,6 +226,10 @@
         privileges: "ALL"
       ansible.builtin.include_tasks:
         file: tasks/mysql/create-user.yml
+    - name: Kinit
+      become: true
+      shell: kinit -k -t /etc/security/keytab/dn.service.keytab dn/vm-controller@KAHOVEC.DEV
+      register: keytab_output
     - name: Install Hive
       ansible.builtin.include_tasks:
         file: tasks/hive/install.yml
@@ -226,14 +244,10 @@
   become: true
   vars:
     kafka_user: "kafka"
+    kafka_group: "hadoop"
     kafka_version: "2.12-3.7.0"
     filename: "kafka_{{ kafka_version }}.tgz"
   tasks:
-    - name: Create Linux User
-      vars:
-        new_user: "{{ kafka_user }}"
-      ansible.builtin.include_tasks:
-        file: tasks/linux/create-user.yml
     - name: Install Kafka
       ansible.builtin.include_tasks:
         file: tasks/kafka/install.yml
@@ -245,14 +259,10 @@
   become: true
   vars:
     spark_user: "spark"
+    spark_group: "hadoop"
     spark_version: "3.5.1"
     filename: "spark-{{ spark_version }}-bin-hadoop3.tgz"
   tasks:
-    - name: Create Linux User
-      vars:
-        new_user: "{{ spark_user }}"
-      ansible.builtin.include_tasks:
-        file: tasks/linux/create-user.yml
     - name: Install Spark
       ansible.builtin.include_tasks:
         file: tasks/spark/install.yml

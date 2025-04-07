@@ -1,9 +1,13 @@
 - name: Start Hive Metastore Service
+  tags:
+    - hive
   ansible.builtin.service:
     name: hive-metastore.service
     state: started
 
 - name: Start Hive Server2 Service
+  tags:
+    - hive
   ansible.builtin.service:
     name: hive-server2.service
     state: started

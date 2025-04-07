@@ -13,7 +13,7 @@
     src: "/tmp/{{ filename }}"
     dest: "/opt/"
     owner: "{{ kafka_user }}"
-    group: "{{ kafka_user }}"
+    group: "{{ kafka_group }}"
     remote_src: yes
 
 - name: Create a symbolic link
@@ -21,7 +21,7 @@
     src: /opt/kafka_{{ kafka_version }}
     dest: /opt/kafka
     owner: "{{ kafka_user }}"
-    group: "{{ kafka_user }}"
+    group: "{{ kafka_group }}"
     state: link
 
 - name: Create Kafka Log directory
@@ -29,14 +29,14 @@
     path: /var/log/kafka
     state: directory
     owner: "{{ kafka_user }}"
-    group: "{{ kafka_user }}"
+    group: "{{ kafka_group }}"
 
 - name: Configure Kafka
   ansible.builtin.template:
     src: server.properties.j2
     dest: /opt/kafka/config/kraft/server.properties
     owner: "{{ kafka_user }}"
-    group: "{{ kafka_user }}"
+    group: "{{ kafka_group }}"
   tags:
     - configuration
 

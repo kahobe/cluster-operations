@@ -9,7 +9,7 @@
     src: hive-site.xml.j2
     dest: /opt/hive/conf/hive-site.xml
     owner: "{{ hive_user }}"
-    group: "{{ hive_user }}"
+    group: "{{ hive_group }}"
   tags:
     - configuration
 
@@ -37,7 +37,6 @@
 - name: Create HDFS /warehouse dir
   shell: $HADOOP_HOME/bin/hdfs dfs -mkdir /warehouse
   become: true
-  become_user: hadoop
   ignore_errors: true
   tags:
     - configuration
@@ -45,14 +44,12 @@
 - name: Set HDFS permissions for /warehouse dir
   shell: $HADOOP_HOME/bin/hdfs dfs -chown hive:hive /warehouse
   become: true
-  become_user: hadoop
   tags:
     - configuration
 
 - name: Create HDFS /tmp dir
   shell: $HADOOP_HOME/bin/hdfs dfs -mkdir /tmp/hive
   become: true
-  become_user: hadoop
   ignore_errors: true
   tags:
     - configuration
@@ -60,7 +57,6 @@
 - name: Set HDFS owner for /tmp dir
   shell: $HADOOP_HOME/bin/hdfs dfs -chown hive:hive /tmp/hive
   become: true
-  become_user: hadoop
   ignore_errors: true
   tags:
     - configuration
@@ -68,7 +64,6 @@
 - name: Set HDFS permissions for /tmp dir
   shell: $HADOOP_HOME/bin/hdfs dfs -chmod -R 733 /tmp
   become: true
-  become_user: hadoop
   ignore_errors: true
   tags:
     - configuration

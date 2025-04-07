@@ -7,6 +7,8 @@
       ansible.builtin.include_tasks:
         file: tasks/hadoop/stop-services.yml
     - name: Stop Hive Services
+      tags:
+        - hive
       ansible.builtin.include_tasks:
         file: tasks/hive/stop-services.yml
       when:
