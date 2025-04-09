@@ -46,21 +46,4 @@
     state: directory
     mode: "0755"
 
-# Setting up environment Variables
-- name: Set HADOOP_HOME environment variable
-  lineinfile:
-    path: /etc/environment
-    line: "export HADOOP_HOME=/opt/hadoop"
-  become: true
 
-- name: Set HADOOP_CONF_DIR environment variable
-  lineinfile:
-    path: /etc/bash.bashrc
-    line: "export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop"
-  become: true
-
-- name: Set YARN_CONF_DIR environment variable
-  lineinfile:
-    path: /etc/bash.bashrc
-    line: "export YARN_CONF_DIR=$HADOOP_CONF_DIR"
-  become: true

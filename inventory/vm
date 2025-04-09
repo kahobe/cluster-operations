@@ -1,10 +1,59 @@
 all:
   vars:
+    users:
+      hadoop:
+        name: hadoop
+        group: hadoop
+      hdfs:
+        name: hdfs
+        group: hadoop
+      yarn:
+        name: yarn
+        group: hadoop
+      mapred:
+        name: mapred
+        group: hadoop
+      hive:
+        name: hive
+        group: hadoop
+      kafka:
+        name: kafka
+        group: kafka
+      spark:
+        name: spark
+        group: spark
+    services:
+      - name: nn
+        user: "{{ users.hdfs.name }}"
+      - name: sn
+        user: "{{ users.hdfs.name }}"
+      - name: dn
+        user: "{{ users.hdfs.name }}"
+      - name: rm
+        user: "{{ users.yarn.name }}"
+      - name: nm
+        user: "{{ users.yarn.name }}"
+      - name: jhs
+        user: "{{ users.mapred.name }}"
+      - name: host
+        user: "{{ users.hadoop.name }}"
+      - name: hive
+        user: "{{ users.hive.name }}"
+    ssl:
+      keystore_file: "/etc/security/hadoop/keystore.jks"
+      truststore_file: "/etc/security/hadoop/truststore.jks"
+    kerberos:
+      realm: "KAHOVEC.DEV"
+      keytab_path: /etc/security/keytab/
+    hadoop:
+      home_path: "/opt/hadoop"
     ansible_user: ansible
-    kafka_cluster_id: 2BKCbwzCTxyCNEM8XkkU1A
-    java_package: "openjdk-8-jdk"
-    java_home_path: "/usr/lib/jvm/java-1.8.0-openjdk-amd64"
-    python_version: "3.10"
+    kafka:
+      cluster_id: 2BKCbwzCTxyCNEM8XkkU1A
+    linux:
+      java_package: "openjdk-8-jdk"
+      java_home_path: "/usr/lib/jvm/java-1.8.0-openjdk-amd64"
+      python_version: "3.10"
   children:
     cluster:
       children:

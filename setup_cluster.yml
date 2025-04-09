@@ -6,50 +6,17 @@
   become: true
   tasks:
     - name: Create User
+      loop: "{{ users }}"
       vars:
-        new_user: "hadoop"
-        new_user_group: "hadoop"
+        new_user: "{{ item.name }}"
+        new_user_group: "{{ item.group }}"
       ansible.builtin.include_tasks:
         file: tasks/linux/create-user.yml
-    - name: Create User
-      vars:
-        new_user: "hdfs"
-        new_user_group: "hadoop"
-      ansible.builtin.include_tasks:
-        file: tasks/linux/create-user.yml
-    - name: Create User
-      vars:
-        new_user: "yarn"
-        new_user_group: "hadoop"
-      ansible.builtin.include_tasks:
-        file: tasks/linux/create-user.yml
-    - name: Create User
-      vars:
-        new_user: "mapred"
-        new_user_group: "hadoop"
-      ansible.builtin.include_tasks:
-        file: tasks/linux/create-user.yml
-    - name: Create Linux User
-      vars:
-        new_user: "hive"
-        new_user_group: "hadoop"
-      ansible.builtin.include_tasks:
-        file: tasks/linux/create-user.yml
-    - name: Create Linux User
-      vars:
-        new_user: "kafka"
-        new_user_group: "hadoop"
-      ansible.builtin.include_tasks:
-        file: tasks/linux/create-user.yml
-    - name: Create Linux User
-      vars:
-        new_user: "spark"
-        new_user_group: "hadoop"
-      ansible.builtin.include_tasks:
-        file: tasks/linux/create-user.yml
+
     - name: Install required packages
       ansible.builtin.include_tasks:
         file: tasks/linux/install-packages.yml
+
     - name: Generate /etc/hosts
       ansible.builtin.include_tasks:
         file: tasks/linux/generate-hosts-file.yml
@@ -84,23 +51,6 @@
   become: true
   vars:
     hosts: "{{ groups['all'] | unique }}"
-    services:
-      - name: nn
-        user: hdfs
-      - name: sn
-        user: hdfs
-      - name: dn
-        user: hdfs
-      - name: rm
-        user: yarn
-      - name: nm
-        user: yarn
-      - name: jhs
-        user: mapred
-      - name: host
-        user: hadoop
-      - name: hive
-        user: hive
   tasks:
     - name: Add Kerberos Principal
       loop: "{{ hosts | product(services) | list }}"
@@ -115,9 +65,8 @@
     - name: Create Keytab on Kerberos Admin Server
       loop: "{{ hosts | product(services) | list }}"
       vars:
-        keytab_user: "{{ item[1].user }}"
-        keytab_dir: "/tmp/keytabs/{{ item[0] }}"
-        keytab_name: "{{ item[1].name }}.service.keytab"
+        path: "{{ kerberos.keytab_path }}/{{ item[0] }}"
+        name: "{{ item[1].name }}.service.keytab"
         principal: "{{ item[1].name }}/{{ item[0] }}@KAHOVEC.DEV host/{{ item[0] }}@KAHOVEC.DEV"
       ansible.builtin.include_tasks:
         file: tasks/kerberos/create_keytab.yml
@@ -155,7 +104,7 @@
         path: /etc/security/keytab/{{ item.name }}.service.keytab
         owner: "{{ item.user }}"
         group: hadoop
-        mode: '0400'
+        mode: "0400"
 
 - name: Remove Temporary Keytabs locally
   hosts: 127.0.0.1

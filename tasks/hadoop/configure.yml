@@ -1,3 +1,22 @@
+# Setting up environment Variables
+- name: Set HADOOP_HOME environment variable
+  lineinfile:
+    path: /etc/environment
+    line: "export HADOOP_HOME={{ hadoop.home_path }}"
+  become: true
+
+- name: Set HADOOP_CONF_DIR environment variable
+  lineinfile:
+    path: /etc/bash.bashrc
+    line: "export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop"
+  become: true
+
+- name: Set YARN_CONF_DIR environment variable
+  lineinfile:
+    path: /etc/bash.bashrc
+    line: "export YARN_CONF_DIR=$HADOOP_CONF_DIR"
+  become: true
+
 - name: Add Hadoop to PATH for all Users
   lineinfile:
     path: /etc/bash.bashrc
@@ -8,7 +27,7 @@
 
 - name: Set JAVA_HOME in hadoop-env.sh User
   lineinfile:
-    path: /opt/hadoop/etc/hadoop/hadoop-env.sh
+    path: "{{ hadoop.home_path }}/etc/hadoop/hadoop-env.sh"
     search_string: "# export JAVA_HOME="
     line: "export JAVA_HOME={{ java_home_path }}"
   tags:
@@ -16,9 +35,11 @@
 
 # Configuring Hadoop
 - name: Configure Hadoop core-site.xml
+  vars:
+    aut_to_local_realm: "{{ kerberos.realm | replace('.','.\\') }}"
   template:
     src: core-site.xml.j2
-    dest: /opt/hadoop/etc/hadoop/core-site.xml
+    dest: "{{ hadoop.home_path }}/etc/hadoop/core-site.xml"
     owner: "{{ hadoop_user }}"
     group: "{{ hadoop_group }}"
   tags:
@@ -27,7 +48,7 @@
 - name: Configure Hadoop hdfs-site.xml
   template:
     src: hdfs-site.xml.j2
-    dest: /opt/hadoop/etc/hadoop/hdfs-site.xml
+    dest: "{{ hadoop.home_path }}/etc/hadoop/hdfs-site.xml"
     owner: "{{ hadoop_user }}"
     group: "{{ hadoop_group }}"
   tags:
@@ -36,7 +57,7 @@
 - name: Configure Yarn yarn-site.xml
   template:
     src: yarn-site.xml.j2
-    dest: /opt/hadoop/etc/hadoop/yarn-site.xml
+    dest: "{{ hadoop.home_path }}/etc/hadoop/yarn-site.xml"
     owner: "{{ hadoop_user }}"
     group: "{{ hadoop_group }}"
   tags:
@@ -45,7 +66,7 @@
 - name: Configure Hadoop mapred-site.xml
   template:
     src: mapred-site.xml.j2
-    dest: /opt/hadoop/etc/hadoop/mapred-site.xml
+    dest: "{{ hadoop.home_path }}/etc/hadoop/mapred-site.xml"
     owner: "{{ hadoop_user }}"
     group: "{{ hadoop_group }}"
   tags:
@@ -54,7 +75,7 @@
 - name: Configure Hadoop ssl-server.xml
   template:
     src: ssl-server.xml.j2
-    dest: /opt/hadoop/etc/hadoop/ssl-server.xml
+    dest: "{{ hadoop.home_path }}/etc/hadoop/ssl-server.xml"
     owner: "{{ hadoop_user }}"
     group: "{{ hadoop_group }}"
   tags:
@@ -64,7 +85,7 @@
 - name: Format NameNode
   become: true
   become_user: "{{ hdfs_user }}"
-  command: "$HADOOP_HOME/bin/hdfs namenode -format -force"
+  command: "{{ hadoop.home_path }}/bin/hdfs namenode -format -force"
   register: namenode_format_result
   when:
     - inventory_hostname in groups["controllers"]
@@ -143,7 +164,7 @@
 
 # Create Directories required by YARN 
 - name: Create HDFS /tmp dir
-  shell: $HADOOP_HOME/bin/hdfs dfs -mkdir -p /tmp/hadoop-yarn
+  shell: "{{ hadoop.home_path }}/bin/hdfs dfs -mkdir -p /tmp/hadoop-yarn"
   become: true
   ignore_errors: true
   tags:
@@ -152,7 +173,7 @@
     - inventory_hostname in groups["controllers"]
 
 - name: Set HDFS permissions for /tmp dir
-  shell: $HADOOP_HOME/bin/hdfs dfs -chmod -R 777 /tmp/hadoop-yarn
+  shell: "{{ hadoop.home_path }}/bin/hdfs dfs -chmod -R 777 /tmp/hadoop-yarn"
   become: true
   ignore_errors: true
   tags:
@@ -161,7 +182,7 @@
     - inventory_hostname in groups["controllers"]
 
 - name: Set HDFS owner for /tmp dir
-  shell: $HADOOP_HOME/bin/hdfs dfs -chown -R {{ hdfs_user }}:{{ hadoop_group }} /tmp/hadoop-yarn
+  shell: "{{ hadoop.home_path }}/bin/hdfs dfs -chown -R {{ hdfs_user }}:{{ hadoop_group }} /tmp/hadoop-yarn"
   become: true
   ignore_errors: true
   tags:
@@ -205,7 +226,7 @@
 
 - name: Add hosts to HADOOP_HOME/etc/hadoop/workers
   lineinfile:
-    dest: "/opt/hadoop/etc/hadoop/workers"
+    dest: "{{ hadoop.home_path }}/etc/hadoop/workers"
     line: "{{ item }}"
   loop: "{{ groups['workernodes'] }}"
   tags:
