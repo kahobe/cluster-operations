@@ -6,6 +6,14 @@
   when:
     - inventory_hostname in groups["krb5server"]
 
+- name: Install krb-user
+  apt:
+    update_cache: true
+    name: krb5-user
+    state: present
+  when:
+    - inventory_hostname in groups["krb5client"]
+    
 - name: Configure kdc.conf
   template:
     src: kdc.conf.j2
@@ -31,11 +39,3 @@
     - inventory_hostname in groups["krb5server"]
   tags:
     - configuration
-
-- name: Install krb-user
-  apt:
-    update_cache: true
-    name: krb5-user
-    state: present
-  when:
-    - inventory_hostname in groups["krb5client"]

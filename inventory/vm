@@ -44,6 +44,7 @@ all:
       truststore_file: "/etc/security/hadoop/truststore.jks"
     kerberos:
       realm: "KAHOVEC.DEV"
+      password: "Sup3rS3cur3Pa55w0rd!"
       keytab_path: /etc/security/keytab/
     hadoop:
       home_path: "/opt/hadoop"
