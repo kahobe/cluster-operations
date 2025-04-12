@@ -13,6 +13,38 @@
   limitations under the License. See accompanying LICENSE file.
 -->
 <configuration>
+  <property>
+    <description>Whether to enable log aggregation. Log aggregation collects
+      each container's logs and moves these logs onto a file-system, for e.g.
+      HDFS, after the application completes. Users can configure the
+      "yarn.nodemanager.remote-app-log-dir" and
+      "yarn.nodemanager.remote-app-log-dir-suffix" properties to determine
+      where these logs are moved to. Users can access the logs via the
+      Application Timeline Server.
+    </description>
+    <name>yarn.log-aggregation-enable</name>
+    <value>true</value>
+  </property>
+  <property>
+    <description>Time in seconds to retain user logs. Only applicable if
+    log aggregation is disabled
+    </description>
+    <name>yarn.nodemanager.log.retain-seconds</name>
+    <value>10800</value>
+  </property>
+  <property>
+    <description>Where to aggregate logs to.</description>
+    <name>yarn.nodemanager.remote-app-log-dir</name>
+    <value>/tmp/logs</value>
+  </property>
+  <property>
+    <description>The remote log dir will be created at 
+      {yarn.nodemanager.remote-app-log-dir}/${user}/{thisParam}
+    </description>
+    <name>yarn.nodemanager.remote-app-log-dir-suffix</name>
+    <value>logs</value>
+  </property>
+  
     <property>
         <name>yarn.resourcemanager.hostname</name>
         <value>{{ groups['namenodes'][0] }}</value>

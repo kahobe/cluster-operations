@@ -15,7 +15,7 @@
     - name: Install required packages
       ansible.builtin.include_tasks:
         file: tasks/linux/install-packages.yml
-    - name: Generate /etc/hosts
+    - name: Generate /etc/hosts file
       ansible.builtin.include_tasks:
         file: tasks/linux/generate-hosts-file.yml
 
@@ -31,13 +31,9 @@
     - name: Create Database
       ansible.builtin.include_tasks:
         file: tasks/kerberos/create_db.yml
-      when:
-        - inventory_hostname in groups["krb5server"]
     - name: Start Daemons
       ansible.builtin.include_tasks:
         file: tasks/kerberos/start_daemons.yml
-      when:
-        - inventory_hostname in groups["krb5server"]
 
 - name: Kerberize Hadoop
   tags:
@@ -72,8 +68,6 @@
       ansible.posix.synchronize:
         src: /tmp/keytabs/
         dest: /tmp/ansible_keytabs
-        owner: true
-        group: true
         mode: pull
       when:
         - inventory_hostname in groups["controllers"]
@@ -119,18 +113,18 @@
     yarn_user: "yarn"
     mapred_user: "mapred"
     hadoop_group: "hadoop"
-    hadoop_version: "3.3.6"
-    filename: "hadoop-{{ hadoop_version }}.tar.gz"
   tasks:
     - name: Distribute Certs
+      tags:
+        - ssl
       ansible.builtin.include_tasks:
         file: tasks/hadoop/distribute_cert.yml
     - name: Kinit
       become: true
-      shell: kinit -k -t /etc/security/keytab/dn.service.keytab dn/vm-controller@KAHOVEC.DEV
+      shell: kinit -k -t /etc/security/keytab/dn.service.keytab dn/{{ groups["controllers"][0] }}@{{ kerberos.realm }}
       register: keytab_output
       when:
-        - inventory_hostname in groups["controllers"]
+        - inventory_hostname == groups["controllers"][0]
     - name: Install Hadoop
       ansible.builtin.include_tasks:
         file: tasks/hadoop/install.yml

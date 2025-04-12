@@ -47,7 +47,48 @@ all:
       password: "Sup3rS3cur3Pa55w0rd!"
       keytab_path: /etc/security/keytab/
     hadoop:
+      version: "3.3.6"
+      binaries_file:  "hadoop/hadoop-{{ hadoop.version }}.tar.gz"
       home_path: "/opt/hadoop"
+    hdfs:
+      dirs:
+        root_dir: 
+          path: "/"
+          owner: "{{ users.hdfs.name }}"
+          group: "{{ users.hadoop.group }}"
+          mode: "755"
+        user_dir: 
+          path: "/user"
+          owner: "{{ users.hdfs.name }}"
+          group: "{{ users.hadoop.group }}"
+          mode: "755"
+        tmp_dir: 
+          path: "/tmp"
+          owner: "{{ users.hdfs.name }}"
+          group: "{{ users.hadoop.group }}"
+          mode: "1777"
+        yarn_remote_app_log_dir: 
+          path: "{{ hdfs.tmp_dir.path }}/logs"
+          owner: "{{ users.yarn.name }}"
+          group: "{{ users.hadoop.group }}"
+          mode: "1777"
+        yarn_mapreduce_am_staging_dir: 
+          path: "/tmp/hadoop-yarn/staging"
+          owner: "{{ users.yarn.name }}"
+          group: "{{ users.hadoop.group }}"
+          mode: "1777"
+        mapreduce_jobhistory_intermediate_done_dir: 
+          path: "{{ hdfs.yarn_mapreduce_am_staging_dir.path }}/history/done_intermediate"
+          owner: "{{ users.mapred.name }}"
+          group: "{{ users.hadoop.group }}"
+          mode: "1777"
+        mapreduce_jobhistory_done_dir: 
+          path: "{{ hdfs.yarn_mapreduce_am_staging_dir.path }}/history/done"
+          owner: "{{ users.mapred.name }}"
+          group: "{{ users.hadoop.group }}"
+          mode: "750"
+
+
     ansible_user: ansible
     kafka:
       cluster_id: 2BKCbwzCTxyCNEM8XkkU1A

@@ -2,6 +2,22 @@
 
 <configuration>
     <property>
+    <name>yarn.app.mapreduce.am.staging-dir</name>
+    <value>/tmp/hadoop-yarn/staging</value>
+    <description>The staging dir used while submitting jobs.
+    </description>
+    </property>
+    <property>
+    <name>mapreduce.jobhistory.intermediate-done-dir</name>
+    <value>${yarn.app.mapreduce.am.staging-dir}/history/done_intermediate</value>
+    <description></description>
+    </property>
+    <property>
+    <name>mapreduce.jobhistory.done-dir</name>
+    <value>${yarn.app.mapreduce.am.staging-dir}/history/done</value>
+    <description></description>
+    </property>
+    <property>
         <name>mapreduce.framework.name</name>
         <value>yarn</value>
     </property>

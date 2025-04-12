@@ -1,0 +1,11 @@
+# Formatting the Namenode
+- name: Format NameNode
+  shell: |
+    hdfs namenode -format -force
+  register: namenode_format_result
+  when:
+    - inventory_hostname == groups["controllers"][0]
+
+- name: Display result
+  debug:
+    var: namenode_format_result

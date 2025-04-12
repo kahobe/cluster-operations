@@ -1,6 +1,6 @@
 - name: Add Kerberos principal
   ansible.builtin.expect:
-    command: kadmin.local -q "addprinc {{ primary }}/{{ instance }}@KAHOVEC.DEV -pw {{ password }}"
+    command: kadmin.local -q "addprinc {{ primary }}/{{ instance }}@{{ realm }} -pw {{ password }}"
   become: yes
   register: result
   run_once: true

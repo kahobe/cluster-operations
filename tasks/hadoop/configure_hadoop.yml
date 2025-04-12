@@ -1,0 +1,75 @@
+# Setting up environment Variables
+- name: Set HADOOP_HOME environment variable
+  lineinfile:
+    path: /etc/environment
+    line: "export HADOOP_HOME={{ hadoop.home_path }}"
+  become: true
+
+- name: Set HADOOP_CONF_DIR environment variable
+  lineinfile:
+    path: /etc/environment
+    line: "export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop"
+  become: true
+
+- name: Set YARN_CONF_DIR environment variable
+  lineinfile:
+    path: /etc/environment
+    line: "export YARN_CONF_DIR=$HADOOP_CONF_DIR"
+  become: true
+
+- name: Add Hadoop to PATH for all Users
+  lineinfile:
+    path: /etc/environment
+    line: "export PATH=$PATH:$HADOOP_HOME/bin"
+  become: true
+
+- name: Set JAVA_HOME in hadoop-env.sh User
+  lineinfile:
+    path: "{{ hadoop.home_path }}/etc/hadoop/hadoop-env.sh"
+    search_string: "# export JAVA_HOME="
+    line: "export JAVA_HOME={{ linux.java_home_path }}"
+
+# Configuring Hadoop
+- name: Configure Hadoop core-site.xml
+  vars:
+    aut_to_local_realm: "{{ kerberos.realm | replace('.','.\\') }}"
+  template:
+    src: hadoop/core-site.xml.j2
+    dest: "{{ hadoop.home_path }}/etc/hadoop/core-site.xml"
+    owner: "{{ users.hadoop.name }}"
+    group: "{{ users.hadoop.group }}"
+
+- name: Configure Hadoop hdfs-site.xml
+  template:
+    src: hadoop/hdfs-site.xml.j2
+    dest: "{{ hadoop.home_path }}/etc/hadoop/hdfs-site.xml"
+    owner: "{{ users.hadoop.name }}"
+    group: "{{ users.hadoop.group }}"
+
+- name: Configure Yarn yarn-site.xml
+  template:
+    src: hadoop/yarn-site.xml.j2
+    dest: "{{ hadoop.home_path }}/etc/hadoop/yarn-site.xml"
+    owner: "{{ users.hadoop.name }}"
+    group: "{{ users.hadoop.group }}"
+
+- name: Configure Hadoop mapred-site.xml
+  template:
+    src: hadoop/mapred-site.xml.j2
+    dest: "{{ hadoop.home_path }}/etc/hadoop/mapred-site.xml"
+    owner: "{{ users.hadoop.name }}"
+    group: "{{ users.hadoop.group }}"
+
+- name: Configure Hadoop ssl-server.xml
+  template:
+    src: hadoop/ssl-server.xml.j2
+    dest: "{{ hadoop.home_path }}/etc/hadoop/ssl-server.xml"
+    owner: "{{ users.hadoop.name }}"
+    group: "{{ users.hadoop.group }}"
+
+- name: Add hosts to HADOOP_HOME/etc/hadoop/workers
+  lineinfile:
+    dest: "{{ hadoop.home_path }}/etc/hadoop/workers"
+    line: "{{ item }}"
+  loop: "{{ groups['workernodes'] }}"
+    

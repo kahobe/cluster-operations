@@ -1,48 +1,48 @@
-# Copy and Extract Hadoop to remote
+# Copy and Extract Hadoop
 - name: Copy Hadoop tarball to remote hosts
   ansible.builtin.copy:
-    src: "{{ filename }}"
-    dest: "/tmp/{{ filename }}"
+    src: "{{ hadoop.binaries_file }}"
+    dest: "/tmp/{{ hadoop.binaries_file }}"
 
 - name: Extract Hadoop tarball
   ansible.builtin.unarchive:
-    src: "/tmp/{{ filename }}"
+    src: "/tmp/{{ hadoop.binaries_file }}"
     dest: "/opt/"
-    owner: "{{ hadoop_user }}"
-    group: "{{ hadoop_group }}"
+    owner: "{{ users.hadoop.name }}"
+    group: "{{ users.hadoop.group }}"
     mode: "u=rwx,g=rwx,o=r"
     remote_src: yes
 
 - name: Create a symbolic link
   ansible.builtin.file:
-    src: /opt/hadoop-{{ hadoop_version }}
+    src: /opt/hadoop-{{ hadoop.version }}
     dest: /opt/hadoop
-    owner: "{{ hadoop_user }}"
-    group: "{{ hadoop_group }}"
+    owner: "{{ users.hadoop.name }}"
+    group: "{{ users.hadoop.group }}"
     state: link
 
-- name: Creates logs directory
+# Setting up Directories
+- name: Create logs directory
   ansible.builtin.file:
     path: /opt/hadoop/logs
-    owner: "{{ hadoop_user }}"
-    group: "{{ hadoop_group }}"
+    owner: "{{ users.hadoop.name }}"
+    group: "{{ users.hadoop.group }}"
     mode: "u=rwx,g=rwx,o=r"
     state: directory
 
-# Setting up Directories
 - name: Create Data Directory
   ansible.builtin.file:
     path: /srv/hadoop/hdfs/data
-    owner: "{{ hdfs_user }}"
-    group: "{{ hadoop_user }}"
+    owner: "{{ users.hdfs.name }}"
+    group: "{{ users.hadoop.group }}"
     state: directory
     mode: "0755"
 
 - name: Create NameNode Directory
   ansible.builtin.file:
     path: /srv/hadoop/hdfs/name
-    owner: "{{ hdfs_user }}"
-    group: "{{ hadoop_user }}"
+    owner: "{{ users.hdfs.name }}"
+    group: "{{ users.hadoop.group }}"
     state: directory
     mode: "0755"
 

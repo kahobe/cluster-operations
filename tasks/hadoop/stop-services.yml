@@ -1,4 +1,6 @@
 - name: Stop NameNode Service
+  tags:
+    - hdfs
   ansible.builtin.service:
     name: hdfs-namenode.service
     state: stopped
@@ -6,6 +8,8 @@
     - inventory_hostname in groups["controllers"]
 
 - name: Stop DataNode Service
+  tags:
+    - hdfs
   ansible.builtin.service:
     name: hdfs-datanode.service
     state: stopped
@@ -13,6 +17,8 @@
     - inventory_hostname in groups["workernodes"]
 
 - name: Stop YARN ResourceManager Service
+  tags:
+    - yarn
   ansible.builtin.service:
     name: yarn-resourcemanager.service
     state: stopped
@@ -20,6 +26,8 @@
     - inventory_hostname in groups["controllers"]
 
 - name: Stop YARN NodeManager Service
+  tags:
+    - yarn
   ansible.builtin.service:
     name: yarn-nodemanager.service
     state: stopped
@@ -27,6 +35,8 @@
     - inventory_hostname in groups["workernodes"]
 
 - name: Stop YARN HistoryServer Service
+  tags:
+    - yarn
   ansible.builtin.service:
     name: yarn-historyserver.service
     state: stopped

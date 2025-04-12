@@ -1,0 +1,20 @@
+
+# Create default hdfs directories 
+- name: Create hdfs dir "{{ item.path }}"
+  loop: "{{ hdfs.dirs }}"
+  shell: |
+    hdfs dfs -mkdir -p {{ item.path }}
+  ignore_errors: true
+  when:
+    - inventory_hostname == groups["controllers"][0]
+
+
+# Set Permissions
+- name: Set permission for hdfs dir "{{ item.path }}" 
+  loop: "{{ hdfs.dirs }}"
+  shell: |
+    hdfs dfs -chown {{ item.owner }}:{{ item.group }} {{ item.path }}
+    hdfs dfs -chmod {{ item.mode }} {{ item.path }}
+  ignore_errors: true
+  when:
+    - inventory_hostname == groups["controllers"][0]
