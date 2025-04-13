@@ -24,68 +24,70 @@ all:
         group: spark
     services:
       - name: nn
-        user: "{{ users.hdfs.name }}"
+        user: hdfs
       - name: sn
-        user: "{{ users.hdfs.name }}"
+        user: hdfs
       - name: dn
-        user: "{{ users.hdfs.name }}"
+        user: hdfs
       - name: rm
-        user: "{{ users.yarn.name }}"
+        user: yarn
       - name: nm
-        user: "{{ users.yarn.name }}"
+        user: yarn
       - name: jhs
-        user: "{{ users.mapred.name }}"
+        user: mapred
       - name: host
-        user: "{{ users.hadoop.name }}"
+        user: hadoop
       - name: hive
-        user: "{{ users.hive.name }}"
+        user: hive
     ssl:
       keystore_file: "/etc/security/hadoop/keystore.jks"
+      keystore_password: "bigdata"
       truststore_file: "/etc/security/hadoop/truststore.jks"
+      truststore_password: "bigdata"
     kerberos:
       realm: "KAHOVEC.DEV"
       password: "Sup3rS3cur3Pa55w0rd!"
-      keytab_path: /etc/security/keytab/
+      keytab_path: /etc/security/keytab
     hadoop:
       version: "3.3.6"
-      binaries_file:  "hadoop/hadoop-{{ hadoop.version }}.tar.gz"
+      binaries_file:  "hadoop-3.3.6.tar.gz"
       home_path: "/opt/hadoop"
     hdfs:
       dirs:
         root_dir: 
           path: "/"
-          owner: "{{ users.hdfs.name }}"
-          group: "{{ users.hadoop.group }}"
+          owner: hdfs
+          group: hadoop
           mode: "755"
         user_dir: 
           path: "/user"
-          owner: "{{ users.hdfs.name }}"
-          group: "{{ users.hadoop.group }}"
+          owner: hdfs
+          group: hadoop
           mode: "755"
         tmp_dir: 
           path: "/tmp"
-          owner: "{{ users.hdfs.name }}"
-          group: "{{ users.hadoop.group }}"
+          owner: hdfs
+          group: hadoop
           mode: "1777"
         yarn_remote_app_log_dir: 
-          path: "{{ hdfs.tmp_dir.path }}/logs"
-          owner: "{{ users.yarn.name }}"
-          group: "{{ users.hadoop.group }}"
+          path: "/tmp/logs"
+          owner: yarn
+          group: hadoop
           mode: "1777"
         yarn_mapreduce_am_staging_dir: 
           path: "/tmp/hadoop-yarn/staging"
-          owner: "{{ users.yarn.name }}"
-          group: "{{ users.hadoop.group }}"
+          owner: yarn
+          group: hadoop
           mode: "1777"
         mapreduce_jobhistory_intermediate_done_dir: 
-          path: "{{ hdfs.yarn_mapreduce_am_staging_dir.path }}/history/done_intermediate"
-          owner: "{{ users.mapred.name }}"
-          group: "{{ users.hadoop.group }}"
+          path: "/tmp/hadoop-yarn/staging/history/done_intermediate"
+          owner: mapred
+          group: hadoop
           mode: "1777"
         mapreduce_jobhistory_done_dir: 
-          path: "{{ hdfs.yarn_mapreduce_am_staging_dir.path }}/history/done"
-          owner: "{{ users.mapred.name }}"
-          group: "{{ users.hadoop.group }}"
+          path: "/tmp/hadoop-yarn/staging/history/done"
+          owner: mapred
+          group: hadoop
           mode: "750"
 
 
@@ -104,25 +106,21 @@ all:
             vm-controller:
               kafka_node_id: 1
 
-        namenodes:
-          hosts:
-            vm-controller:
-
         workernodes:
           hosts:
             vm-worker01:
               kafka_node_id: 2
-            vm-worker02:
-              kafka_node_id: 3
-            vm-worker03:
-              kafka_node_id: 4
+            # vm-worker02:
+            #   kafka_node_id: 3
+            # vm-worker03:
+            #   kafka_node_id: 4
 
-        krb5server:
-          hosts:
-            vm-controller:
+        # krb5server:
+        #   hosts:
+        #     vm-controller:
 
-        krb5client:
-          hosts:
-            vm-worker01:
-            vm-worker02:
-            vm-worker03:
+        # krb5client:
+        #   hosts:
+        #     vm-worker01:
+        #     # vm-worker02:
+        #     # vm-worker03:

@@ -35,7 +35,7 @@
   <property>
     <description>Where to aggregate logs to.</description>
     <name>yarn.nodemanager.remote-app-log-dir</name>
-    <value>/tmp/logs</value>
+    <value>{{ hdfs.dirs.yarn_remote_app_log_dir.path }}</value>
   </property>
   <property>
     <description>The remote log dir will be created at 
@@ -47,7 +47,7 @@
   
     <property>
         <name>yarn.resourcemanager.hostname</name>
-        <value>{{ groups['namenodes'][0] }}</value>
+        <value>{{ groups['controllers'][0] }}</value>
     </property>
     <property>
         <name>yarn.webapp.ui2.enable</name>
@@ -63,15 +63,15 @@
     </property>
     <property>
         <name>yarn.log.server.url</name>
-        <value>http://{{ groups['namenodes'][0] }}:19888/jobhistory/logs</value>
+        <value>http://{{ groups['controllers'][0] }}:19888/jobhistory/logs</value>
     </property>
     <property>
         <name>yarn.resourcemanager.principal</name>
-        <value>rm/_HOST@KAHOVEC.DEV</value>
+        <value>rm/_HOST@{{ kerberos.realm }}</value>
     </property>
     <property>
         <name>yarn.resourcemanager.keytab</name>
-        <value>/etc/security/keytab/rm.service.keytab</value>
+        <value>{{ kerberos.keytab_path }}/rm.service.keytab</value>
     </property>
     <property>
         <name>yarn.resourcemanager.webapp.https.address</name>
@@ -79,18 +79,18 @@
     </property>
     <property>
         <name>yarn.resourcemanager.keytab</name>
-        <value>/etc/security/keytab/rm.service.keytab</value>
+        <value>{{ kerberos.keytab_path }}/rm.service.keytab</value>
     </property>
     <property>
         <name>yarn.nodemanager.principal</name>
-        <value>nm/_HOST@KAHOVEC.DEV</value>
+        <value>nm/_HOST@{{ kerberos.realm }}</value>
     </property>
     <property>
         <name>yarn.nodemanager.keytab</name>
-        <value>/etc/security/keytab/nm.service.keytab</value>
+        <value>{{ kerberos.keytab_path }}/nm.service.keytab</value>
     </property>
     <property>
         <name>yarn.nodemanager.webapp.https.address</name>
-        <value>0.0.0.0:8044</value>
+        <value>{{ groups['controllers'][0] }}:8044</value>
     </property>
 </configuration>

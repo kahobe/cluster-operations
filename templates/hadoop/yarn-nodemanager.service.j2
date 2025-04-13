@@ -4,13 +4,13 @@ After=syslog.target network.target remote-fs.target nss-lookup.target network-on
 Requires=network-online.target
 
 [Service]
-User=yarn
-Group=hadoop
+User={{ users.yarn.name }}
+Group={{ users.hadoop.group }}
 Type=forking
-ExecStart=/opt/hadoop/bin/yarn --daemon start nodemanager
-ExecStop=/opt/hadoop/bin/yarn --daemon stop nodemanager
-ExecStopPost=/opt/hadoop/yarn --daemon stop nodemanager
-WorkingDirectory=/opt/hadoop
+ExecStart={{ hadoop.home_path }}/bin/yarn --daemon start nodemanager
+ExecStop={{ hadoop.home_path }}/bin/yarn --daemon stop nodemanager
+ExecStopPost={{ hadoop.home_path }}/bin/yarn --daemon stop nodemanager
+WorkingDirectory={{ hadoop.home_path }}
 TimeoutStartSec=1min
 Restart=no
 RestartSec=30

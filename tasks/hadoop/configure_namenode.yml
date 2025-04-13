@@ -1,10 +1,11 @@
 # Formatting the Namenode
 - name: Format NameNode
+  become_user: "{{ users.hdfs.name }}"
   shell: |
-    hdfs namenode -format -force
+    {{ hadoop.home_path }}/bin/hdfs namenode -format -force
   register: namenode_format_result
   when:
-    - inventory_hostname == groups["controllers"][0]
+    - inventory_hostname in groups["controllers"]
 
 - name: Display result
   debug:

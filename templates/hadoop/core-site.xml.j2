@@ -50,7 +50,7 @@
     <property>
         <name>hadoop.security.auth_to_local</name>
         <value>
-            RULE:[2:$1/$2@$0]([ndj]n/.*@K{{ aut_to_local_realm }})s/.*/hdfs/
+            RULE:[2:$1/$2@$0]([ndj]n/.*@{{ aut_to_local_realm }})s/.*/hdfs/
             RULE:[2:$1/$2@$0]([rn]m/.*@{{ aut_to_local_realm }})s/.*/yarn/
             RULE:[2:$1/$2@$0](jhs/.*@{{ aut_to_local_realm }})s/.*/mapred/
             DEFAULT

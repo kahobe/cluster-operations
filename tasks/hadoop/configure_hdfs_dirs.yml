@@ -1,20 +1,22 @@
 
 # Create default hdfs directories 
-- name: Create hdfs dir "{{ item.path }}"
-  loop: "{{ hdfs.dirs }}"
+- name: Create hdfs dir
+  become_user: "{{ users.hdfs.name }}"
+  loop: "{{ hdfs.dirs | dict2items }}"
   shell: |
-    hdfs dfs -mkdir -p {{ item.path }}
+    {{ hadoop.home_path }}/bin/hdfs dfs -mkdir -p {{ item.value.path }}
   ignore_errors: true
   when:
-    - inventory_hostname == groups["controllers"][0]
+    - inventory_hostname in groups["controllers"]
 
 
 # Set Permissions
-- name: Set permission for hdfs dir "{{ item.path }}" 
-  loop: "{{ hdfs.dirs }}"
+- name: Set permission for hdfs dir
+  become_user: "{{ users.hdfs.name }}"
+  loop: "{{ hdfs.dirs | dict2items }}"
   shell: |
-    hdfs dfs -chown {{ item.owner }}:{{ item.group }} {{ item.path }}
-    hdfs dfs -chmod {{ item.mode }} {{ item.path }}
+    {{ hadoop.home_path }}/bin/hdfs dfs -chown {{ item.value.owner }}:{{ item.value.group }} {{ item.value.path }}
+    {{ hadoop.home_path }}/bin/hdfs dfs -chmod {{ item.value.mode }} {{ item.value.path }}
   ignore_errors: true
   when:
-    - inventory_hostname == groups["controllers"][0]
+    - inventory_hostname in groups["controllers"]

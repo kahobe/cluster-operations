@@ -6,10 +6,10 @@
   become: true
   tasks:
     - name: Create User
-      loop: "{{ users }}"
+      loop: "{{ users | dict2items }}"
       vars:
-        new_user: "{{ item.name }}"
-        new_user_group: "{{ item.group }}"
+        new_user: "{{ item.value.name }}"
+        new_user_group: "{{ item.value.group }}"
       ansible.builtin.include_tasks:
         file: tasks/linux/create-user.yml
     - name: Install required packages
@@ -22,7 +22,7 @@
 - name: Setup Kerberos
   tags:
     - kerberos
-  hosts: krb5server, krb5client
+  hosts: controllers, workernodes
   become: true
   tasks:
     - name: Install Kerberos
@@ -41,10 +41,10 @@
   hosts: controllers, workernodes
   become: true
   vars:
-    hosts: "{{ groups['all'] | unique }}"
+    nodes: "{{ groups['all'] | unique }}"
   tasks:
     - name: Add Kerberos Principal
-      loop: "{{ hosts | product(services) | list }}"
+      loop: "{{ nodes | product(services) | list }}"
       vars:
         primary: "{{ item[1].name }}"
         instance: "{{ item[0] }}"
@@ -55,9 +55,9 @@
       when:
         - inventory_hostname in groups["controllers"]
     - name: Create temporary Keytab on Kerberos Admin Server
-      loop: "{{ hosts | product(services) | list }}"
+      loop: "{{ nodes | product(services) | list }}"
       vars:
-        path: "/tmp/keytabs/{{ item[0] }}"
+        path: "/tmp/ansible_keytabs/{{ item[0] }}"
         name: "{{ item[1].name }}.service.keytab"
         principal: "{{ item[1].name }}/{{ item[0] }}@{{ kerberos.realm }} host/{{ item[0] }}@{{ kerberos.realm }}"
       ansible.builtin.include_tasks:
@@ -66,7 +66,7 @@
         - inventory_hostname in groups["controllers"]
     - name: Copy temporary Keytab to local
       ansible.posix.synchronize:
-        src: /tmp/keytabs/
+        src: /tmp/ansible_keytabs/
         dest: /tmp/ansible_keytabs
         mode: pull
       when:
@@ -102,35 +102,59 @@
     - name: Delete local directory
       file: path=/tmp/ansible_keytabs/ state=absent
 
-- name: Setup Hadoop
+- name: Install Hadoop
   tags:
-    - hadoop
+    - install_hadoop
   hosts: controllers, workernodes
   become: true
-  vars:
-    hadoop_user: "hadoop"
-    hdfs_user: "hdfs"
-    yarn_user: "yarn"
-    mapred_user: "mapred"
-    hadoop_group: "hadoop"
   tasks:
     - name: Distribute Certs
-      tags:
-        - ssl
       ansible.builtin.include_tasks:
         file: tasks/hadoop/distribute_cert.yml
-    - name: Kinit
-      become: true
-      shell: kinit -k -t /etc/security/keytab/dn.service.keytab dn/{{ groups["controllers"][0] }}@{{ kerberos.realm }}
-      register: keytab_output
-      when:
-        - inventory_hostname == groups["controllers"][0]
     - name: Install Hadoop
       ansible.builtin.include_tasks:
         file: tasks/hadoop/install.yml
+    - name: Configure Systemd Services
+      ansible.builtin.include_tasks:
+        file: tasks/hadoop/configure_systemd.yml
+
+- name: Configure Hadoop
+  tags:
+    - configure_hadoop
+  hosts: controllers, workernodes
+  become: true
+  tasks:
+    - name: Stop hadoop services
+      ansible.builtin.include_tasks:
+        file: tasks/hadoop/stop_services.yml
+      vars:
+        - service: "all"
     - name: Configure Hadoop
       ansible.builtin.include_tasks:
-        file: tasks/hadoop/configure.yml
+        file: tasks/hadoop/configure_hadoop.yml
+    - name: Configure NameNode
+      ansible.builtin.include_tasks:
+        file: tasks/hadoop/configure_namenode.yml
+    - name: Start hdfs
+      ansible.builtin.include_tasks:
+        file: tasks/hadoop/start_services.yml
+      vars:
+        - service: "hdfs"
+    - name: Kinit using DataNode Keytab
+      vars:
+        become_user: "{{ users.hdfs.name }}"
+        keytab: "{{kerberos.keytab_path}}/nn.service.keytab"
+        principal: "nn/{{ groups['controllers'][0] }}@{{ kerberos.realm }}"
+      ansible.builtin.include_tasks:
+        file: tasks/kerberos/kinit.yml
+    - name: Configure hdfs directories
+      ansible.builtin.include_tasks:
+        file: tasks/hadoop/configure_hdfs_dirs.yml
+    - name: Stop hdfs
+      ansible.builtin.include_tasks:
+        file: tasks/hadoop/stop_services.yml
+      vars:
+        - service: "hdfs"
 
 - name: Setup MySQL
   hosts: controllers

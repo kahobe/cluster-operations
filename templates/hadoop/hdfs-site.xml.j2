@@ -36,29 +36,29 @@
 
     <property>
         <name>dfs.namenode.kerberos.principal</name>
-        <value>nn/_HOST@KAHOVEC.DEV</value>
+        <value>nn/_HOST@{{ kerberos.realm }}</value>
     </property>
     <property>
         <name>dfs.namenode.keytab.file</name>
-        <value>/etc/security/keytab/nn.service.keytab</value>
+        <value>{{ kerberos.keytab_path }}/nn.service.keytab</value>
     </property>
 
     <property>
         <name>dfs.journalnode.kerberos.principal</name>
-        <value>jn/_HOST@KAHOVEC.DEV</value>
+        <value>jn/_HOST@{{ kerberos.realm }}</value>
     </property>
     <property>
         <name>dfs.journalnode.keytab.file</name>
-        <value>/etc/security/keytab/jn.service.keytab</value>
+        <value>{{ kerberos.keytab_path }}/jn.service.keytab</value>
     </property>
 
     <property>
         <name>dfs.datanode.kerberos.principal</name>
-        <value>dn/_HOST@KAHOVEC.DEV</value>
+        <value>dn/_HOST@{{ kerberos.realm }}</value>
     </property>
     <property>
         <name>dfs.datanode.keytab.file</name>
-        <value>/etc/security/keytab/dn.service.keytab</value>
+        <value>{{ kerberos.keytab_path }}/dn.service.keytab</value>
     </property>
 
     <property>
@@ -68,14 +68,14 @@
     
     <property>
         <name>dfs.datanode.address</name>
-        <value>0.0.0.0:50010</value>
+        <value>{{ inventory_hostname }}:50010</value>
     </property>
     <property>
         <name>dfs.datanode.http.address</name>
-        <value>0.0.0.0:50020</value>
+        <value>{{ inventory_hostname }}:50020</value>
     </property>
     <property>
         <name>dfs.datanode.https.address</name>
-        <value>0.0.0.0:9865</value>
+        <value>{{ inventory_hostname }}:9865</value>
     </property>
 </configuration>

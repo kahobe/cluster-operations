@@ -1,0 +1,13 @@
+[libdefaults]
+	default_realm = {{ kerberos.realm }}
+	kdc_timesync = 1
+	ccache_type = 4
+	forwardable = true
+	proxiable = true
+
+[realms]
+	{{ kerberos.realm }} = {
+		kdc = {{ groups['controllers'][0] }}
+		admin_server = {{ groups['controllers'][0] }}
+		default_domain = {{ kerberos.realm.lower() }}
+        }

@@ -4,13 +4,13 @@ After=syslog.target network.target remote-fs.target nss-lookup.target network-on
 Requires=network-online.target
 
 [Service]
-User=hdfs
-Group=hadoop
+User={{ users.hdfs.name }}
+Group={{ users.hadoop.group }}
 Type=forking
-ExecStart=/opt/hadoop/bin/hdfs --daemon start namenode
-ExecStop=/opt/hadoop/bin/hdfs --daemon stop namenode
-ExecStopPost=/opt/hadoop/bin/hdfs --daemon stop namenode
-WorkingDirectory=/opt/hadoop
+ExecStart={{ hadoop.home_path }}/bin/hdfs --daemon start namenode
+ExecStop={{ hadoop.home_path }}/bin/hdfs --daemon stop namenode
+ExecStopPost={{ hadoop.home_path }}/bin/hdfs --daemon stop namenode
+WorkingDirectory={{ hadoop.home_path }}
 TimeoutStartSec=1min
 Restart=no
 RestartSec=30

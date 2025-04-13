@@ -1,21 +1,13 @@
-- name: Start Cluster
+- name: Start Hadoop
+  tags:
+    - hadoop
   hosts: controllers, workernodes
   become: true
 
   tasks:
     - name: Start Hadoop Services
+
       ansible.builtin.include_tasks:
-        file: tasks/hadoop/start-services.yml
-    - name: Start Hive Services
-      tags:
-        - hive
-      ansible.builtin.include_tasks:
-        file: tasks/hive/start-services.yml
-      when:
-        - inventory_hostname in groups["controllers"]
-    - name: Start Kafka Services
-      ansible.builtin.include_tasks:
-        file: tasks/kafka/start-services.yml
-    - name: Start Spark Services
-      ansible.builtin.include_tasks:
-        file: tasks/spark/start-standalone-services.yml
+        file: tasks/hadoop/start_services.yml
+      vars:
+        - service: "all"

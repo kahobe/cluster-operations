@@ -8,7 +8,7 @@
   register: result
   run_once: true
   when:
-    - inventory_hostname in groups["krb5server"]
+    - inventory_hostname == groups["controllers"][0]
 
 - name: Print output
   debug:

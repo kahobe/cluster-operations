@@ -4,13 +4,13 @@ After=syslog.target network.target remote-fs.target nss-lookup.target network-on
 Requires=network-online.target
 
 [Service]
-User=mapred
-Group=hadoop
+User={{ users.mapred.name }}
+Group={{ users.hadoop.group }}
 Type=forking
-ExecStart=/opt/hadoop/bin/mapred --daemon start historyserver
-ExecStop=/opt/hadoop/bin/mapred --daemon stop historyserver
-ExecStopPost=/opt/hadoop/bin/mapred --daemon stop historyserver
-WorkingDirectory=/opt/hadoop
+ExecStart={{ hadoop.home_path }}/bin/mapred --daemon start historyserver
+ExecStop={{ hadoop.home_path }}/bin/mapred --daemon stop historyserver
+ExecStopPost={{ hadoop.home_path }}/bin/mapred --daemon stop historyserver
+WorkingDirectory={{ hadoop.home_path }}
 TimeoutStartSec=1min
 Restart=no
 RestartSec=30

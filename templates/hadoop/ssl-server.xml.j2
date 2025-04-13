@@ -4,14 +4,14 @@
 
 <property>
   <name>ssl.server.truststore.location</name>
-  <value>/etc/security/hadoop/truststore.jks</value>
+  <value>{{ ssl.truststore_file }}</value>
   <description>Truststore to be used by NN and DN. Must be specified.
   </description>
 </property>
 
 <property>
   <name>ssl.server.truststore.password</name>
-  <value>bigdata</value>
+  <value>{{ ssl.truststore_password }}</value>
   <description>Optional. Default value is "".
   </description>
 </property>
@@ -33,21 +33,21 @@
 
 <property>
   <name>ssl.server.keystore.location</name>
-  <value>/etc/security/hadoop/keystore.jks</value>
+  <value>{{ ssl.keystore_file }}</value>
   <description>Keystore to be used by NN and DN. Must be specified.
   </description>
 </property>
 
 <property>
   <name>ssl.server.keystore.password</name>
-  <value>bigdata</value>
+  <value>{{ ssl.keystore_password }}</value>
   <description>Must be specified.
   </description>
 </property>
 
 <property>
   <name>ssl.server.keystore.keypassword</name>
-  <value>bigdata</value>
+  <value>{{ ssl.keystore_password }}</value>
   <description>Must be specified.
   </description>
 </property>

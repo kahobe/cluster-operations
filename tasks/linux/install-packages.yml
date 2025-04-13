@@ -19,19 +19,19 @@
 
 - name: Install venv
   apt:
-    name: "python{{ python_version }}-venv"
+    name: "python{{ linux.python_version }}-venv"
     state: present
   when:
     - inventory_hostname in groups["controllers"]
 
 - name: Install Java
   apt:
-    name: "{{ java_package }}"
+    name: "{{ linux.java_package }}"
     state: present
 
 - name: Set JAVA_HOME
   lineinfile:
-    path: /etc/environment
+    path: /etc/bash.bashrc
     state: present
     regexp: "^JAVA_HOME"
-    line: "JAVA_HOME={{ java_home_path }}"
+    line: "JAVA_HOME={{ linux.java_home_path }}"
