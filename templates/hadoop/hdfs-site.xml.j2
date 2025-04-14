@@ -42,6 +42,38 @@
         <name>dfs.namenode.keytab.file</name>
         <value>{{ kerberos.keytab_path }}/nn.service.keytab</value>
     </property>
+    <property>
+        <name>dfs.namenode.kerberos.internal.spnego.principal</name>
+        <value>HTTP/_HOST@{{ kerberos.realm }}</value>
+        <description>
+            The server principal used by the NameNode for web UI SPNEGO
+            authentication when Kerberos security is enabled. This is
+            typically set to HTTP/_HOST@REALM.TLD The SPNEGO server principal
+            begins with the prefix HTTP/ by convention.
+
+            If the value is '*', the web server will attempt to login with
+            every principal specified in the keytab file
+            dfs.web.authentication.kerberos.keytab.
+        </description>
+    </property>
+    <property>
+        <name>dfs.web.authentication.kerberos.keytab</name>
+        <value>{{ kerberos.keytab_path }}/HTTP.service.keytab</value>
+        <description>
+            The keytab file for the principal corresponding to
+            dfs.web.authentication.kerberos.principal.
+        </description>
+    </property>
+    <property>
+        <name>dfs.namenode.https-address</name>
+        <value>{{ groups['controllers'][0] }}:9871</value>
+        <description>The namenode secure http server address and port.</description>
+    </property>
+    <property>
+        <name>dfs.namenode.http-address</name>
+        <value>{{ groups['controllers'][0] }}:9870</value>
+        <description>The namenode secure http server address and port.</description>
+    </property>
 
     <property>
         <name>dfs.journalnode.kerberos.principal</name>

@@ -39,6 +39,8 @@ all:
         user: hadoop
       - name: hive
         user: hive
+      - name: HTTP
+        user: hadoop
     ssl:
       keystore_file: "/etc/security/hadoop/keystore.jks"
       keystore_password: "bigdata"

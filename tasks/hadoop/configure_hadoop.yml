@@ -36,6 +36,16 @@
     owner: "{{ users.hadoop.name }}"
     group: "{{ users.hadoop.group }}"
 
+
+- name: Create hadoop-http-auth-signature-secret file
+  loop: "{{ users | dict2items}}"
+  copy:
+    owner: "{{ item.value.name }}"
+    mode: "700"
+    dest: "/home/{{ item.value.name }}/hadoop-http-auth-signature-secret"
+    content: |
+      {{ item.value.name }}
+
 - name: Add hosts to HADOOP_HOME/etc/hadoop/workers
   lineinfile:
     dest: "{{ hadoop.home_path }}/etc/hadoop/workers"
