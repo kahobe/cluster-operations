@@ -54,6 +54,7 @@ all:
       version: "3.3.6"
       binaries_file:  "hadoop-3.3.6.tar.gz"
       home_path: "/opt/hadoop"
+      cluster_id: "hadoop_1"
     hdfs:
       dirs:
         root_dir: 

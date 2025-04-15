@@ -2,7 +2,7 @@
 - name: Format NameNode
   become_user: "{{ users.hdfs.name }}"
   shell: |
-    {{ hadoop.home_path }}/bin/hdfs namenode -format -force
+    {{ hadoop.home_path }}/bin/hdfs namenode -format -force -clusterId {{ hadoop.cluster_id }}
   register: namenode_format_result
   when:
     - inventory_hostname in groups["controllers"]

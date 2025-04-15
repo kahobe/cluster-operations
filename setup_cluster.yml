@@ -92,7 +92,7 @@
         path: /etc/security/keytab/{{ item.name }}.service.keytab
         owner: "{{ item.user }}"
         group: "{{ users.hadoop.group }}"
-        mode: "0400"
+        mode: "{{ '0440' if item.name == 'HTTP' else '0400' }}"
 
 - name: Remove Temporary Keytabs locally
   hosts: 127.0.0.1
