@@ -1,5 +1,10 @@
 all:
   vars:
+    ansible_user: ansible
+    linux:
+      java_package: "openjdk-8-jdk"
+      java_home_path: "/usr/lib/jvm/java-1.8.0-openjdk-amd64"
+      python_version: "3.10"
     users:
       hadoop:
         name: hadoop
@@ -48,13 +53,29 @@ all:
       truststore_password: "bigdata"
     kerberos:
       realm: "KAHOVEC.DEV"
-      password: "Sup3rS3cur3Pa55w0rd!"
+      password: "Sup3rS3cur3Pa55w0rd!" # FIXME: use ansible vault
       keytab_path: /etc/security/keytab
     hadoop:
       version: "3.3.6"
       binaries_file:  "hadoop-3.3.6.tar.gz"
       home_path: "/opt/hadoop"
       cluster_id: "hadoop_1"
+      dirs:
+        logs:
+          path: /var/log/hadoop/
+          owner: hdfs
+          group: hadoop
+          mode: "0770" 
+        namenode:
+          path: /srv/hadoop/hdfs/name
+          owner: hdfs
+          group: hadoop
+          mode: "0700" 
+        datanode: 
+          path: /srv/hadoop/hdfs/data
+          owner: hdfs
+          group: hadoop
+          mode: "0700" 
     hdfs:
       dirs:
         root_dir: 
@@ -92,15 +113,8 @@ all:
           owner: mapred
           group: hadoop
           mode: "750"
-
-
-    ansible_user: ansible
     kafka:
       cluster_id: 2BKCbwzCTxyCNEM8XkkU1A
-    linux:
-      java_package: "openjdk-8-jdk"
-      java_home_path: "/usr/lib/jvm/java-1.8.0-openjdk-amd64"
-      python_version: "3.10"
   children:
     cluster:
       children:

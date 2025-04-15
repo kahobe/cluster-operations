@@ -3,39 +3,39 @@
 <configuration>
     <!-- HTTP web-consoles Authentication -->
     <property>
-    <name>hadoop.http.authentication.type</name>
-    <value>kerberos</value>
-    <description>
+        <name>hadoop.http.authentication.type</name>
+        <value>kerberos</value>
+        <description>
         Defines authentication used for Oozie HTTP endpoint.
         Supported values are: simple | kerberos | #AUTHENTICATION_HANDLER_CLASSNAME#
-    </description>
+        </description>
     </property>
 
     <property>
-    <name>hadoop.http.authentication.signature.secret.file</name>
-    <value>${user.home}/hadoop-http-auth-signature-secret</value>
-    <description>
+        <name>hadoop.http.authentication.signature.secret.file</name>
+        <value>${user.home}/hadoop-http-auth-signature-secret</value>
+        <description>
         The signature secret for signing the authentication tokens.
         A different secret should be used for each service.
-    </description>
+        </description>
     </property>
 
     <property>
-    <name>hadoop.http.authentication.kerberos.principal</name>
-    <value>HTTP/_HOST@{{ kerberos.realm }}</value>
-    <description>
+        <name>hadoop.http.authentication.kerberos.principal</name>
+        <value>HTTP/_HOST@{{ kerberos.realm }}</value>
+        <description>
         Indicates the Kerberos principal to be used for HTTP endpoint.
         The principal MUST start with 'HTTP/' as per Kerberos HTTP SPNEGO specification.
-    </description>
+        </description>
     </property>
 
     <property>
-    <name>hadoop.http.authentication.kerberos.keytab</name>
-    <value>{{ kerberos.keytab_path }}/HTTP.service.keytab</value>
-    <description>
+        <name>hadoop.http.authentication.kerberos.keytab</name>
+        <value>{{ kerberos.keytab_path }}/HTTP.service.keytab</value>
+        <description>
         Location of the keytab file with the credentials for the principal.
         Referring to the same keytab file Oozie uses for its Kerberos credentials for Hadoop.
-    </description>
+        </description>
     </property>
     <property>
         <name>hadoop.http.filter.initializers</name>

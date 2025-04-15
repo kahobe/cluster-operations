@@ -22,29 +22,14 @@
     state: link
 
 # Setting up Directories
-- name: Create logs directory
+- name: Create directories
+  loop: "{{ hadoop.dirs | dict2items }}"
   ansible.builtin.file:
-    path: /opt/hadoop/logs
-    owner: "{{ users.hadoop.name }}"
-    group: "{{ users.hadoop.group }}"
-    mode: "u=rwx,g=rwx,o=r"
+    path: "{{ item.value.path }}"
+    owner: "{{ item.value.owner }}"
+    group: "{{ item.value.group }}"
     state: directory
-
-- name: Create Data Directory
-  ansible.builtin.file:
-    path: /srv/hadoop/hdfs/data
-    owner: "{{ users.hdfs.name }}"
-    group: "{{ users.hadoop.group }}"
-    state: directory
-    mode: "0755"
-
-- name: Create NameNode Directory
-  ansible.builtin.file:
-    path: /srv/hadoop/hdfs/name
-    owner: "{{ users.hdfs.name }}"
-    group: "{{ users.hadoop.group }}"
-    state: directory
-    mode: "0755"
+    mode: "{{ item.value.mode }}"
 
 
 # Setting up environment Variables
@@ -72,8 +57,14 @@
     line: "export PATH=$PATH:$HADOOP_HOME/bin"
   become: true
 
-- name: Set JAVA_HOME in hadoop-env.sh User
+- name: Set JAVA_HOME in hadoop-env.sh
   lineinfile:
     path: "{{ hadoop.home_path }}/etc/hadoop/hadoop-env.sh"
     search_string: "# export JAVA_HOME="
     line: "export JAVA_HOME={{ linux.java_home_path }}"
+
+- name: Set HADOOP_LOG_DIR in hadoop-env.sh User
+  lineinfile:
+    path: "{{ hadoop.home_path }}/etc/hadoop/hadoop-env.sh"
+    search_string: "# export HADOOP_LOG_DIR="
+    line: "export HADOOP_LOG_DIR={{ hadoop.dirs.logs.path }}"

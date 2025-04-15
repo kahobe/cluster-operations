@@ -29,6 +29,9 @@
       ansible.builtin.include_tasks:
         file: tasks/kerberos/install.yml
     - name: Create Database
+      vars:
+        realm: "{{ kerberos.realm }}"
+        password: "{{ kerberos.password }}"
       ansible.builtin.include_tasks:
         file: tasks/kerberos/create_db.yml
     - name: Start Daemons
@@ -49,7 +52,7 @@
         primary: "{{ item[1].name }}"
         instance: "{{ item[0] }}"
         realm: "{{ kerberos.realm }}"
-        password: "{{ kerberos.password }}" # FIXME: use ansible vault
+        password: "{{ kerberos.password }}"
       ansible.builtin.include_tasks:
         file: tasks/kerberos/add_princ.yml
       when:
