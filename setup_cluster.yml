@@ -135,9 +135,10 @@
     - name: Configure Hadoop
       ansible.builtin.include_tasks:
         file: tasks/hadoop/configure_hadoop.yml
-    - name: Configure NameNode
+    - name: Format NameNode
       ansible.builtin.include_tasks:
-        file: tasks/hadoop/configure_namenode.yml
+        file: tasks/hadoop/format_namenode.yml
+      when: format_namenode | default(false)
     - name: Start hdfs
       ansible.builtin.include_tasks:
         file: tasks/hadoop/start_services.yml
