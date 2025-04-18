@@ -13,7 +13,7 @@
     state: present
   when:
     - inventory_hostname in groups["workernodes"]
-    
+
 - name: Configure kdc.conf
   template:
     src: kerberos/kdc.conf.j2

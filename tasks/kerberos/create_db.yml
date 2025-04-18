@@ -1,15 +1,49 @@
+- name: Check if Database already exists
+  become: true
+  ansible.builtin.stat:
+    path: /var/kerberos/krb5kdc/principal
+  register: kdb_file
+  run_once: true
+  when:
+    - inventory_hostname == groups["controllers"][0]
+
+- name: Destroy Existing Database
+  become: true
+  command: "kdb5_util destroy -f {{ realm }}"
+  when:
+    - inventory_hostname == groups["controllers"][0]
+    - kdb_file is defined
+    - kdb_file.stat is defined
+    - not kdb_file.stat.exists
+    - delete_krb_db | default(false)
+
+- name: Re-check if DB exists after deletion
+  ansible.builtin.stat:
+    path: /var/kerberos/krb5kdc/principal
+  register: kdb_file
+  become: true
+  run_once: true
+  when:
+    - inventory_hostname == groups["controllers"][0]
+    - delete_krb_db | default(false)
+
 - name: Create Kerberos Database
+  become: true
   ansible.builtin.expect:
     command: "kdb5_util create -r {{ realm }} -s"
     responses:
       "Enter KDC database master key: ": "{{ password }}"
       "Re-enter KDC database master key to verify: ": "{{ password }}"
-  become: yes
   register: result
   run_once: true
   when:
     - inventory_hostname == groups["controllers"][0]
+    - kdb_file is defined
+    - kdb_file.stat is defined
+    - not kdb_file.stat.exists
 
-- name: Print output
+- name: Print DB creation output (only if DB was created)
   debug:
     var: result.stdout_lines
+  when:
+    - result is defined

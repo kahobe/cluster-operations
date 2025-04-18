@@ -3,11 +3,11 @@
 # Configuration
 KEYSTORE_PASSWORD="bigdata"
 TRUSTSTORE_PASSWORD="bigdata"
-VALIDITY_DAYS=360
+VALIDITY_DAYS=3600
 KEY_SIZE=2048
 
 # List of hosts (modify as needed)
-HOSTS=('vm-controller' 'vm-worker01' 'vm-worker02' 'vm-worker03')
+HOSTS=('vm-controller' 'vm-worker01')
 
 # Output directories
 OUTPUT_DIR="./certs"
