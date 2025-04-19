@@ -1,0 +1,31 @@
+- name: Configure systemd Hive Metastore Service
+  template:
+    src: hive/hive-metastore.service.j2
+    dest: /etc/systemd/system/hive-metastore.service
+  tags:
+    - configuration
+  become: true
+
+- name: Enable Hive Metastore Service
+  ansible.builtin.systemd_service:
+    name: hive-metastore
+    enabled: true
+    state: stopped
+  tags:
+    - configuration
+
+- name: Configure systemd Hive Server2 Service
+  template:
+    src: hive/hive-server2.service.j2
+    dest: /etc/systemd/system/hive-server2.service
+  tags:
+    - configuration
+  become: true
+
+- name: Enable Hive Server2 Service
+  ansible.builtin.systemd_service:
+    name: hive-server2
+    enabled: true
+    state: stopped
+  tags:
+    - configuration

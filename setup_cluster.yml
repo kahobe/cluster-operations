@@ -159,3 +159,67 @@
         file: tasks/hadoop/stop_services.yml
       vars:
         - service: "hdfs"
+
+- name: Install MySQL
+  hosts: controllers
+  tags:
+    - hive
+    - install_mysql
+  become: true
+  tasks:
+    - name: Install MySQL
+      ansible.builtin.include_tasks:
+        file: tasks/mysql/install.yml
+
+- name: Create MySQL Users
+  hosts: controllers
+  tags:
+    - hive
+    - create_mysql_users
+  become: true
+  tasks:
+    - name: Create MySQL Users
+      loop: "{{ mysql.users | dict2items }}"
+      vars:
+        user: "{{ item.value.name }}"
+        password: "{{ item.value.password }}"
+        db: "{{ item.value.db }}"
+        table: "{{ item.value.table }}"
+        privileges: "{{ item.value.privileges }}"
+      ansible.builtin.include_tasks:
+        file: tasks/mysql/create-user.yml
+
+- name: Install Hive
+  tags:
+    - hive
+    - install_hive
+  hosts: controllers
+  become: true
+  tasks:
+    - name: Install Hive
+      ansible.builtin.include_tasks:
+        file: tasks/hive/install.yml
+    - name: Configure Systemd Services
+      ansible.builtin.include_tasks:
+        file: tasks/hive/configure_systemd.yml
+
+- name: Configure Hive
+  tags:
+    - hive
+    - configure_hive
+  hosts: controllers
+  become: true
+  tasks:
+    - name: configure hive
+      ansible.builtin.include_tasks:
+        file: tasks/hive/configure_hive.yml
+    - name: Kinit using DataNode Keytab
+      vars:
+        become_user: "{{ users.hdfs.name }}"
+        keytab: "{{kerberos.keytab_path}}/nn.service.keytab"
+        principal: "nn/{{ groups['controllers'][0] }}@{{ kerberos.realm }}"
+      ansible.builtin.include_tasks:
+        file: tasks/kerberos/kinit.yml
+    - name: Configure hdfs directories
+      ansible.builtin.include_tasks:
+        file: tasks/hive/configure_hdfs_dirs.yml

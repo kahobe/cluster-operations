@@ -1,7 +1,7 @@
 # Create default hdfs directories
 - name: Create hdfs dir
   become_user: "{{ users.hdfs.name }}"
-  loop: "{{ hdfs.hadoop_dirs | dict2items }}"
+  loop: "{{ hdfs.hive_dirs | dict2items }}"
   shell: |
     {{ hadoop.home_path }}/bin/hdfs dfs -mkdir -p {{ item.value.path }}
   ignore_errors: true
@@ -11,7 +11,7 @@
 # Set Permissions
 - name: Set permission for hdfs dir
   become_user: "{{ users.hdfs.name }}"
-  loop: "{{ hdfs.hadoop_dirs | dict2items }}"
+  loop: "{{ hdfs.hive_dirs | dict2items }}"
   shell: |
     {{ hadoop.home_path }}/bin/hdfs dfs -chown {{ item.value.owner }}:{{ item.value.group }} {{ item.value.path }}
     {{ hadoop.home_path }}/bin/hdfs dfs -chmod {{ item.value.mode }} {{ item.value.path }}

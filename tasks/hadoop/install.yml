@@ -1,4 +1,4 @@
-# Copy and Extract Hadoop
+# Copy and extract hadoop``
 - name: Copy Hadoop tarball to remote hosts
   ansible.builtin.copy:
     src: "hadoop/{{ hadoop.binaries_file }}"
@@ -30,7 +30,6 @@
     group: "{{ item.value.group }}"
     state: directory
     mode: "{{ item.value.mode }}"
-
 
 # Setting up environment Variables
 - name: Set HADOOP_HOME environment variable

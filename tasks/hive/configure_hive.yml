@@ -1,0 +1,41 @@
+# configure hive
+- name: Configure Hadoop hive-site.xml
+  template:
+    src: hive/hive-site.xml.j2
+    dest: "{{ hive.home_path }}/conf/hive-site.xml"
+    owner: "{{ users.hive.name }}"
+    group: "{{ users.hive.group }}"
+  tags:
+    - configuration
+
+- name: Copy file
+  ansible.builtin.copy:
+    src: "{{ hive.home_path }}/conf/hive-env.sh.template"
+    dest: "{{ hive.home_path }}/conf/hive-env.sh"
+    owner: "{{ users.hive.name }}"
+    group: "{{ users.hive.group }}"
+    remote_src: yes
+  tags:
+    - configuration
+
+- name: Set HADOOP_HOME in hive-env.sh
+  lineinfile:
+    path: "{{ hive.home_path }}/conf/hive-env.sh"
+    search_string: "# export HADOOP_HOME"
+    line: "export HADOOP_HOME={{ hadoop.home_path }}"
+  tags:
+    - configuration
+
+# initialize  hive metastore
+- name: Check if Hive metastore is already initialized
+  command: "{{ hive.home_path }}/bin/schematool --dbType mysql --info"
+  become: true
+  become_user: "{{ users.hive.name }}"
+  register: hive_schema_check
+  changed_when: false
+  failed_when: false
+
+- name: Initialize Metastore Schema
+  command: "{{ hive.home_path }}/bin/schematool --dbType mysql --initSchema"
+  become_user: "{{ users.hive.name }}"
+  when: "'Metastore schema version:' not in hive_schema_check.stdout"

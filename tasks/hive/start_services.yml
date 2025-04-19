@@ -4,6 +4,9 @@
   ansible.builtin.service:
     name: hive-metastore.service
     state: started
+  when:
+    - inventory_hostname in groups["controllers"]
+    - service == "hive_metastore" or service == "all"
 
 - name: Start Hive Server2 Service
   tags:
@@ -11,3 +14,6 @@
   ansible.builtin.service:
     name: hive-server2.service
     state: started
+  when:
+    - inventory_hostname in groups["controllers"]
+    - service == "hive_server2" or service == "all"

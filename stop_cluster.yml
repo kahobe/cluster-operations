@@ -3,11 +3,21 @@
     - hadoop
   hosts: controllers, workernodes
   become: true
-
   tasks:
-    - name: Start Hadoop Services
-
+    - name: Stop Hadoop Services
       ansible.builtin.include_tasks:
         file: tasks/hadoop/stop_services.yml
+      vars:
+        - service: "all"
+
+- name: Stop Hive
+  tags:
+    - hive
+  hosts: controllers, workernodes
+  become: true
+  tasks:
+    - name: Stop Hadoop Services
+      ansible.builtin.include_tasks:
+        file: tasks/hive/stop_services.yml
       vars:
         - service: "all"

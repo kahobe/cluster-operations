@@ -6,8 +6,20 @@
 
   tasks:
     - name: Start Hadoop Services
-
       ansible.builtin.include_tasks:
         file: tasks/hadoop/start_services.yml
+      vars:
+        - service: "all"
+
+- name: Start Hive
+  tags:
+    - hive
+  hosts: controllers, workernodes
+  become: true
+
+  tasks:
+    - name: Start Hive Services
+      ansible.builtin.include_tasks:
+        file: tasks/hive/start_services.yml
       vars:
         - service: "all"

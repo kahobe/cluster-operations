@@ -14,7 +14,7 @@
 
     <property>
         <name>yarn.app.mapreduce.am.staging-dir</name>
-        <value>{{ hdfs.dirs.yarn_mapreduce_am_staging_dir.path }}</value>
+        <value>{{ hdfs.hadoop_dirs.yarn_mapreduce_am_staging_dir.path }}</value>
         <description>The staging dir used while submitting jobs.
         </description>
     </property>
@@ -23,13 +23,13 @@
 
     <property>
         <name>mapreduce.jobhistory.intermediate-done-dir</name>
-        <value>{{ hdfs.dirs.mapreduce_jobhistory_intermediate_done_dir.path }}</value>
+        <value>{{ hdfs.hadoop_dirs.mapreduce_jobhistory_intermediate_done_dir.path }}</value>
         <description></description>
     </property>
 
     <property>
         <name>mapreduce.jobhistory.done-dir</name>
-        <value>{{ hdfs.dirs.mapreduce_jobhistory_done_dir.path }}</value>
+        <value>{{ hdfs.hadoop_dirs.mapreduce_jobhistory_done_dir.path }}</value>
         <description></description>
     </property>
 

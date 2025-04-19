@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+
+  <!-- metastore configuration -->
+  <property>
+    <name>javax.jdo.option.ConnectionURL</name>
+    <value>jdbc:mysql://{{ groups['controllers'][0] }}/hive_metastore?createDatabaseIfNotExist=true</value>
+    <description>JDBC connection string for the data store which contains metadata</description>
+  </property>
+
+  <property>
+    <name>javax.jdo.option.ConnectionDriverName</name>
+    <value>com.mysql.jdbc.Driver</value>
+    <description>MySQL JDBC driver class</description>
+  </property>
+
+  <property>
+    <name>javax.jdo.option.ConnectionUserName</name>
+    <value>{{ hive.metastore.user }}</value>
+    <description>user name for connecting to MySQL server</description>
+  </property>
+
+  <property>
+    <name>javax.jdo.option.ConnectionPassword</name>
+    <value>{{ hive.metastore.password }}</value>
+    <description>password for connecting to MySQL server</description>
+  </property>
+
+  <property>
+    <name>datanucleus.autoStartMechanism</name>
+    <value>SchemaTable</value>
+    <description>Whether to initialize on startup.</description>
+  </property>
+
+  <property>
+    <name>hive.metastore.uris</name>
+    <value>thrift://{{ groups['controllers'][0] }}:9083</value>
+    <description>Hive connects to one of these URIs to make metadata requests to a remote Metastore
+      (comma separated list of URIs)</description>
+  </property>
+
+  <property>
+    <name>hive.metastore.warehouse.dir</name>
+    <value>{{ hdfs.hive_dirs.hive_managed_dir.path }}</value>
+    <description>default hdfs location for Hive managed tables.</description>
+  </property>
+
+  <property>
+    <name>hive.metastore.warehouse.external.dir</name>
+    <value>{{ hdfs.hive_dirs.hive_external_dir.path }}</value>
+    <description>default hdfs location for Hive external tables.</description>
+  </property>
+
+
+  <!-- hive server2 configuration -->
+  <property>
+    <name>hive.server2.thrift.bind.host</name>
+    <value>{{ groups['controllers'][0] }}</value>
+    <description>TCP interface to bind to</description>
+  </property>
+
+  <property>
+    <name>hive.server2.enable.doAs</name>
+    <value>false</value>
+    <description>Impersonate the connected user, default true</description>
+  </property>
+
+  <property>
+    <name>hive.server2.authentication</name>
+    <value>KERBEROS</value>
+    <description>Authentication mode, default NONE. Options are NONE (uses plain SASL), NOSASL,
+      KERBEROS, LDAP, PAM and CUSTOM</description>
+  </property>
+
+  <property>
+    <name>hive.server2.authentication.kerberos.principal</name>
+    <value>hive/_HOST@{{ kerberos.realm }}</value>
+    <description>Kerberos principal for server.</description>
+  </property>
+
+  <property>
+    <name>hive.server2.authentication.kerberos.keytab</name>
+    <value>{{ kerberos.keytab_path }}/hive.service.keytab</value>
+    <description>Keytab for server principal.</description>
+  </property>
+
+  <property>
+    <name>hive.server2.use.SSL</name>
+    <value>true</value>
+  </property>
+
+  <property>
+    <name>hive.server2.keystore.path</name>
+    <value>{{ ssl.keystore_file }}</value>
+
+  </property>
+
+  <property>
+    <name>hive.server2.keystore.password</name>
+    <value>{{ ssl.keystore_password }}</value>
+  </property>
+
+
+  <!-- NO IDEA WHAT THOSE SETTINGS DO -->
+  <property>
+    <name>hive.metastore.event.db.notification.api.auth</name>
+    <value>false</value>
+    <description></description>
+  </property>
+  <property>
+    <name>hive.support.concurrency</name>
+    <value>true</value>
+    <description></description>
+  </property>
+  <property>
+    <name>hive.txn.manager</name>
+    <value>org.apache.hadoop.hive.ql.lockmgr.DbTxnManager</value>
+  </property>
+  <property>
+    <name>hive.merge.mapfiles</name>
+    <value>true</value>
+  </property>
+  <property>
+    <name>hive.merge.mapredfiles</name>
+    <value>true</value>
+  </property>
+  <property>
+    <name>hive.merge.smallfiles.avgsize</name>
+    <value>1024000000</value>
+  </property>
+  <property>
+    <name>hive.compactor.initiator.on</name>
+    <value>true</value>
+  </property>
+  <property>
+    <name>hive.compactor.worker.threads</name>
+    <value>5</value>
+  </property>
+  <property>
+    <name>mapreduce.task.io.sort.mb</name>
+    <value>1</value>
+  </property>
+  <property>
+    <name>mapreduce.map.memory.mb</name>
+    <value>4096</value>
+  </property>
+  <property>
+    <name>mapreduce.map.java.opts</name>
+    <value>-Xmx3686m</value>
+  </property>
+  <property>
+    <name>mapreduce.reduce.memory.mb</name>
+    <value>4096</value>
+  </property>
+  <property>
+    <name>mapreduce.reduce.java.opts</name>
+    <value>-Xmx3686m</value>
+  </property>
+
+
+</configuration>

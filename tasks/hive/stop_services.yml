@@ -1,13 +1,15 @@
 - name: Stop Hive Metastore Service
-  tags:
-    - hive
   ansible.builtin.service:
     name: hive-metastore.service
     state: stopped
+  when:
+    - inventory_hostname in groups["controllers"]
+    - service == "hive_metastore" or service == "all"
 
 - name: Stop Hive Server2 Service
-  tags:
-    - hive
   ansible.builtin.service:
     name: hive-server2.service
     state: stopped
+  when:
+    - inventory_hostname in groups["controllers"]
+    - service == "hive_server2`" or service == "all"

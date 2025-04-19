@@ -1,0 +1,12 @@
+[Unit]
+Description=Apache HiveServer2
+After=network.target
+Requires=network.target
+
+[Service]
+Type=simple
+User=hive
+ExecStart={{ hive.home_path }}/bin/hive --service hiveserver2
+
+[Install]
+WantedBy=multi-user.target
