@@ -1,8 +1,208 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 <configuration>
-
   <!-- metastore configuration -->
+  <property>
+    <name>javax.jdo.option.ConnectionURL</name>
+    <value>jdbc:mysql://{{ groups['controllers'][0] }}/{{ mysql.users.hive.db }}?createDatabaseIfNotExist=true</value>
+    <description>JDBC connection string for the data store which contains metadata</description>
+  </property>
+
+  <property>
+    <name>javax.jdo.option.ConnectionDriverName</name>
+    <value>com.mysql.jdbc.Driver</value>
+    <description>MySQL JDBC driver class</description>
+  </property>
+
+  <property>
+    <name>javax.jdo.option.ConnectionUserName</name>
+    <value>{{ hive.metastore.user }}</value>
+    <description>user name for connecting to MySQL server</description>
+  </property>
+
+  <property>
+    <name>javax.jdo.option.ConnectionPassword</name>
+    <value>{{ hive.metastore.password }}</value>
+    <description>password for connecting to MySQL server</description>
+  </property>
+
+  <property>
+    <name>hive.metastore.uris</name>
+    <value>thrift://{{ groups['controllers'][0] }}:9083</value>
+    <description>Hive connects to one of these URIs to make metadata requests to a remote Metastore
+      (comma separated list of URIs)</description>
+  </property>
+
+  <property>
+    <name>hive.metastore.warehouse.dir</name>
+    <value>{{ hdfs.hive_dirs.hive_managed_dir.path }}</value>
+    <description>default hdfs location for Hive managed tables.</description>
+  </property>
+
+  <property>
+    <name>hive.metastore.event.db.notification.api.auth</name>
+    <value>false</value>
+    <description>
+      Should metastore do authorization against database notification related APIs such as get_next_notification.
+      If set to true, then only the superusers in proxy settings have the permission
+    </description>
+  </property>
+
+ <!-- metastore kerberos configuration -->
+  <property>
+    <name>hive.metastore.sasl.enabled</name>
+    <value>true</value>
+  </property>
+
+  <property>
+    <name>hive.metastore.kerberos.keytab.file</name>
+    <value>{{ kerberos.keytab_path }}/hive.service.keytab</value>
+  </property>
+
+  <property>
+    <name>hive.metastore.kerberos.principal</name>
+    <value>hive/_HOST@{{ kerberos.realm }}</value>
+  </property>
+
+  {# metastore Storage Based Authorization https://hive.apache.org/docs/latest/storage-based-authorization-in-the-metastore-server_45876440/
+  Should fix this error:
+  MetaException(message:Failed to create external path hdfs://vm-controller:9000/warehouse/managed/test_db.db for database test_db. This may result in access not being allowed if the StorageBasedAuthorizationProvider is enabled: null) #}
+  <property>
+    {# https://docs.cloudera.com/runtime/7.2.0/securing-hive/topics/hive_configure_storage_based_authorization.html #}
+    <property>
+      <name>hive.security.authorization.enabled</name>
+      <value>false</value>
+    </property>
+
+    <property>
+      <name>hive.security.authorization.manager</name>
+      <value>org.apache.hadoop.hive.ql.security.authorization.StorageBasedAuthorizationProvider</value>
+    </property>
+
+    <name>hive.security.metastore.authorization.manager</name>
+    <value>org.apache.hadoop.hive.ql.security.authorization.StorageBasedAuthorizationProvider</value>
+    <description>Names of authorization manager classes (comma separated) to be used in the metastore for authorization.
+    User-defined authorization classes should implement interface org.apache.hadoop.hive.ql.security.authorization.HiveMetastoreAuthorizationProvider.
+    All authorization manager classes have to successfully authorize the metastore API call for the command execution to be allowed.
+    The DefaultHiveMetastoreAuthorizationProvider implements the standard Hive grant/revoke model.
+    A storage-based authorization implementation is also provided to use as the value of this configuration property:
+    org.apache.hadoop.hive.ql.security.authorization.StorageBasedAuthorizationProvider
+    which uses HDFS permissions to provide authorization instead of using Hive-style grant-based authorization.</description>
+  </property>
+
+
+  <property>
+    <name>hive.security.metastore.authenticator.manager</name>
+    <value>org.apache.hadoop.hive.ql.security.HadoopDefaultMetastoreAuthenticator</value>
+    <description>authenticator manager class name to be used in the metastore for authentication.
+    The user defined authenticator should implement interface 
+    org.apache.hadoop.hive.ql.security.HiveAuthenticationProvider.
+    </description>
+  </property>
+
+  <property>
+    <name>hive.metastore.pre.event.listeners</name>
+    <value>org.apache.hadoop.hive.ql.security.authorization.AuthorizationPreEventListener</value>
+    <description>The pre-event listener classes to be loaded on the metastore side to run code whenever databases, tables, and partitions are created, altered, or dropped.
+    Set this configuration property to org.apache.hadoop.hive.ql.security.authorization.AuthorizationPreEventListener in hive-site.xml to turn on Hive metastore-side security.</description>
+  </property>
+
+  <property>
+    <name>hive.metastore.execute.setugi</name>
+    <value>true</value>
+    <description>In unsecure mode, true will cause the metastore to execute DFS operations using the client's reported user and group permissions.
+    Note that this property must be set on both the client and server sides. Further note that it's best effort.
+    If client sets it to true and server sets it to false, the client setting will be ignored.</description>
+  </property>
+
+
+  <property>
+    <name>hive.security.metastore.authorization.auth.reads</name>
+    <value>true</value>
+    <description>When this is set to true, Hive metastore authorization also checks for read access.
+    It is set to true by default. Read authorization checks were introduced in Hive 0.14.0.</description>
+  </property>
+
+
+  <!-- datanucleus -->
+  <property>
+    <name>datanucleus.autoStartMechanism</name>
+    <value>SchemaTable</value>
+    <description>Whether to initialize on startup. Configuring auto start for data nucleus is highly recommended. 
+    See https://issues.apache.org/jira/browse/HIVE-4762 for more details</description>
+  </property>
+
+  <!-- hive server 2 -->
+  <property>
+    <name>hive.server2.thrift.bind.host</name>
+    <value>{{ groups['controllers'][0] }}</value>
+    <description>Bind host on which to run the HiveServer2 Thrift interface. Can be overridden by setting $HIVE_SERVER2_THRIFT_BIND_HOST.</description>
+  </property>
+
+  <property>
+    <name>hive.server2.thrift.port</name>
+    <value>10000</value>
+    <description>Port number of HiveServer2 Thrift interface. Can be overridden by setting $HIVE_SERVER2_THRIFT_PORT.</description>
+  </property>
+
+
+  <!-- hive server 2 security -->
+  <property>
+    <name>hive.server2.authentication</name>
+    <value>KERBEROS</value>
+    <description>Authentication mode, default NONE. Options are NONE (uses plain SASL), NOSASL,
+      KERBEROS, LDAP, PAM and CUSTOM</description>
+  </property>
+
+  <property>
+    <name>hive.server2.authentication.kerberos.principal</name>
+    <value>hive/_HOST@{{ kerberos.realm }}</value>
+    <description>Kerberos principal for server.</description>
+  </property>
+
+  <property>
+    <name>hive.server2.authentication.kerberos.keytab</name>
+    <value>{{ kerberos.keytab_path }}/hive.service.keytab</value>
+    <description>Keytab for server principal.</description>
+  </property>
+
+  <property>
+    <name>hive.server2.thrift.sasl.qop</name>
+    <value>auth</value>
+    <description>Sasl QOP value; set it to one of the following values to enable higher levels of protection for HiveServer2 communication with clients.
+      "auth" – authentication only (default)
+      "auth-int" – authentication plus integrity protection
+      "auth-conf" – authentication plus integrity and confidentiality protection
+      Note that hadoop.rpc.protection being set to a higher level than HiveServer2 does not make sense in most situations. 
+      HiveServer2 ignores hadoop.rpc.protection in favor of hive.server2.thrift.sasl.qop.</description>
+  </property>
+
+
+  <!-- hive server 2 Impersonation -->
+  <property>
+    <name>hive.server2.enable.doAs</name>
+    <value>true</value>
+    <description>Impersonate the connected user, default true</description>
+  </property>
+
+  <!-- hive server 2 SSL Encryption -->
+  <property>
+    <name>hive.server2.use.SSL</name>
+    <value>true</value>
+  </property>
+
+  <property>
+    <name>hive.server2.keystore.path</name>
+    <value>{{ ssl.keystore_file }}</value>
+
+  </property>
+
+  <property>
+    <name>hive.server2.keystore.password</name>
+    <value>{{ ssl.keystore_password }}</value>
+  </property>
+  
+  {# <!-- metastore configuration -->
   <property>
     <name>javax.jdo.option.ConnectionURL</name>
     <value>jdbc:mysql://{{ groups['controllers'][0] }}/hive_metastore?createDatabaseIfNotExist=true</value>
@@ -156,7 +356,7 @@
   <property>
     <name>mapreduce.reduce.java.opts</name>
     <value>-Xmx3686m</value>
-  </property>
+  </property> #}
 
 
 </configuration>

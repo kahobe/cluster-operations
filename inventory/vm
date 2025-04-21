@@ -85,8 +85,8 @@ all:
           table: "*"
           privileges: "ALL"
     hive:
-      version: "4.0.0"
-      binaries_file: "apache-hive-4.0.0-bin.tar.gz"
+      version: "4.0.1"
+      binaries_file: "apache-hive-4.0.1-bin.tar.gz"
       jdbc_file: "mysql-connector-j-8.4.0.jar"
       home_path: "/opt/hive"
       metastore:

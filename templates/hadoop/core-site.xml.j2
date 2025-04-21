@@ -103,12 +103,14 @@
         </value>
         <description>Maps kerberos principals to local user names</description>
     </property>
+
+    <!-- hive user impersonation -->
     <property>
-        <name>hadoop.proxyuser.superuser.hosts</name>
+        <name>hadoop.proxyuser.hive.hosts</name>
         <value>*</value>
     </property>
     <property>
-        <name>hadoop.proxyuser.superuser.groups</name>
+        <name>hadoop.proxyuser.hive.groups</name>
         <value>*</value>
     </property>
 </configuration>
