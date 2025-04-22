@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <configuration>
-    <!-- HTTP web-consoles Authentication -->
+    <!-- ================= HTTP web-consoles Authentication ================= -->
     <property>
         <name>hadoop.http.authentication.type</name>
         <value>kerberos</value>
@@ -47,7 +47,7 @@
         ordering of the filters.</description>
     </property>
 
-    <!-- file system properties -->
+    <!-- ================= file system properties ================= -->
     <property>
         <name>fs.defaultFS</name>
         <value>hdfs://{{ groups['controllers'][0] }}:9000</value>
@@ -58,7 +58,7 @@
             determine the host, port, etc. for a filesystem.</description>
     </property>
 
-    <!-- i/o properties -->
+    <!-- ================= I/O ================= -->
     <property>
         <name>io.file.buffer.size</name>
         <value>131072</value>
@@ -69,7 +69,7 @@
         </description>
     </property>
 
-    <!-- security properties -->
+    <!-- ================= Security ================= -->
     <property>
         <name>hadoop.security.authorization</name>
         <value>true</value>
@@ -104,7 +104,7 @@
         <description>Maps kerberos principals to local user names</description>
     </property>
 
-    <!-- hive user impersonation -->
+    <!-- ================= Hive User Impersonation ================= -->
     <property>
         <name>hadoop.proxyuser.hive.hosts</name>
         <value>*</value>

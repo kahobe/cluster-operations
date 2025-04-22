@@ -2,8 +2,7 @@
 
 <configuration>
 
-    <!-- MR YARN Application properties -->
-
+    <!-- ================= MR YARN Application properties ================= -->
     <property>
         <name>mapreduce.framework.name</name>
         <value>yarn</value>
@@ -19,8 +18,7 @@
         </description>
     </property>
 
-    <!-- jobhistory properties -->
-
+    <!-- ================= Jobhistory Properties ================= -->
     <property>
         <name>mapreduce.jobhistory.intermediate-done-dir</name>
         <value>{{ hdfs.hadoop_dirs.mapreduce_jobhistory_intermediate_done_dir.path }}</value>
@@ -56,15 +54,14 @@
         </description>
     </property>
 
-    <!-- Job Notification Configuration -->
 
+    <!-- ================= Job Notification Configuration ================= -->
     <property>
         <name>mapreduce.application.classpath</name>
         <value>/opt/hadoop/etc/hadoop:/opt/hadoop/share/hadoop/common/lib/*:/opt/hadoop/share/hadoop/common/*:/opt/hadoop/share/hadoop/hdfs:/opt/hadoop/share/hadoop/hdfs/lib/*:/opt/hadoop/share/hadoop/hdfs/*:/opt/hadoop/share/hadoop/mapreduce/*:/opt/hadoop/share/hadoop/yarn:/opt/hadoop/share/hadoop/yarn/lib/*:/opt/hadoop/share/hadoop/yarn/*</value>
     </property>
 
-    <!-- i/o properties -->
-
+    <!-- ================= I/O properties ================= 
     <property>
         <name>mapreduce.map.memory.mb</name>
         <value>-Xmx3686m</value>
@@ -89,8 +86,8 @@
         <name>mapred.child.java.opts</name>
         <value>-Xmx1024m -server</value>
     </property>
-
-    <!-- overrides mapred.child.java.opts -->
+    -->
+    <!-- ================= overrides mapred.child.java.opts ================= 
     <property>
         <name>mapreduce.reduce.java.opts</name>
         <value>-Xmx3686m</value>
@@ -117,5 +114,5 @@
         <description>The total amount of buffer memory to use while sorting
         files, in megabytes.  By default, gives each merge stream 1MB, which
         should minimize seeks.</description>
-    </property>
+    </property> -->
 </configuration>

@@ -2,8 +2,7 @@
 
 <configuration>
 
-    <!-- dfs properties -->
-
+    <!-- ================= DFS properties ================= -->
     <property>
         <name>dfs.replication</name>
         <value>{{ [groups['workernodes'] | length, 3] | min }}</value>
@@ -57,8 +56,7 @@
         </description>
     </property>
 
-    <!-- security properties -->
-
+    <!-- ================= Security ================= -->
     <property>
         <name>dfs.http.policy</name>
         <value>HTTPS_ONLY</value>
@@ -132,8 +130,7 @@
         </description>
     </property>
 
-    <!-- kerberos principals/keytabs -->
-
+    <!-- ================= Kerberos ================= -->
     <property>
         <name>dfs.namenode.kerberos.principal</name>
         <value>nn/_HOST@{{ kerberos.realm }}</value>

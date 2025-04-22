@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <configuration>
 
-  <!-- Node Manager Configuration -->
-
+  <!-- ================= Node Manager properties ================= -->
   <property>
     <name>yarn.log-aggregation-enable</name>
     <value>true</value>
@@ -68,7 +67,7 @@
     <value>org.apache.hadoop.mapred.ShuffleHandler</value>
   </property>
 
-  <!-- Resource Manager Configuration -->
+  <!-- ================= Resourcemanager properties ================= -->
   <property>
     <name>yarn.resourcemanager.hostname</name>
     <value>{{ groups['controllers'][0] }}</value>
@@ -109,7 +108,7 @@
     </description>
   </property>
 
-  <!-- Other Configuration -->
+  <!-- ================= Other properties ================= -->
   <property>
     <name>yarn.log.server.url</name>
     <value>http://{{ groups['controllers'][0] }}:19888/jobhistory/logs</value>
