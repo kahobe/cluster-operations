@@ -139,12 +139,12 @@ all:
           path: "/warehouse/managed"
           owner: hive
           group: hadoop
-          mode: "755"
+          mode: "770"
         hive_external_dir:
           path: "/warehouse/external"
           owner: hive
           group: hadoop
-          mode: "755"
+          mode: "770"
     kafka:
       cluster_id: 2BKCbwzCTxyCNEM8XkkU1A
   children:

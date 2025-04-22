@@ -8,7 +8,7 @@
       ansible.builtin.include_tasks:
         file: tasks/hadoop/stop_services.yml
       vars:
-        - service: "all"
+        service: "all"
 
 - name: Stop Hive
   tags:
@@ -20,4 +20,4 @@
       ansible.builtin.include_tasks:
         file: tasks/hive/stop_services.yml
       vars:
-        - service: "all"
+        service: "all"

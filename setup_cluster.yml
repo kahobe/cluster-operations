@@ -131,7 +131,7 @@
       ansible.builtin.include_tasks:
         file: tasks/hadoop/stop_services.yml
       vars:
-        - service: "all"
+        service: "all"
     - name: Configure Hadoop
       ansible.builtin.include_tasks:
         file: tasks/hadoop/configure_hadoop.yml
@@ -143,7 +143,7 @@
       ansible.builtin.include_tasks:
         file: tasks/hadoop/start_services.yml
       vars:
-        - service: "hdfs"
+        service: "hdfs"
     - name: Kinit using DataNode Keytab
       vars:
         become_user: "{{ users.hdfs.name }}"
@@ -158,7 +158,7 @@
       ansible.builtin.include_tasks:
         file: tasks/hadoop/stop_services.yml
       vars:
-        - service: "hdfs"
+        service: "hdfs"
 
 - name: Install MySQL
   hosts: controllers
