@@ -7,7 +7,7 @@ VALIDITY_DAYS=3600
 KEY_SIZE=2048
 
 # List of hosts (modify as needed)
-HOSTS=('vm-controller' 'vm-worker01')
+HOSTS=('rpic' 'rpiw1' 'rpiw2' 'rpiw3')
 
 # Output directories
 OUTPUT_DIR="./certs"
