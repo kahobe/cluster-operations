@@ -2,6 +2,12 @@
 
 ## Tips
 
+disable unattended upgrades to avoid confilcts, needs to be done once on each host
+
+```bash
+sudo dpkg-reconfigure -plow unattended-upgrades
+```
+
 - Use the download the versions that are already configured in the playbooks since the installation prcedure might vary for different versions.
 - Run the command with `--diff --check` first to avoid problems.
 
