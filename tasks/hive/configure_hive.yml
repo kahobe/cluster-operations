@@ -3,8 +3,8 @@
   template:
     src: hive/hive-site.xml.j2
     dest: "{{ hive.home_path }}/conf/hive-site.xml"
-    owner: "{{ users.hive.name }}"
-    group: "{{ users.hive.group }}"
+    owner: "{{ service_users.hive.name }}"
+    group: "{{ service_users.hive.group }}"
   tags:
     - configuration
 
@@ -12,8 +12,8 @@
   ansible.builtin.copy:
     src: "{{ hive.home_path }}/conf/hive-env.sh.template"
     dest: "{{ hive.home_path }}/conf/hive-env.sh"
-    owner: "{{ users.hive.name }}"
-    group: "{{ users.hive.group }}"
+    owner: "{{ service_users.hive.name }}"
+    group: "{{ service_users.hive.group }}"
     remote_src: yes
   tags:
     - configuration
@@ -30,12 +30,12 @@
 - name: Check if Hive metastore is already initialized
   command: "{{ hive.home_path }}/bin/schematool --dbType mysql --info"
   become: true
-  become_user: "{{ users.hive.name }}"
+  become_user: "{{ service_users.hive.name }}"
   register: hive_schema_check
   changed_when: false
   failed_when: false
 
 - name: Initialize Metastore Schema
   command: "{{ hive.home_path }}/bin/schematool --dbType mysql --initSchema"
-  become_user: "{{ users.hive.name }}"
+  become_user: "{{ service_users.hive.name }}"
   when: "'Metastore schema version:' not in hive_schema_check.stdout"

@@ -5,40 +5,39 @@
   template:
     src: hadoop/core-site.xml.j2
     dest: "{{ hadoop.home_path }}/etc/hadoop/core-site.xml"
-    owner: "{{ users.hadoop.name }}"
-    group: "{{ users.hadoop.group }}"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
 
 - name: Configure Hadoop hdfs-site.xml
   template:
     src: hadoop/hdfs-site.xml.j2
     dest: "{{ hadoop.home_path }}/etc/hadoop/hdfs-site.xml"
-    owner: "{{ users.hadoop.name }}"
-    group: "{{ users.hadoop.group }}"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
 
 - name: Configure Yarn yarn-site.xml
   template:
     src: hadoop/yarn-site.xml.j2
     dest: "{{ hadoop.home_path }}/etc/hadoop/yarn-site.xml"
-    owner: "{{ users.hadoop.name }}"
-    group: "{{ users.hadoop.group }}"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
 
 - name: Configure Hadoop mapred-site.xml
   template:
     src: hadoop/mapred-site.xml.j2
     dest: "{{ hadoop.home_path }}/etc/hadoop/mapred-site.xml"
-    owner: "{{ users.hadoop.name }}"
-    group: "{{ users.hadoop.group }}"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
 
 - name: Configure Hadoop ssl-server.xml
   template:
     src: hadoop/ssl-server.xml.j2
     dest: "{{ hadoop.home_path }}/etc/hadoop/ssl-server.xml"
-    owner: "{{ users.hadoop.name }}"
-    group: "{{ users.hadoop.group }}"
-
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
 
 - name: Create hadoop-http-auth-signature-secret file
-  loop: "{{ users | dict2items}}"
+  loop: "{{ service_users | dict2items}}"
   copy:
     owner: "{{ item.value.name }}"
     mode: "700"
@@ -51,4 +50,3 @@
     dest: "{{ hadoop.home_path }}/etc/hadoop/workers"
     line: "{{ item }}"
   loop: "{{ groups['workernodes'] }}"
-    

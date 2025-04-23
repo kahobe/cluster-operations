@@ -1,11 +1,13 @@
 - name: Check if Database already exists
   become: true
   ansible.builtin.stat:
-    path: /var/kerberos/krb5kdc/principal
+    path: /var/lib/krb5kdc/principal
   register: kdb_file
   run_once: true
   when:
     - inventory_hostname == groups["controllers"][0]
+
+- debug: msg="{{ kdb_file.stat }}"
 
 - name: Destroy Existing Database
   become: true
@@ -14,12 +16,12 @@
     - inventory_hostname == groups["controllers"][0]
     - kdb_file is defined
     - kdb_file.stat is defined
-    - not kdb_file.stat.exists
+    - kdb_file.stat.exists
     - delete_krb_db | default(false)
 
 - name: Re-check if DB exists after deletion
   ansible.builtin.stat:
-    path: /var/kerberos/krb5kdc/principal
+    path: /var/lib/krb5kdc/principal
   register: kdb_file
   become: true
   run_once: true

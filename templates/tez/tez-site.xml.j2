@@ -1,0 +1,24 @@
+<configuration>
+  <property>
+    <name>tez.use.cluster.hadoop-libs</name>
+    <value>true</value>
+  </property>
+
+  <!-- Path to the Tez tarball in HDFS -->
+  <property>
+    <name>tez.lib.uris</name>
+    <value>hdfs://{{ tez.hdfs_location }}/{{ tez.binaries_file }}</value>
+  </property>
+
+  <!-- Optional tuning -->
+  <property>
+    <name>tez.am.resource.memory.mb</name>
+    <value>1024</value>
+  </property>
+
+  <property>
+    <name>tez.am.launch.cmd-opts</name>
+    <value>-Xmx768m</value>
+  </property>
+
+</configuration>

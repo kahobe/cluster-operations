@@ -6,7 +6,7 @@
   become: true
   tasks:
     - name: Create User
-      loop: "{{ users | dict2items }}"
+      loop: "{{ service_users | dict2items }}"
       vars:
         new_user: "{{ item.value.name }}"
         new_user_group: "{{ item.value.group }}"
@@ -94,7 +94,7 @@
       ansible.builtin.file:
         path: /etc/security/keytab/{{ item.name }}.service.keytab
         owner: "{{ item.user }}"
-        group: "{{ users.hadoop.group }}"
+        group: "{{ service_users.hadoop.group }}"
         mode: "{{ '0440' if item.name == 'HTTP' else '0400' }}"
 
 - name: Remove Temporary Keytabs locally
@@ -146,7 +146,7 @@
         - service: "hdfs"
     - name: Kinit using DataNode Keytab
       vars:
-        become_user: "{{ users.hdfs.name }}"
+        become_user: "{{ service_users.hdfs.name }}"
         keytab: "{{kerberos.keytab_path}}/nn.service.keytab"
         principal: "nn/{{ groups['controllers'][0] }}@{{ kerberos.realm }}"
       ansible.builtin.include_tasks:

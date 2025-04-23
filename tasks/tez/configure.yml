@@ -1,0 +1,13 @@
+- name: Configure tez-site.xml for hadoop
+  template:
+    src: tez/tez-site.xml.j2
+    dest: "{{ hadoop.home_path }}/etc/hadoop/tez-site.xml"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
+
+- name: Configure tez-site.xml for hive
+  template:
+    src: tez/tez-site.xml.j2
+    dest: "{{ hive.home_path }}/conf/tez-site.xml"
+    owner: "{{ service_users.hive.name }}"
+    group: "{{ service_users.hive.group }}"

@@ -1,6 +1,6 @@
 # Create default hdfs directories
 - name: Create hdfs dir
-  become_user: "{{ users.hdfs.name }}"
+  become_user: "{{ service_users.hdfs.name }}"
   loop: "{{ hdfs.hive_dirs | dict2items }}"
   shell: |
     {{ hadoop.home_path }}/bin/hdfs dfs -mkdir -p {{ item.value.path }}
@@ -10,7 +10,7 @@
 
 # Set Permissions
 - name: Set permission for hdfs dir
-  become_user: "{{ users.hdfs.name }}"
+  become_user: "{{ service_users.hdfs.name }}"
   loop: "{{ hdfs.hive_dirs | dict2items }}"
   shell: |
     {{ hadoop.home_path }}/bin/hdfs dfs -chown {{ item.value.owner }}:{{ item.value.group }} {{ item.value.path }}

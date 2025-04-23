@@ -8,17 +8,17 @@
   ansible.builtin.unarchive:
     src: "/tmp/{{ hadoop.binaries_file }}"
     dest: "/opt/"
-    owner: "{{ users.hadoop.name }}"
-    group: "{{ users.hadoop.group }}"
-    mode: "u=rwx,g=rwx,o=r"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
+    mode: "u=rwx,g=rwx,o=rx"
     remote_src: yes
 
 - name: Create a symbolic link
   ansible.builtin.file:
     src: /opt/hadoop-{{ hadoop.version }}
     dest: /opt/hadoop
-    owner: "{{ users.hadoop.name }}"
-    group: "{{ users.hadoop.group }}"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
     state: link
 
 # Setting up Directories
@@ -61,6 +61,21 @@
     path: "{{ hadoop.home_path }}/etc/hadoop/hadoop-env.sh"
     search_string: "# export JAVA_HOME="
     line: "export JAVA_HOME={{ linux.java_home_path }}"
+
+- name: Set TEZ_CONF_DIR in hadoop-env.sh
+  lineinfile:
+    path: "{{ hadoop.home_path }}/etc/hadoop/hadoop-env.sh"
+    line: "export TEZ_CONF_DIR={{ hadoop.home_path }}/etc/hadoop/tez-site.xml"
+
+- name: Set TEZ_JARS in hadoop-env.sh
+  lineinfile:
+    path: "{{ hadoop.home_path }}/etc/hadoop/hadoop-env.sh"
+    line: "export TEZ_JARS={{ tez.home_path }}"
+
+- name: Set HADOOP_CLASSPATH in hadoop-env.sh
+  lineinfile:
+    path: "{{ hadoop.home_path }}/etc/hadoop/hadoop-env.sh"
+    line: "export HADOOP_CLASSPATH=${HADOOP_CLASSPATH}:${TEZ_CONF_DIR}:${TEZ_JARS}/*:${TEZ_JARS}/lib/*"
 
 - name: Set HADOOP_LOG_DIR in hadoop-env.sh User
   lineinfile:

@@ -2,7 +2,7 @@
 
 KEY_NAME='id_ed25519'
 USER='ansible'
-HOSTS=('vm-controller' 'vm-worker01' 'vm-worker02' 'vm-worker03')
+HOSTS=('vm-controller' 'vm-worker01')
 
 cd ~/.ssh
 ssh-keygen -t ed25519 -f ~/.ssh/${KEY_NAME}

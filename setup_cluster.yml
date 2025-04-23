@@ -5,11 +5,18 @@
   gather_facts: yes
   become: true
   tasks:
-    - name: Create User
-      loop: "{{ users | dict2items }}"
+    - name: Create Service User
+      loop: "{{ service_users | dict2items }}"
       vars:
         new_user: "{{ item.value.name }}"
         new_user_group: "{{ item.value.group }}"
+      ansible.builtin.include_tasks:
+        file: tasks/linux/create-user.yml
+    - name: Create Cluster User
+      loop: "{{ cluster_users }}"
+      vars:
+        new_user: "{{ item.name }}"
+        new_user_group: "{{ item.group }}"
       ansible.builtin.include_tasks:
         file: tasks/linux/create-user.yml
     - name: Install required packages
@@ -46,7 +53,7 @@
   vars:
     nodes: "{{ groups['all'] | unique }}"
   tasks:
-    - name: Add Kerberos Principal
+    - name: Add Kerberos Principal for Service User
       loop: "{{ nodes | product(services) | list }}"
       vars:
         primary: "{{ item[1].name }}"
@@ -94,7 +101,7 @@
       ansible.builtin.file:
         path: /etc/security/keytab/{{ item.name }}.service.keytab
         owner: "{{ item.user }}"
-        group: "{{ users.hadoop.group }}"
+        group: "{{ service_users.hadoop.group }}"
         mode: "{{ '0440' if item.name == 'HTTP' else '0400' }}"
 
 - name: Remove Temporary Keytabs locally
@@ -107,6 +114,7 @@
 
 - name: Install Hadoop
   tags:
+    - hadoop
     - install_hadoop
   hosts: controllers, workernodes
   become: true
@@ -123,6 +131,7 @@
 
 - name: Configure Hadoop
   tags:
+    - hadoop
     - configure_hadoop
   hosts: controllers, workernodes
   become: true
@@ -146,7 +155,7 @@
         service: "hdfs"
     - name: Kinit using DataNode Keytab
       vars:
-        become_user: "{{ users.hdfs.name }}"
+        become_user: "{{ service_users.hdfs.name }}"
         keytab: "{{kerberos.keytab_path}}/nn.service.keytab"
         principal: "nn/{{ groups['controllers'][0] }}@{{ kerberos.realm }}"
       ansible.builtin.include_tasks:
@@ -213,9 +222,14 @@
     - name: configure hive
       ansible.builtin.include_tasks:
         file: tasks/hive/configure_hive.yml
+    - name: Start hdfs
+      ansible.builtin.include_tasks:
+        file: tasks/hadoop/start_services.yml
+      vars:
+        service: "hdfs"
     - name: Kinit using DataNode Keytab
       vars:
-        become_user: "{{ users.hdfs.name }}"
+        become_user: "{{ service_users.hdfs.name }}"
         keytab: "{{kerberos.keytab_path}}/nn.service.keytab"
         principal: "nn/{{ groups['controllers'][0] }}@{{ kerberos.realm }}"
       ansible.builtin.include_tasks:
@@ -223,3 +237,37 @@
     - name: Configure hdfs directories
       ansible.builtin.include_tasks:
         file: tasks/hive/configure_hdfs_dirs.yml
+
+- name: Install Tez
+  tags:
+    - tez
+    - install_tez
+  hosts: controllers, workernodes
+  become: true
+  tasks:
+    - name: Start hdfs
+      ansible.builtin.include_tasks:
+        file: tasks/hadoop/start_services.yml
+      vars:
+        service: "all"
+    - name: Kinit using DataNode Keytab
+      vars:
+        become_user: "{{ service_users.hdfs.name }}"
+        keytab: "{{kerberos.keytab_path}}/nn.service.keytab"
+        principal: "nn/{{ groups['controllers'][0] }}@{{ kerberos.realm }}"
+      ansible.builtin.include_tasks:
+        file: tasks/kerberos/kinit.yml
+    - name: Install Tez
+      ansible.builtin.include_tasks:
+        file: tasks/tez/install.yml
+
+- name: Configure Tez
+  tags:
+    - tez
+    - configure_tez
+  hosts: controllers
+  become: true
+  tasks:
+    - name: Install Tez
+      ansible.builtin.include_tasks:
+        file: tasks/tez/configure.yml

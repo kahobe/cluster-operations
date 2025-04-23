@@ -5,7 +5,7 @@ all:
       java_package: "openjdk-8-jdk"
       java_home_path: "/usr/lib/jvm/java-1.8.0-openjdk-amd64"
       python_version: "3.10"
-    users:
+    service_users:
       hadoop:
         name: hadoop
         group: hadoop
@@ -27,6 +27,11 @@ all:
       spark:
         name: spark
         group: spark
+
+    cluster_users:
+      - name: bernhard
+        group: bernhard
+
     services:
       - name: nn
         user: hdfs
@@ -57,7 +62,7 @@ all:
       keytab_path: /etc/security/keytab
     hadoop:
       version: "3.3.6"
-      binaries_file: "apache-hive-4.0.0-bin.tar.gz"
+      binaries_file: "hadoop-3.3.6.tar.gz"
       home_path: "/opt/hadoop"
       cluster_id: "hadoop_1"
       dirs:
@@ -76,6 +81,11 @@ all:
           owner: hdfs
           group: hadoop
           mode: "0700"
+    tez:
+      version: "0.10.4"
+      home_path: "/opt/tez"
+      hdfs_location: "/apps/tez-0.10.4"
+      binaries_file: "apache-tez-0.10.4-bin.tar.gz"
     mysql:
       users:
         hive:

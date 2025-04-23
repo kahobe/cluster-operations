@@ -14,17 +14,17 @@
   ansible.builtin.unarchive:
     src: "/tmp/{{ hive.binaries_file }}"
     dest: "/opt/"
-    owner: "{{ users.hive.name }}"
-    group: "{{ users.hive.group }}"
-    mode: "u=rwx,g=rwx,o=r"
+    owner: "{{ service_users.hive.name }}"
+    group: "{{ service_users.hive.group }}"
+    mode: "u=rwx,g=rwx,o=rx"
     remote_src: yes
 
 - name: Create a symbolic link
   ansible.builtin.file:
     src: "/opt/apache-hive-{{ hive.version }}-bin"
     dest: "{{ hive.home_path }}"
-    owner: "{{ users.hive.name }}"
-    group: "{{ users.hive.group }}"
+    owner: "{{ service_users.hive.name }}"
+    group: "{{ service_users.hive.group }}"
     state: link
 
 # Setting up environment Variables
