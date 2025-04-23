@@ -271,3 +271,7 @@
     - name: Install Tez
       ansible.builtin.include_tasks:
         file: tasks/tez/configure.yml
+# SPARK
+
+# KAFKA
+# https://kafka.apache.org/documentation/#security_sasl_kerberos
