@@ -18,3 +18,28 @@
   ignore_errors: true
   when:
     - inventory_hostname in groups["controllers"]
+
+# Configure Access Control Lists
+- name: Configure Access Control Lists for manged tables
+  become_user: "{{ service_users.hdfs.name }}"
+  shell: |
+    {{ hadoop.home_path }}/bin/hdfs dfs -setfacl -m default:user::rwx {{ hdfs.hive_dirs.hive_managed_dir.path }}/
+    {{ hadoop.home_path }}/bin/hdfs dfs -setfacl -m default:group::r-x {{ hdfs.hive_dirs.hive_managed_dir.path }}/
+    {{ hadoop.home_path }}/bin/hdfs dfs -setfacl -m default:other::--x {{ hdfs.hive_dirs.hive_managed_dir.path }}/
+    {{ hadoop.home_path }}/bin/hdfs dfs -setfacl -m default:user:hive:rwx {{ hdfs.hive_dirs.hive_managed_dir.path }}/
+    {{ hadoop.home_path }}/bin/hdfs dfs -setfacl -m default:mask::rwx {{ hdfs.hive_dirs.hive_managed_dir.path }}/
+  when:
+    - inventory_hostname in groups["controllers"]
+
+# Configure Access Control Lists
+- name: Configure Access Control Lists for external tables
+  become_user: "{{ service_users.hdfs.name }}"
+  shell: |
+    {{ hadoop.home_path }}/bin/hdfs dfs -setfacl -m default:user::rwx {{ hdfs.hive_dirs.hive_external_dir.path }}
+    {{ hadoop.home_path }}/bin/hdfs dfs -setfacl -m default:group::r-x {{ hdfs.hive_dirs.hive_external_dir.path }}/
+    {{ hadoop.home_path }}/bin/hdfs dfs -setfacl -m default:other::--x {{ hdfs.hive_dirs.hive_external_dir.path }}/
+    {{ hadoop.home_path }}/bin/hdfs dfs -setfacl -m default:user:hive:rwx {{ hdfs.hive_dirs.hive_external_dir.path }}/
+    {{ hadoop.home_path }}/bin/hdfs dfs -setfacl -m default:mask::rwx {{ hdfs.hive_dirs.hive_external_dir.path }}/
+  ignore_errors: true
+  when:
+    - inventory_hostname in groups["controllers"]

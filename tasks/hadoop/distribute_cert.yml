@@ -4,7 +4,7 @@
     path: /etc/security/hadoop/
     owner: "{{ service_users.hadoop.name }}"
     group: "{{ service_users.hadoop.group }}"
-    mode: "u=rwx,g=rwx,o=r"
+    mode: "u=rwx,g=rwx,o=rx"
     state: directory
 
 - name: Copy Keystore
@@ -19,6 +19,6 @@
   ansible.builtin.copy:
     src: "certs/truststore.jks"
     dest: "{{ ssl.truststore_file }}"
-    mode: "640"
+    mode: "644"
     owner: "{{ service_users.hadoop.name }}"
     group: "{{ service_users.hadoop.group }}"

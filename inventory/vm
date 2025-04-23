@@ -31,7 +31,8 @@ all:
     cluster_users:
       - name: bernhard
         group: bernhard
-
+      - name: testuser
+        group: testuser
     services:
       - name: nn
         user: hdfs
@@ -148,13 +149,13 @@ all:
         hive_managed_dir:
           path: "/warehouse/managed"
           owner: hive
-          group: hadoop
-          mode: "770"
+          group: hive
+          mode: "777"
         hive_external_dir:
           path: "/warehouse/external"
           owner: hive
-          group: hadoop
-          mode: "770"
+          group: hive
+          mode: "777"
     kafka:
       cluster_id: 2BKCbwzCTxyCNEM8XkkU1A
   children:
