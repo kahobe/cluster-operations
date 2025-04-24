@@ -4,6 +4,11 @@
     src: "hadoop/{{ hadoop.binaries_file }}"
     dest: "/tmp/{{ hadoop.binaries_file }}"
 
+- name: Remove existing Hadoop directory
+  ansible.builtin.file:
+    path: /opt/hadoop-{{ hadoop.version }}
+    state: absent
+
 - name: Extract Hadoop tarball
   ansible.builtin.unarchive:
     src: "/tmp/{{ hadoop.binaries_file }}"

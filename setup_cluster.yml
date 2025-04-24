@@ -271,7 +271,16 @@
     - name: Install Tez
       ansible.builtin.include_tasks:
         file: tasks/tez/configure.yml
-# SPARK
 
+- name: Install Spark
+  tags:
+    - spark
+    - install_spark
+  hosts: controllers, workernodes
+  become: true
+  tasks:
+    - name: Install Spark
+      ansible.builtin.include_tasks:
+        file: tasks/spark/install.yml
 # KAFKA
 # https://kafka.apache.org/documentation/#security_sasl_kerberos

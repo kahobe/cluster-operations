@@ -23,3 +23,16 @@
         file: tasks/hive/start_services.yml
       vars:
         service: "all"
+
+- name: Start Spark
+  tags:
+    - spark
+  hosts: controllers, workernodes
+  become: true
+
+  tasks:
+    - name: Start Spark Services
+      ansible.builtin.include_tasks:
+        file: tasks/spark/start_standalone_services.yml
+      vars:
+        service: "all"

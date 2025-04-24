@@ -1,33 +1,33 @@
 - name: Copy Spark tarball to remote hosts
   ansible.builtin.copy:
-    src: "{{ filename }}"
-    dest: "/tmp/spark-{{ spark_version }}-bin-hadoop3.tgz"
+    src: "spark/{{ spark.binaries_file }}"
+    dest: "/tmp/{{ spark.binaries_file }}"
 
 - name: Remove existing Spark directory
   ansible.builtin.file:
-    path: "/opt/spark-{{ spark_version }}-bin-hadoop3"
+    path: "/opt/spark-{{ spark.version }}-bin-hadoop3"
     state: absent
 
 - name: Extract Spark tarball
   ansible.builtin.unarchive:
-    src: "/tmp/spark-{{ spark_version }}-bin-hadoop3.tgz"
+    src: "/tmp/{{ spark.binaries_file }}"
     dest: "/opt/"
-    owner: "{{ spark_user }}"
-    group: "{{ spark_group }}"
+    owner: "{{ service_users.spark.name }}"
+    group: "{{ service_users.spark.group }}"
     remote_src: yes
 
 - name: Create a symbolic link
   ansible.builtin.file:
-    src: /opt/spark-{{ spark_version }}-bin-hadoop3
-    dest: /opt/spark
-    owner: "{{ spark_user }}"
-    group: "{{ spark_group }}"
+    src: /opt/spark-{{ spark.version }}-bin-hadoop3
+    dest: "{{ spark.home_path }}"
+    owner: "{{ service_users.spark.name }}"
+    group: "{{ service_users.spark.group }}"
     state: link
 
 - name: Set Spark environment variables
   lineinfile:
-    path: /etc/environment
-    line: "export SPARK_HOME=/opt/spark"
+    path: /etc/bash.bashrc
+    line: "export SPARK_HOME={{ spark.home_path }}"
   become: true
 
 - name: Set Spark environment variables
@@ -38,7 +38,7 @@
 
 - name: Configure systemd Spark Master Service
   template:
-    src: spark-master.service.j2
+    src: spark/spark-master.service.j2
     dest: /etc/systemd/system/spark-master.service
   tags:
     - configuration
@@ -58,7 +58,7 @@
 
 - name: Configure systemd Spark Worker Service
   template:
-    src: spark-worker.service.j2
+    src: spark/spark-worker.service.j2
     dest: /etc/systemd/system/spark-worker.service
   tags:
     - configuration
