@@ -33,3 +33,16 @@
         file: tasks/spark/stop_standalone_services.yml
       vars:
         service: "all"
+
+- name: Stop Kafka
+  tags:
+    - kafka
+  hosts: controllers, workernodes
+  become: true
+
+  tasks:
+    - name: Stop Kafka
+      ansible.builtin.include_tasks:
+        file: tasks/kafka/stop_services.yml
+      vars:
+        service: "all"

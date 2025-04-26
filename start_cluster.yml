@@ -36,3 +36,16 @@
         file: tasks/spark/start_standalone_services.yml
       vars:
         service: "all"
+
+- name: Start Kafka
+  tags:
+    - kafka
+  hosts: controllers, workernodes
+  become: true
+
+  tasks:
+    - name: Start Kafka
+      ansible.builtin.include_tasks:
+        file: tasks/kafka/start_services.yml
+      vars:
+        service: "all"

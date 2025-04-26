@@ -282,5 +282,27 @@
     - name: Install Spark
       ansible.builtin.include_tasks:
         file: tasks/spark/install.yml
+
 # KAFKA
 # https://kafka.apache.org/documentation/#security_sasl_kerberos
+- name: Install Kafka
+  tags:
+    - kafka
+    - install_kafka
+  hosts: controllers, workernodes
+  become: true
+  tasks:
+    - name: Install Kafka
+      ansible.builtin.include_tasks:
+        file: tasks/kafka/install.yml
+
+- name: Configure Kafka
+  tags:
+    - kafka
+    - configure_kafka
+  hosts: controllers, workernodes
+  become: true
+  tasks:
+    - name: Install Kafka
+      ansible.builtin.include_tasks:
+        file: tasks/kafka/configure.yml

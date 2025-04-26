@@ -7,8 +7,8 @@ Requires=network-online.target
 User=kafka
 Group=kafka
 Type=simple
-ExecStart=/opt/kafka/bin/kafka-server-start.sh /opt/kafka/config/kraft/server.properties
-ExecStop=/opt/kafka/bin/kafka-server-stop.sh
+ExecStart={{ kafka.home_path}}/bin/kafka-server-start.sh {{ kafka.home_path}}/config/server.properties
+ExecStop={{ kafka.home_path}}/bin/kafka-server-stop.sh
 Restart=on-abnormal
 
 [Install]

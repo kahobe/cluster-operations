@@ -24,14 +24,12 @@
   when:
     - inventory_hostname in groups["controllers"]
 
-- name: Install Java
+- name: Install Java 8
   apt:
-    name: "{{ linux.java_package }}"
+    name: "{{ linux.java8_package }}"
     state: present
 
-- name: Set JAVA_HOME
-  lineinfile:
-    path: /etc/bash.bashrc
+- name: Install Java 17
+  apt:
+    name: "{{ linux.java17_package }}"
     state: present
-    regexp: "^JAVA_HOME"
-    line: "JAVA_HOME={{ linux.java_home_path }}"

@@ -24,6 +24,41 @@
     group: "{{ service_users.spark.group }}"
     state: link
 
+- name: Copy file
+  ansible.builtin.copy:
+    src: "{{ spark.home_path }}/conf/spark-env.sh.template"
+    dest: "{{ spark.home_path }}/conf/spark-env.sh"
+    owner: "{{ service_users.spark.name }}"
+    group: "{{ service_users.spark.group }}"
+    remote_src: yes
+  tags:
+    - configuration
+
+# Setting up environment spark-env.sh
+- name: Set HADOOP_HOME in spark-env.sh
+  lineinfile:
+    path: "{{ spark.home_path }}/conf/spark-env.sh"
+    line: "export HADOOP_HOME={{ hadoop.home_path }}"
+  become: true
+
+- name: Set HADOOP_CONF_DIR in spark-env.sh
+  lineinfile:
+    path: "{{ spark.home_path }}/conf/spark-env.sh"
+    line: "export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop"
+  become: true
+
+- name: Set YARN_CONF_DIR in spark-env.sh
+  lineinfile:
+    path: "{{ spark.home_path }}/conf/spark-env.sh"
+    line: "export YARN_CONF_DIR=$HADOOP_CONF_DIR"
+  become: true
+
+- name: Set JAVA_HOME in spark-env.sh
+  lineinfile:
+    path: "{{ spark.home_path }}/conf/spark-env.sh"
+    line: "export JAVA_HOME={{ linux.java17_home_path }}"
+
+# Setting up environment Variables
 - name: Set Spark environment variables
   lineinfile:
     path: /etc/bash.bashrc
