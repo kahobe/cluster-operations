@@ -44,13 +44,18 @@ controller.quorum.voters={{ hostvars[groups['controllers'][0]]['kafka_node_id'] 
 #   EXAMPLE:
 #     listeners = PLAINTEXT://your.host.name:9092
 {% if ansible_hostname in groups['controllers'] %}
-listeners=PLAINTEXT://{{ ansible_hostname }}:9092,CONTROLLER://{{ ansible_hostname }}:9093
+listeners=SASL_PLAINTEXT://{{ ansible_hostname }}:9092,CONTROLLER://{{ ansible_hostname }}:9093
 {% else %}
-listeners=PLAINTEXT://{{ ansible_hostname }}:9092
+listeners=SASL_PLAINTEXT://{{ ansible_hostname }}:9092
 {% endif %}
 
+security.inter.broker.protocol=SASL_PLAINTEXT
+sasl.mechanism.inter.broker.protocol=GSSAPI
+sasl.enabled.mechanisms=GSSAPI
+sasl.kerberos.service.name={{ service_users.kafka.name }}
+
 # Name of listener used for communication between brokers.
-inter.broker.listener.name=PLAINTEXT
+# inter.broker.listener.name=SASL_PLAINTEXT
 
 # Listener name, hostname and port the broker will advertise to clients.
 # If not set, it uses the value for "listeners".

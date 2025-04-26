@@ -54,6 +54,8 @@ all:
         user: hive
       - name: HTTP
         user: hadoop
+      - name: kafka
+        user: kafka
     ssl:
       keystore_file: "/etc/security/hadoop/keystore.jks"
       keystore_password: "bigdata"

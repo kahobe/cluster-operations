@@ -31,16 +31,23 @@
     owner: "{{ service_users.kafka.name }}"
     group: "{{ service_users.kafka.group }}"
 
-- name: Configure Kafka
+- name: Configure server.properties
   ansible.builtin.template:
     src: kafka/server.properties.j2
     dest: "{{ kafka.home_path }}/config/server.properties"
     owner: "{{ service_users.kafka.name }}"
     group: "{{ service_users.kafka.group }}"
 
+- name: Configure kafka_server_jaas.conf
+  ansible.builtin.template:
+    src: kafka/kafka_server_jaas.conf.j2
+    dest: "{{ kafka.home_path }}/config/kafka_server_jaas.conf"
+    owner: "{{ service_users.kafka.name }}"
+    group: "{{ service_users.kafka.group }}"
+
 - name: Format Kafka storage
   ansible.builtin.command:
-    cmd: "{{ kafka.home_path}}/bin/kafka-storage.sh format -t {{ kafka.cluster_id }} -c {{ kafka.home_path}}/config/server.properties"
+    cmd: "{{ kafka.home_path}}/bin/kafka-storage.sh format -t {{ kafka.cluster_id }} -c {{ kafka.home_path}}/config/server.properties --ignore-formatted"
   become_user: "{{ service_users.kafka.name }}"
   become: true
   tags:
@@ -51,11 +58,12 @@
     src: kafka/kafka-broker.service.j2
     dest: /etc/systemd/system/kafka-broker.service
 
-- name: Enable Kafks Broker Service
+- name: Enable Kafka Broker Service
   ansible.builtin.systemd_service:
     name: kafka-broker
     enabled: true
     state: stopped
+    daemon_reload: true
 
 - name: Set Kafka environment variables
   lineinfile:

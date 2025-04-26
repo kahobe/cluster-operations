@@ -4,9 +4,10 @@ After=syslog.target network.target remote-fs.target nss-lookup.target network-on
 Requires=network-online.target
 
 [Service]
-User=kafka
-Group=kafka
+User={{ service_users.kafka.name }}
+Group={{ service_users.kafka.group }}
 Type=simple
+Environment=KAFKA_OPTS="-Djava.security.krb5.conf=/etc/krb5.conf -Djava.security.auth.login.config={{ kafka.home_path }}/config/kafka_server_jaas.conf"
 ExecStart={{ kafka.home_path}}/bin/kafka-server-start.sh {{ kafka.home_path}}/config/server.properties
 ExecStop={{ kafka.home_path}}/bin/kafka-server-stop.sh
 Restart=on-abnormal
