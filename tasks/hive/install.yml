@@ -10,6 +10,11 @@
     src: "hive/{{ hive.binaries_file }}"
     dest: "/tmp/{{ hive.binaries_file }}"
 
+- name: Remove existing Hive directory
+  ansible.builtin.file:
+    path: /opt/apache-hive-{{ hive.version }}-bin"
+    state: absent
+
 - name: Extract Hive tarball
   ansible.builtin.unarchive:
     src: "/tmp/{{ hive.binaries_file }}"
