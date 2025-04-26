@@ -2,8 +2,8 @@ all:
   vars:
     ansible_user: ansible
     linux:
-      java_package: "openjdk-8-jdk"
-      java_home_path: "/usr/lib/jvm/java-1.8.0-openjdk-amd64"
+      java_package: "openjdk-17-jdk"
+      java_home_path: "/usr/lib/jvm/java-1.17.0-openjdk-amd64"
       python_version: "3.10"
     service_users:
       hadoop:

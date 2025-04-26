@@ -82,3 +82,9 @@
     path: "{{ hadoop.home_path }}/etc/hadoop/hadoop-env.sh"
     search_string: "# export HADOOP_LOG_DIR="
     line: "export HADOOP_LOG_DIR={{ hadoop.dirs.logs.path }}"
+
+- name: Set HADOOP_OPTS in hadoop-env.sh User for Java 17 support
+  lineinfile:
+    path: "{{ hadoop.home_path }}/etc/hadoop/hadoop-env.sh"
+    search_string: "# export HADOOP_LOG_DIR="
+    line: 'export HADOOP_OPTS="$HADOOP_OPTS --add-opens java.base/java.lang=ALL-UNNAMED"'
