@@ -11,6 +11,7 @@
     name: hive-metastore
     enabled: true
     state: stopped
+    daemon_reload: true
   tags:
     - configuration
 
@@ -27,5 +28,6 @@
     name: hive-server2
     enabled: true
     state: stopped
+    daemon_reload: true
   tags:
     - configuration

@@ -86,6 +86,7 @@
     name: spark-master
     enabled: true
     state: stopped
+    daemon_reload: true
   tags:
     - configuration
   when:
@@ -106,6 +107,7 @@
     name: spark-worker
     enabled: true
     state: stopped
+    daemon_reload: true
   tags:
     - configuration
   when:

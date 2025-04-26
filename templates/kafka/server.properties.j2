@@ -44,7 +44,7 @@ controller.quorum.voters={{ hostvars[groups['controllers'][0]]['kafka_node_id'] 
 #   EXAMPLE:
 #     listeners = PLAINTEXT://your.host.name:9092
 {% if ansible_hostname in groups['controllers'] %}
-listeners=SASL_PLAINTEXT://{{ ansible_hostname }}:9092,CONTROLLER://{{ ansible_hostname }}:9093
+listeners=CONTROLLER://{{ ansible_hostname }}:9093
 {% else %}
 listeners=SASL_PLAINTEXT://{{ ansible_hostname }}:9092
 {% endif %}
