@@ -63,7 +63,7 @@ all:
       truststore_file: "/etc/security/hadoop/truststore.jks"
       truststore_password: "bigdata"
     kerberos:
-      realm: "KAHOVECVM.DEV"
+      realm: "KAHOVEC.DEV"
       password: "Sup3rS3cur3Pa55w0rd!" # FIXME: use ansible vault
       keytab_path: /etc/security/keytab
     hadoop:
