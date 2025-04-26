@@ -2,8 +2,10 @@ all:
   vars:
     ansible_user: ansible
     linux:
-      java_package: "openjdk-8-jdk"
-      java_home_path: "/usr/lib/jvm/java-1.8.0-openjdk-arm64"
+      java8_package: "openjdk-8-jdk"
+      java8_home_path: "/usr/lib/jvm/java-1.8.0-openjdk-arm64"
+      java17_package: "openjdk-17-jdk"
+      java17_home_path: "/usr/lib/jvm/java-1.17.0-openjdk-arm64"
       python_version: "3.12"
     service_users:
       hadoop:
@@ -23,15 +25,16 @@ all:
         group: hadoop
       kafka:
         name: kafka
-        group: kafka
+        group: hadoop
       spark:
         name: spark
-        group: spark
+        group: hadoop
 
     cluster_users:
       - name: bernhard
         group: bernhard
-
+      - name: testuser
+        group: testuser
     services:
       - name: nn
         user: hdfs
@@ -51,13 +54,16 @@ all:
         user: hive
       - name: HTTP
         user: hadoop
+      - name: kafka
+        user: kafka
     ssl:
+      local_certs_dir: "certs_rpi"
       keystore_file: "/etc/security/hadoop/keystore.jks"
       keystore_password: "bigdata"
       truststore_file: "/etc/security/hadoop/truststore.jks"
       truststore_password: "bigdata"
     kerberos:
-      realm: "KAHOVEC.DEV"
+      realm: "KAHOVECVM.DEV"
       password: "Sup3rS3cur3Pa55w0rd!" # FIXME: use ansible vault
       keytab_path: /etc/security/keytab
     hadoop:
@@ -82,10 +88,15 @@ all:
           group: hadoop
           mode: "0700"
     tez:
-      version: "0.10.4"
+      version: "0.10.3"
       home_path: "/opt/tez"
-      hdfs_location: "/apps/tez-0.10.4"
-      binaries_file: "apache-tez-0.10.4-bin.tar.gz"
+      hdfs_location: "/apps/tez-0.10.3"
+      binaries_file: "apache-tez-0.10.3-bin.tar.gz"
+    kafka:
+      version: "2.13-4.0.0"
+      home_path: "/opt/kafka"
+      binaries_file: "kafka_2.13-4.0.0.tgz"
+      cluster_id: "2BKCbwzCTxyCNEM8XkkU1A"
     mysql:
       users:
         hive:
@@ -95,13 +106,17 @@ all:
           table: "*"
           privileges: "ALL"
     hive:
-      version: "4.0.1"
-      binaries_file: "apache-hive-4.0.1-bin.tar.gz"
+      version: "4.0.0"
+      binaries_file: "apache-hive-4.0.0-bin.tar.gz"
       jdbc_file: "mysql-connector-j-8.4.0.jar"
       home_path: "/opt/hive"
       metastore:
         user: "hive"
         password: "Sup3rS3cur3Pa55w0rd!"
+    spark:
+      version: "3.5.5"
+      binaries_file: "spark-3.5.5-bin-hadoop3.tgz"
+      home_path: "/opt/spark"
     hdfs:
       hadoop_dirs:
         root_dir:
@@ -155,8 +170,7 @@ all:
           owner: hive
           group: hive
           mode: "777"
-    kafka:
-      cluster_id: 2BKCbwzCTxyCNEM8XkkU1A
+
   children:
     cluster:
       children:

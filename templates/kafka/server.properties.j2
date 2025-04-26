@@ -22,7 +22,7 @@
 
 # The role of this server. Setting this puts us in KRaft mode
 {% if ansible_hostname in groups['controllers'] %}
-process.roles=broker,controller
+process.roles=controller
 {% else %}
 process.roles=broker
 {% endif %}
