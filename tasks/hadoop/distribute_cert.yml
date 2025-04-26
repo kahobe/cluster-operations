@@ -9,7 +9,7 @@
 
 - name: Copy Keystore
   ansible.builtin.copy:
-    src: "certs/{{ inventory_hostname }}-keystore.jks"
+    src: "{{ ssl.local_certs_dir }}/{{ inventory_hostname }}-keystore.jks"
     dest: "{{ ssl.keystore_file }}"
     mode: "640"
     owner: "{{ service_users.hadoop.name }}"
@@ -17,7 +17,7 @@
 
 - name: Copy Trusstore
   ansible.builtin.copy:
-    src: "certs/truststore.jks"
+    src: "{{ ssl.local_certs_dir }}/truststore.jks"
     dest: "{{ ssl.truststore_file }}"
     mode: "644"
     owner: "{{ service_users.hadoop.name }}"

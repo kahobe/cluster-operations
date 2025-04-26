@@ -50,8 +50,6 @@
     cmd: "{{ kafka.home_path}}/bin/kafka-storage.sh format -t {{ kafka.cluster_id }} -c {{ kafka.home_path}}/config/server.properties --ignore-formatted"
   become_user: "{{ service_users.kafka.name }}"
   become: true
-  tags:
-    - format
 
 - name: Configure systemd Kafka Broker Service
   template:

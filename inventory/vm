@@ -25,10 +25,10 @@ all:
         group: hadoop
       kafka:
         name: kafka
-        group: kafka
+        group: hadoop
       spark:
         name: spark
-        group: spark
+        group: hadoop
 
     cluster_users:
       - name: bernhard
@@ -57,6 +57,7 @@ all:
       - name: kafka
         user: kafka
     ssl:
+      local_certs_dir: "certs_vm"
       keystore_file: "/etc/security/hadoop/keystore.jks"
       keystore_password: "bigdata"
       truststore_file: "/etc/security/hadoop/truststore.jks"

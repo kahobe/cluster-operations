@@ -27,7 +27,7 @@
     name: yarn-nodemanager.service
     state: stopped
   when:
-    - inventory_hostname in groups["controllers"]
+    - inventory_hostname in groups["workernodes"]
     - service == "yarn" or service == "all"
 
 - name: Stop YARN HistoryServer Service
