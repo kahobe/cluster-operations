@@ -13,25 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#
-# This configuration file is intended for use in KRaft mode, where
-# Apache ZooKeeper is not present.
-#
-
 ############################# Server Basics #############################
 
 # The role of this server. Setting this puts us in KRaft mode
-{% if ansible_hostname in groups['controllers'] %}
-process.roles=controller
-{% else %}
-process.roles=broker
-{% endif %}
+process.roles=broker,controller
 
 # The node id associated with this instance's roles
-node.id={{ kafka_node_id }}
+node.id={{ hostvars[inventory_hostname].kafka_node_id }}
 
-# The connect string for the controller quorum
-controller.quorum.voters={{ hostvars[groups['controllers'][0]]['kafka_node_id'] }}@{{ groups['controllers'][0] }}:9093
+# List of controller endpoints used connect to the controller cluster
+controller.quorum.voters={% for host in groups['workernodes'] %}{{ hostvars[host].kafka_node_id }}@{{ host }}:9093{% if not loop.last %},{% endif %}{% endfor %}
 
 ############################# Socket Server Settings #############################
 
@@ -43,23 +34,18 @@ controller.quorum.voters={{ hostvars[groups['controllers'][0]]['kafka_node_id'] 
 #     listeners = listener_name://host_name:port
 #   EXAMPLE:
 #     listeners = PLAINTEXT://your.host.name:9092
-{% if ansible_hostname in groups['controllers'] %}
-listeners=CONTROLLER://{{ ansible_hostname }}:9093
-{% else %}
-listeners=SASL_PLAINTEXT://{{ ansible_hostname }}:9092
-{% endif %}
+listeners=SASL_PLAINTEXT://0.0.0.0:9092,CONTROLLER://{{ ansible_hostname }}:9093
+advertised.listeners=SASL_PLAINTEXT://{{ ansible_hostname }}:9092
 
+# Name of listener used for communication between brokers.
 security.inter.broker.protocol=SASL_PLAINTEXT
 sasl.mechanism.inter.broker.protocol=GSSAPI
 sasl.enabled.mechanisms=GSSAPI
 sasl.kerberos.service.name={{ service_users.kafka.name }}
 
-# Name of listener used for communication between brokers.
-# inter.broker.listener.name=SASL_PLAINTEXT
-
-# Listener name, hostname and port the broker will advertise to clients.
+# Listener name, hostname and port the broker or the controller will advertise to clients.
 # If not set, it uses the value for "listeners".
-# advertised.listeners=PLAINTEXT://localhost:9092
+# advertised.listeners=SASL_PLAINTEXT://{{ ansible_hostname }}:9092,CONTROLLER://{{ ansible_hostname }}:9093
 
 # A comma-separated list of the names of the listeners used by the controller.
 # If no explicit mapping set in `listener.security.protocol.map`, default will be using PLAINTEXT protocol
@@ -67,7 +53,7 @@ sasl.kerberos.service.name={{ service_users.kafka.name }}
 controller.listener.names=CONTROLLER
 
 # Maps listener names to security protocols, the default is for them to be the same. See the config documentation for more details
-listener.security.protocol.map=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,SSL:SSL,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL
+listener.security.protocol.map=CONTROLLER:SASL_PLAINTEXT,SASL_PLAINTEXT:SASL_PLAINTEXT
 
 # The number of threads that the server uses for receiving requests from the network and sending responses to the network
 num.network.threads=3
@@ -88,7 +74,7 @@ socket.request.max.bytes=104857600
 ############################# Log Basics #############################
 
 # A comma separated list of directories under which to store log files
-log.dirs=/var/log/kafka
+log.dirs={{ kafka.log_dir }}
 
 # The default number of log partitions per topic. More partitions allow greater
 # parallelism for consumption, but this will also result in more files across
@@ -100,9 +86,11 @@ num.partitions=1
 num.recovery.threads.per.data.dir=1
 
 ############################# Internal Topic Settings  #############################
-# The replication factor for the group metadata internal topics "__consumer_offsets" and "__transaction_state"
+# The replication factor for the group metadata internal topics "__consumer_offsets", "__share_group_state" and "__transaction_state"
 # For anything other than development testing, a value greater than 1 is recommended to ensure availability such as 3.
 offsets.topic.replication.factor=1
+share.coordinator.state.topic.replication.factor=1
+share.coordinator.state.topic.min.isr=1
 transaction.state.log.replication.factor=1
 transaction.state.log.min.isr=1
 

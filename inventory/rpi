@@ -97,6 +97,7 @@ all:
       home_path: "/opt/kafka"
       binaries_file: "kafka_2.13-4.0.0.tgz"
       cluster_id: "2BKCbwzCTxyCNEM8XkkU1A"
+      log_dir: "/var/kafka/kraft-combined-logs"
     mysql:
       users:
         hive:
@@ -177,16 +178,15 @@ all:
         controllers:
           hosts:
             rpic:
-              kafka_node_id: 1
 
         workernodes:
           hosts:
             rpiw1:
-              kafka_node_id: 2
+              kafka_node_id: 1
             rpiw2:
-              kafka_node_id: 3
+              kafka_node_id: 2
             rpiw3:
-              kafka_node_id: 4
+              kafka_node_id: 3
 
         krb5server:
           hosts:
