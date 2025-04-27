@@ -25,6 +25,11 @@
     - name: Generate /etc/hosts file
       ansible.builtin.include_tasks:
         file: tasks/linux/generate-hosts-file.yml
+    - name: disable /etc/hosts update in /etc/cloud/cloud.cfg
+      lineinfile:
+        path: "/etc/cloud/cloud.cfg"
+        search_string: "- update_etc_hosts"
+        line: "# - update_etc_hosts"
 
 - name: Setup Kerberos
   tags:
