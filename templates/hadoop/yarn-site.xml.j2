@@ -2,6 +2,22 @@
 <configuration>
 
   <!-- ================= Node Manager properties ================= -->
+
+  <!-- Will execute the Container as the user who submitted the job, requires the user to be presenton all workernodes -->
+  <property>
+    <name>yarn.nodemanager.container-executor.class</name>
+    <value>org.apache.hadoop.yarn.server.nodemanager.LinuxContainerExecutor</value>
+    <description>
+      This is the container executor setting that ensures that all applications
+      are started with the LinuxContainerExecutor.
+    </description>
+  </property>
+
+  <property>
+    <name>yarn.nodemanager.linux-container-executor.group</name>
+    <value>hadoop</value>
+  </property>
+
   <property>
     <name>yarn.log-aggregation-enable</name>
     <value>true</value>
@@ -17,10 +33,15 @@
 
   <property>
     <name>yarn.nodemanager.log.retain-seconds</name>
-    <value>10800</value>
+    <value>604800</value>
     <description>Time in seconds to retain user logs. Only applicable if
     log aggregation is disabled
     </description>
+  </property>
+
+  <property>
+    <name>yarn.log-aggregation.retain-seconds</name>
+    <value>604800</value>
   </property>
 
   <property>

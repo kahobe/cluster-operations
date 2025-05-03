@@ -8,9 +8,10 @@ KEY_SIZE=2048
 
 # List of hosts (modify as needed)
 HOSTS=('rpic' 'rpiw1' 'rpiw2' 'rpiw3')
+HOSTS=('vm-controller' 'vm-worker01')
 
 # Output directories
-OUTPUT_DIR="./certs"
+OUTPUT_DIR="./certs_vm"
 mkdir -p "$OUTPUT_DIR"
 
 # Step 1: Generate keystores and certificates

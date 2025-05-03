@@ -68,7 +68,8 @@ all:
       keytab_path: /etc/security/keytab
     hadoop:
       version: "3.3.6"
-      binaries_file: "hadoop-3.3.6.tar.gz"
+      binaries_file: "hadoop-3.3.6-aarch64.tar"
+      libssl_file: "libssl1.1_1.1.0g-2ubuntu4_arm64.deb"
       home_path: "/opt/hadoop"
       cluster_id: "hadoop_1"
       dirs:
@@ -76,7 +77,12 @@ all:
           path: /var/log/hadoop/
           owner: hdfs
           group: hadoop
-          mode: "0770"
+          mode: "0771"
+        user_logs:
+          path: /var/log/hadoop/userlogs
+          owner: yarn
+          group: hadoop
+          mode: "1777"
         namenode:
           path: /srv/hadoop/hdfs/name
           owner: hdfs
@@ -115,8 +121,8 @@ all:
         user: "hive"
         password: "Sup3rS3cur3Pa55w0rd!"
     spark:
-      version: "3.5.5"
-      binaries_file: "spark-3.5.5-bin-hadoop3.tgz"
+      version: "3.5.5-bin-hadoop3-scala2.13"
+      binaries_file: "spark-3.5.5-bin-hadoop3-scala2.13.tar"
       home_path: "/opt/spark"
     hdfs:
       hadoop_dirs:

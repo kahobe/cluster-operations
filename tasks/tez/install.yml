@@ -22,10 +22,10 @@
     state: link
 
 # Removing slf4j jars
-- name: Removing slf4j jars to avoid conflicts with hadoop
-  shell: |
-    rm /opt/apache-tez-0.10.3-bin/lib/slf4j-*.jar
-  ignore_errors: true
+# - name: Removing slf4j jars to avoid conflicts with hadoop
+#   shell: |
+#     rm /opt/apache-tez-0.10.3-bin/lib/slf4j-*.jar
+#   ignore_errors: true
 
 # Copy tez tarball into hdfs
 - name: Copy tez tarball into hdfs

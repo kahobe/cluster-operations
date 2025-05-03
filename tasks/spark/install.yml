@@ -5,7 +5,7 @@
 
 - name: Remove existing Spark directory
   ansible.builtin.file:
-    path: "/opt/spark-{{ spark.version }}-bin-hadoop3"
+    path: "/opt/spark-{{ spark.version }}"
     state: absent
 
 - name: Extract Spark tarball
@@ -18,7 +18,7 @@
 
 - name: Create a symbolic link
   ansible.builtin.file:
-    src: /opt/spark-{{ spark.version }}-bin-hadoop3
+    src: /opt/spark-{{ spark.version }}
     dest: "{{ spark.home_path }}"
     owner: "{{ service_users.spark.name }}"
     group: "{{ service_users.spark.group }}"

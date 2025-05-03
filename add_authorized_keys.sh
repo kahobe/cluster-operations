@@ -2,6 +2,7 @@
 
 KEY_NAME='id_ed25519'
 USER='ansible'
+HOSTS=('rpic' 'rpiw1' 'rpiw2' 'rpiw3')
 HOSTS=('vm-controller' 'vm-worker01')
 
 cd ~/.ssh
