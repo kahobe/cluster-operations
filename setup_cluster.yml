@@ -288,6 +288,27 @@
       ansible.builtin.include_tasks:
         file: tasks/spark/install.yml
 
+- name: Configure Spark
+  tags:
+    - spark
+    - configure_spark
+  hosts: controllers, workernodes
+  become: true
+  tasks:
+    - name: Kinit using DataNode Keytab
+      vars:
+        become_user: "{{ service_users.hdfs.name }}"
+        keytab: "{{kerberos.keytab_path}}/nn.service.keytab"
+        principal: "nn/{{ groups['controllers'][0] }}@{{ kerberos.realm }}"
+      ansible.builtin.include_tasks:
+        file: tasks/kerberos/kinit.yml
+    - name: Configure Spark
+      ansible.builtin.include_tasks:
+        file: tasks/spark/configure_hdfs_dirs.yml
+    - name: Upload Spark JARs
+      ansible.builtin.include_tasks:
+        file: tasks/spark/upload_jars.yml
+
 - name: Install Kafka
   tags:
     - kafka

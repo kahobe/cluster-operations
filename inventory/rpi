@@ -161,6 +161,12 @@ all:
           owner: mapred
           group: hadoop
           mode: "750"
+      spark_dirs:
+        spark_jar_archive_dir:
+          path: "/apps/spark"
+          owner: spark
+          group: hadoop
+          mode: "755"
       hive_dirs:
         hive_tmp:
           path: "/tmp/hive"

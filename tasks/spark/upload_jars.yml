@@ -1,0 +1,16 @@
+# package jars
+- name: Create Spark JARs archive
+  become_user: "{{ service_users.hdfs.name }}"
+  loop: "{{ hdfs.spark_dirs | dict2items }}"
+  shell: |
+    jar cv0f ~/spark-libs.jar -C {{ spark.home_path }}/jars/ .
+  when:
+    - inventory_hostname in groups["controllers"]
+
+# upload jar archive
+- name: Upload Spark JARs archive
+  become_user: "{{ service_users.hdfs.name }}"
+  shell: |
+    {{ hadoop.home_path }}/bin/hdfs dfs -put ~/spark-libs.jar {{ hdfs.spark_dirs.spark_jar_archive_dir.path }}/spark-libs.jar
+  when:
+    - inventory_hostname in groups["controllers"]
