@@ -12,5 +12,6 @@
   become_user: "{{ service_users.hdfs.name }}"
   shell: |
     {{ hadoop.home_path }}/bin/hdfs dfs -put ~/spark-libs.jar {{ hdfs.spark_dirs.spark_jar_archive_dir.path }}/spark-libs.jar
+  ignore_errors: true
   when:
     - inventory_hostname in groups["controllers"]
