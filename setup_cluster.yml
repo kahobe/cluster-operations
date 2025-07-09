@@ -304,6 +304,9 @@
         file: tasks/kerberos/kinit.yml
     - name: Configure Spark
       ansible.builtin.include_tasks:
+        file: tasks/spark/configure.yml
+    - name: Configure Spark HDFS dirs
+      ansible.builtin.include_tasks:
         file: tasks/spark/configure_hdfs_dirs.yml
     - name: Upload Spark JARs
       ansible.builtin.include_tasks:
