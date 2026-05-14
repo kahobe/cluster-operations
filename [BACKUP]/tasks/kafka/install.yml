@@ -1,0 +1,84 @@
+- name: Copy Kafka tarball to remote hosts
+  ansible.builtin.copy:
+    src: "kafka/{{ kafka.binaries_file }}"
+    dest: "/tmp/{{ kafka.binaries_file }}"
+
+- name: Remove existing Kafka directory
+  ansible.builtin.file:
+    path: "/opt/kafka_{{ kafka.version }}"
+    state: absent
+
+- name: Remove existing {{ kafka.log_dir }} directory
+  ansible.builtin.file:
+    path: "{{ kafka.log_dir }}"
+    state: absent
+
+# Setting up Directories
+- name: Create {{ kafka.log_dir }} directory
+  ansible.builtin.file:
+    path: "{{ kafka.log_dir }}"
+    owner: "{{ service_users.kafka.name }}"
+    group: "{{ service_users.kafka.name }}"
+    state: directory
+
+- name: Extract Kafka tarball
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ kafka.binaries_file }}"
+    dest: "/opt/"
+    owner: "{{ service_users.kafka.name }}"
+    group: "{{ service_users.kafka.group }}"
+    remote_src: yes
+
+- name: Create a symbolic link
+  ansible.builtin.file:
+    src: /opt/kafka_{{ kafka.version }}
+    dest: /opt/kafka
+    owner: "{{ service_users.kafka.name }}"
+    group: "{{ service_users.kafka.group }}"
+    state: link
+
+- name: Configure node.properties
+  ansible.builtin.template:
+    src: kafka/server.properties.j2
+    dest: "{{ kafka.home_path }}/config/node.properties"
+    owner: "{{ service_users.kafka.name }}"
+    group: "{{ service_users.kafka.group }}"
+
+- name: Configure kafka_server_jaas.conf
+  ansible.builtin.template:
+    src: kafka/kafka_server_jaas.conf.j2
+    dest: "{{ kafka.home_path }}/config/kafka_server_jaas.conf"
+    owner: "{{ service_users.kafka.name }}"
+    group: "{{ service_users.kafka.group }}"
+
+- name: Format Kafka storage
+  ansible.builtin.shell: |
+    {{ kafka.home_path}}/bin/kafka-storage.sh format \
+      --cluster-id {{ kafka.cluster_id }} \
+      --config {{ kafka.home_path}}/config/node.properties 
+  become_user: "{{ service_users.kafka.name }}"
+  become: true
+
+- name: Configure systemd Kafka Broker Service
+  template:
+    src: kafka/kafka-broker.service.j2
+    dest: /etc/systemd/system/kafka-broker.service
+
+- name: Enable Kafka Broker Service
+  ansible.builtin.systemd_service:
+    name: kafka-broker
+    enabled: true
+    state: stopped
+    daemon_reload: true
+
+- name: Set Kafka environment variables
+  lineinfile:
+    path: /etc/environment
+    line: "export KAFKA_HOME={{ kafka.home_path}}"
+  become: true
+
+- name: Add Kafka to PATH for all Users
+  lineinfile:
+    path: /etc/bash.bashrc
+    line: "export PATH=$PATH:$KAFKA_HOME/bin"
+  become: true

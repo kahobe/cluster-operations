@@ -1,0 +1,198 @@
+- name: "Set HADOOP_HOME environment variable"
+  ansible.builtin.lineinfile:
+    path: "/etc/environment"
+    line: "export HADOOP_HOME={{ hadoop.home_path }}"
+  become: true
+
+- name: "Set HADOOP_CONF_DIR environment variable"
+  ansible.builtin.lineinfile:
+    path: "/etc/environment"
+    line: "export HADOOP_CONF_DIR={{ hadoop.home_path }}/etc/hadoop"
+  become: true
+
+- name: "Set YARN_CONF_DIR environment variable"
+  ansible.builtin.lineinfile:
+    path: "/etc/environment"
+    line: "export YARN_CONF_DIR={{ hadoop.home_path }}/etc/hadoop"
+  become: true
+
+- name: "Add Hadoop to PATH for all users"
+  ansible.builtin.lineinfile:
+    path: "/etc/bash.bashrc"
+    line: "export PATH=$PATH:$HADOOP_HOME/bin"
+  become: true
+
+- name: "Set JAVA_HOME in hadoop-env.sh"
+  become: true
+  become_user: "hadoop"
+  ansible.builtin.lineinfile:
+    path: "{{ hadoop.home_path }}/etc/hadoop/hadoop-env.sh"
+    search_string: "# export JAVA_HOME="
+    line: "export JAVA_HOME={{ java.jdk_8.home_path }}"
+
+- name: "Set TEZ_CONF_DIR in hadoop-env.sh"
+  become: true
+  become_user: "hadoop"
+  ansible.builtin.lineinfile:
+    path: "{{ hadoop.home_path }}/etc/hadoop/hadoop-env.sh"
+    line: "export TEZ_CONF_DIR={{ hadoop.home_path }}/etc/hadoop/tez-site.xml"
+
+- name: "Set TEZ_JARS in hadoop-env.sh"
+  become: true
+  become_user: "hadoop"
+  ansible.builtin.lineinfile:
+    path: "{{ hadoop.home_path }}/etc/hadoop/hadoop-env.sh"
+    line: "export TEZ_JARS={{ tez.home_path }}"
+
+- name: "Set HADOOP_CLASSPATH in hadoop-env.sh"
+  become: true
+  become_user: "hadoop"
+  ansible.builtin.lineinfile:
+    path: "{{ hadoop.home_path }}/etc/hadoop/hadoop-env.sh"
+    line: "export HADOOP_CLASSPATH=${HADOOP_CLASSPATH}:${TEZ_CONF_DIR}:${TEZ_JARS}/*:${TEZ_JARS}/lib/*"
+
+- name: "Set HADOOP_LOG_DIR in hadoop-env.sh user"
+  become: true
+  become_user: "hadoop"
+  ansible.builtin.lineinfile:
+    path: "{{ hadoop.home_path }}/etc/hadoop/hadoop-env.sh"
+    search_string: "# export HADOOP_LOG_DIR="
+    line: "export HADOOP_LOG_DIR={{ hadoop.dirs.logs.path }}"
+
+
+- name: "Configure Hadoop core-site.xml"
+  become: true
+  vars:
+    aut_to_local_realm: "{{ kerberos.realm | replace('.', '\\.') }}"
+  ansible.builtin.template:
+    src: "conf/core-site.xml.j2"
+    dest: "{{ hadoop.home_path }}/etc/hadoop/core-site.xml"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
+    mode: "0644"
+
+- name: "Configure Hadoop hdfs-site.xml"
+  become: true
+  ansible.builtin.template:
+    src: "conf/hdfs-site.xml.j2"
+    dest: "{{ hadoop.home_path }}/etc/hadoop/hdfs-site.xml"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
+    mode: "0644"
+
+- name: "Configure Yarn yarn-site.xml"
+  become: true
+  ansible.builtin.template:
+    src: "conf/yarn-site.xml.j2"
+    dest: "{{ hadoop.home_path }}/etc/hadoop/yarn-site.xml"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
+    mode: "0644"
+
+- name: "Configure Hadoop mapred-site.xml"
+  become: true
+  ansible.builtin.template:
+    src: "conf/mapred-site.xml.j2"
+    dest: "{{ hadoop.home_path }}/etc/hadoop/mapred-site.xml"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
+    mode: "0644"
+
+- name: "Configure Hadoop ssl-server.xml"
+  become: true
+  ansible.builtin.template:
+    src: "conf/ssl-server.xml.j2"
+    dest: "{{ hadoop.home_path }}/etc/hadoop/ssl-server.xml"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
+    mode: "0644"
+
+- name: "Create hadoop-http-auth-signature-secret file"
+  become: true
+  loop: "{{ service_users | dict2items }}"
+  ansible.builtin.copy:
+    owner: "{{ item.value.name }}"
+    mode: "0700"
+    dest: "/home/{{ item.value.name }}/hadoop-http-auth-signature-secret"
+    content: |
+      {{ item.value.name }}
+
+- name: "Add hosts to HADOOP_HOME/etc/hadoop/workers"
+  become: true
+  become_user: "hadoop"
+  ansible.builtin.lineinfile:
+    dest: "{{ hadoop.home_path }}/etc/hadoop/workers"
+    line: "{{ item }}"
+  loop: "{{ groups['hdfs_datanode'] }}"
+
+- name: "Set Hadoop Home Direcotry Permissions"
+  become: true
+  ansible.builtin.file:
+    path: "{{ hadoop.home_path }}"
+    recurse: true
+    state: "directory"
+    owner: "root"
+    group: "{{ service_users.hadoop.group }}"
+    mode: "755"
+
+- name: "Set container-executor binary permissions"
+  become: true
+  ansible.builtin.file:
+    path: "{{ hadoop.home_path }}/bin/container-executor"
+    owner: "root"
+    group: "{{ service_users.hadoop.group }}"
+    mode: "6050"
+
+- name: "Configure yarn container-executor.cfg"
+  become: true
+  ansible.builtin.template:
+    src: "conf/container-executor.cfg.j2"
+    dest: "{{ hadoop.home_path }}/etc/hadoop/container-executor.cfg"
+    owner: "root"
+    group: "{{ service_users.hadoop.group }}"
+    mode: "6050"
+
+- name: "Configure systemd datanode service"
+  become: true
+  ansible.builtin.template:
+    src: services/hdfs-datanode.service.j2
+    dest: /etc/systemd/system/hdfs-datanode.service
+    owner: "root"
+    group: "root"
+    mode: "0644"
+
+- name: "Configure systemd namenode service"
+  become: true
+  ansible.builtin.template:
+    src: services/hdfs-namenode.service.j2
+    dest: /etc/systemd/system/hdfs-namenode.service
+    owner: "root"
+    group: "root"
+    mode: "0644"
+
+- name: "Configure systemd resourcemanager service"
+  become: true
+  ansible.builtin.template:
+    src: services/yarn-resourcemanager.service.j2
+    dest: /etc/systemd/system/yarn-resourcemanager.service
+    owner: "root"
+    group: "root"
+    mode: "0644"
+
+- name: "Configure systemd nodemanager service"
+  become: true
+  ansible.builtin.template:
+    src: services/yarn-nodemanager.service.j2
+    dest: /etc/systemd/system/yarn-nodemanager.service
+    owner: "root"
+    group: "root"
+    mode: "0644"
+
+- name: "Configure systemd historyserver service"
+  become: true
+  ansible.builtin.template:
+    src: services/yarn-historyserver.service.j2
+    dest: /etc/systemd/system/yarn-historyserver.service
+    owner: "root"
+    group: "root"
+    mode: "0644"

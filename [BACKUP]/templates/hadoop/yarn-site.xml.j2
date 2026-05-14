@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+<configuration>
+
+  <!-- ================= Node Manager properties ================= -->
+
+  <!-- Will execute the Container as the user who submitted the job, requires the user to be presenton all workernodes -->
+  <property>
+    <name>yarn.nodemanager.container-executor.class</name>
+    <value>org.apache.hadoop.yarn.server.nodemanager.LinuxContainerExecutor</value>
+    <description>
+      This is the container executor setting that ensures that all applications
+      are started with the LinuxContainerExecutor.
+    </description>
+  </property>
+
+  <property>
+    <name>yarn.nodemanager.linux-container-executor.group</name>
+    <value>hadoop</value>
+  </property>
+
+  <property>
+    <name>yarn.log-aggregation-enable</name>
+    <value>true</value>
+    <description>Whether to enable log aggregation. Log aggregation collects
+    each container's logs and moves these logs onto a file-system, for e.g.
+    HDFS, after the application completes. Users can configure the
+    "yarn.nodemanager.remote-app-log-dir" and
+    "yarn.nodemanager.remote-app-log-dir-suffix" properties to determine
+    where these logs are moved to. Users can access the logs via the
+    Application Timeline Server.
+    </description>
+  </property>
+
+  <property>
+    <name>yarn.nodemanager.log.retain-seconds</name>
+    <value>604800</value>
+    <description>Time in seconds to retain user logs. Only applicable if
+    log aggregation is disabled
+    </description>
+  </property>
+
+  <property>
+    <name>yarn.log-aggregation.retain-seconds</name>
+    <value>604800</value>
+  </property>
+
+  <property>
+    <name>yarn.nodemanager.remote-app-log-dir</name>
+    <value>{{ hdfs.hadoop_dirs.yarn_remote_app_log_dir.path }}</value>
+    <description>Where to aggregate logs to.</description>
+  </property>
+
+  <property>
+    <name>yarn.nodemanager.remote-app-log-dir-suffix</name>
+    <value>logs</value>
+    <description>The remote log dir will be created at 
+    {yarn.nodemanager.remote-app-log-dir}/${user}/{thisParam}
+    </description>
+  </property>
+
+  <property>
+    <name>yarn.nodemanager.principal</name>
+    <value>nm/_HOST@{{ kerberos.realm }}</value>
+    <description>The kerberos principal for the node manager.</description>
+  </property>
+
+  <property>
+    <name>yarn.nodemanager.keytab</name>
+    <value>{{ kerberos.keytab_path }}/nm.service.keytab</value>
+    <description>Keytab for NM.</description>
+  </property>
+
+  <property>
+    <name>yarn.nodemanager.webapp.https.address</name>
+    <value>{{ groups['controllers'][0] }}:8044</value>
+    <description>The https adddress of the NM web application.</description>
+  </property>
+
+  <property>
+    <name>yarn.nodemanager.aux-services</name>
+    <value>mapreduce_shuffle</value>
+    <description>A comma separated list of services where service name should only
+    contain a-zA-Z0-9_ and can not start with numbers</description>
+  </property>
+
+  <property>
+    <name>yarn.nodemanager.aux-services.mapreduce_shuffle.class</name>
+    <value>org.apache.hadoop.mapred.ShuffleHandler</value>
+  </property>
+
+  <!-- ================= Resourcemanager properties ================= -->
+  <property>
+    <name>yarn.resourcemanager.hostname</name>
+    <value>{{ groups['controllers'][0] }}</value>
+    <description>The hostname of the RM.</description>
+  </property>
+
+  <property>
+    <name>yarn.resourcemanager.webapp.https.address</name>
+    <value>${yarn.resourcemanager.hostname}:8090</value>
+  </property>
+
+  <property>
+    <name>yarn.resourcemanager.principal</name>
+    <value>rm/_HOST@{{ kerberos.realm }}</value>
+    <description>The Kerberos principal for the resource manager.</description>
+  </property>
+
+  <property>
+    <name>yarn.resourcemanager.keytab</name>
+    <value>{{ kerberos.keytab_path }}/rm.service.keytab</value>
+    <description>The keytab for the resource manager.</description>
+  </property>
+
+  <property>
+    <name>yarn.webapp.ui2.enable</name>
+    <value>true</value>
+    <description>To enable RM web ui2 application.</description>
+  </property>
+
+  <property>
+    <name>yarn.nodemanager.resource.memory-mb</name>
+    <value>13312</value>
+    <description>Amount of physical memory, in MB, that can be allocated 
+    for containers. If set to -1 and
+    yarn.nodemanager.resource.detect-hardware-capabilities is true, it is
+    automatically calculated(in case of Windows and Linux).
+    In other cases, the default is 8192MB.
+    </description>
+  </property>
+
+  <!-- ================= Other properties ================= -->
+  <property>
+    <name>yarn.log.server.url</name>
+    <value>http://{{ groups['controllers'][0] }}:19888/jobhistory/logs</value>
+    <description>URL for log aggregation server</description>
+  </property>
+
+  <!-- ================= Resource Management ================= 
+  https://docs.cloudera.com/HDPDocuments/HDP2/HDP-2.3.0/bk_installing_manually_book/content/determine-hdp-memory-config.html-->
+  <property>
+    <name>yarn.resourcemanager.nodemanagers.heartbeat-interval-ms</name>
+    <value>5000</value>
+  </property>
+</configuration>

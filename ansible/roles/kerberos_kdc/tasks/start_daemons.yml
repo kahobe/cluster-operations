@@ -1,0 +1,7 @@
+- name: "Start KDC"
+  become: true
+  ansible.builtin.command: krb5kdc
+
+- name: "Start Admin-Server"
+  become: true
+  ansible.builtin.command: kadmind

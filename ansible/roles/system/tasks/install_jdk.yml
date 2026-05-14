@@ -1,0 +1,29 @@
+- name: "Copy to remote Hosts: {{ jdk_binaries_file }}"
+  ansible.builtin.copy:
+    src: "{{ jdk_binaries_location }}/{{ jdk_binaries_file }}"
+    dest: "/tmp/{{ jdk_binaries_file }}"
+    mode: "755"
+
+- name: "Remove existing Directory {{ jdk_home_path }}"
+  become: true
+  ansible.builtin.file:
+    path: "{{ jdk_home_path }}"
+    state: absent
+
+- name: "Extract jdk tarball"
+  become: true
+  register: system_unarchive_result
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ jdk_binaries_file }}"
+    dest: "/opt/"
+    mode: "755"
+    remote_src: true
+
+- name: "Create symbolic Link"
+  become: true
+  ansible.builtin.file:
+    force: true
+    src: "/opt/{{ jdk_binaries_file.split('.tar.gz')[0] }}"
+    dest: "{{ jdk_home_path }}"
+    state: "link"
+    mode: "755"

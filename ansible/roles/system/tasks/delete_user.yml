@@ -1,0 +1,11 @@
+- name: "Ensure user is absent: {{ user_name }}"
+  become: true
+  ansible.builtin.user:
+    name: "{{ user_name }}"
+    state: "absent"
+
+- name: "Ensure group is absent: {{ user_group }}"
+  become: true
+  ansible.builtin.group:
+    name: "{{ user_group }}"
+    state: "absent"

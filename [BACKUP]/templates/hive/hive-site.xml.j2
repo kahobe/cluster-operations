@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+
+  <!-- ================= TEZ CONFIGURATION ================= -->
+  <!-- Tez configuration instructions https://issues.apache.org/jira/browse/HIVE-6098 -->
+  <!-- Setting Execution Engine -->
+  <property>
+    <name>hive.execution.engine</name>
+    <value>tez</value>
+  </property>
+
+  <!-- Path to Tez Tarball -->
+  <property>
+    <name>tez.lib.uris</name>
+    <value>hdfs://{{ tez.hdfs_location }}/{{ tez.binaries_file }}</value>
+  </property>
+
+  <!-- use "find /opt/tez/ -name *.jar | sort | paste -sd, -" to generate list of tez jars -->
+  <property>
+    <name>hive.aux.jars.path</name>
+    <value>/opt/tez/hadoop-shim-0.10.3.jar,/opt/tez/hadoop-shim-2.8-0.10.3.jar,/opt/tez/lib/async-http-client-2.12.3.jar,/opt/tez/lib/commons-cli-1.2.jar,/opt/tez/lib/commons-codec-1.15.jar,/opt/tez/lib/commons-collections4-4.4.jar,/opt/tez/lib/commons-io-2.8.0.jar,/opt/tez/lib/commons-lang-2.6.jar,/opt/tez/lib/guava-32.0.1-jre.jar,/opt/tez/lib/hadoop-hdfs-client-3.3.6.jar,/opt/tez/lib/hadoop-mapreduce-client-common-3.3.6.jar,/opt/tez/lib/hadoop-mapreduce-client-core-3.3.6.jar,/opt/tez/lib/hadoop-yarn-server-timeline-pluginstorage-3.3.6.jar,/opt/tez/lib/javax.servlet-api-3.1.0.jar,/opt/tez/lib/jersey-client-1.19.jar,/opt/tez/lib/jersey-json-1.19.jar,/opt/tez/lib/jettison-1.5.4.jar,/opt/tez/lib/jsr305-3.0.0.jar,/opt/tez/lib/metrics-core-3.1.0.jar,/opt/tez/lib/netty-all-4.1.94.Final.jar,/opt/tez/lib/protobuf-java-3.21.1.jar,/opt/tez/lib/RoaringBitmap-0.7.45.jar,/opt/tez/lib/slf4j-api-1.7.36.jar,/opt/tez/lib/slf4j-reload4j-1.7.36.jar,/opt/tez/tez-api-0.10.3.jar,/opt/tez/tez-build-tools-0.10.3.jar,/opt/tez/tez-common-0.10.3.jar,/opt/tez/tez-dag-0.10.3.jar,/opt/tez/tez-examples-0.10.3.jar,/opt/tez/tez-history-parser-0.10.3.jar,/opt/tez/tez-javadoc-tools-0.10.3.jar,/opt/tez/tez-job-analyzer-0.10.3.jar,/opt/tez/tez-mapreduce-0.10.3.jar,/opt/tez/tez-protobuf-history-plugin-0.10.3.jar,/opt/tez/tez-runtime-internals-0.10.3.jar,/opt/tez/tez-runtime-library-0.10.3.jar,/opt/tez/tez-tests-0.10.3.jar,/opt/tez/tez-yarn-timeline-cache-plugin-0.10.3.jar,/opt/tez/tez-yarn-timeline-history-0.10.3.jar,/opt/tez/tez-yarn-timeline-history-with-acls-0.10.3.jar,/opt/tez/tez-yarn-timeline-history-with-fs-0.10.3.jar</value>
+  </property>
+
+  <!-- ================= METASTORE CONFIGURATION ================= -->
+  <!-- Connection URL to the metastore database -->
+  <property>
+    <name>javax.jdo.option.ConnectionURL</name>
+    <value>jdbc:mysql://{{ groups['controllers'][0] }}/{{ mysql.users.hive.db }}?createDatabaseIfNotExist=true</value>
+    <description>JDBC connection string for the data store which contains metadata</description>
+  </property>
+
+  <!-- JDBC driver class for MySQL -->
+  <property>
+    <name>javax.jdo.option.ConnectionDriverName</name>
+    <value>com.mysql.jdbc.Driver</value>
+    <description>MySQL JDBC driver class</description>
+  </property>
+
+  <!-- Username used to connect to the metastore database -->
+  <property>
+    <name>javax.jdo.option.ConnectionUserName</name>
+    <value>{{ hive.metastore.user }}</value>
+    <description>user name for connecting to MySQL server</description>
+  </property>
+
+  <!-- Password for the database user -->
+  <property>
+    <name>javax.jdo.option.ConnectionPassword</name>
+    <value>{{ hive.metastore.password }}</value>
+    <description>password for connecting to MySQL server</description>
+  </property>
+
+  <!-- URI used by Hive to connect to the remote Metastore service -->
+  <property>
+    <name>hive.metastore.uris</name>
+    <value>thrift://{{ groups['controllers'][0] }}:9083</value>
+    <description>Hive connects to one of these URIs to make metadata requests to a remote Metastore</description>
+  </property>
+
+  <!-- Default HDFS directory where Hive will store managed tables -->
+  <property>
+    <name>hive.metastore.warehouse.dir</name>
+    <value>{{ hdfs.hive_dirs.hive_managed_dir.path }}</value>
+    <description>Default HDFS location for Hive managed tables.</description>
+  </property>
+
+  <!-- Enable or disable authorization checks for DB notifications -->
+  <property>
+    <name>hive.metastore.event.db.notification.api.auth</name>
+    <value>false</value>
+    <description>Enable DB notification API authorization.</description>
+  </property>
+
+  <!-- ================= METASTORE SECURITY (KERBEROS) ================= -->
+  <!-- Enable SASL for Kerberos-based security -->
+  <property>
+    <name>hive.metastore.sasl.enabled</name>
+    <value>true</value>
+  </property>
+
+  <!-- Path to the keytab file used for Kerberos authentication -->
+  <property>
+    <name>hive.metastore.kerberos.keytab.file</name>
+    <value>{{ kerberos.keytab_path }}/hive.service.keytab</value>
+  </property>
+
+  <!-- Kerberos principal name for Hive Metastore -->
+  <property>
+    <name>hive.metastore.kerberos.principal</name>
+    <value>hive/_HOST@{{ kerberos.realm }}</value>
+  </property>
+
+  <!-- ================= STORAGE-BASED AUTHORIZATION ================= -->
+  <!-- Enable authorization at the storage (HDFS) level -->
+  <property>
+    <name>hive.security.authorization.enabled</name>
+    <value>false</value>
+  </property>
+
+  <!-- Specify the class that provides authorization capabilities -->
+  <property>
+    <name>hive.security.authorization.manager</name>
+    <value>org.apache.hadoop.hive.ql.security.authorization.StorageBasedAuthorizationProvider</value>
+  </property>
+
+  <!-- Authorization manager used by Hive Metastore for enforcing access control -->
+  <property>
+    <name>hive.security.metastore.authorization.manager</name>
+    <value>org.apache.hadoop.hive.ql.security.authorization.StorageBasedAuthorizationProvider</value>
+    <description>Authorization manager class for the metastore.</description>
+  </property>
+
+  <!-- Class responsible for authenticating users in the metastore -->
+  <property>
+    <name>hive.security.metastore.authenticator.manager</name>
+    <value>org.apache.hadoop.hive.ql.security.HadoopDefaultMetastoreAuthenticator</value>
+    <description>Authenticator manager class name for the metastore.</description>
+  </property>
+
+  <!-- Hook to run custom code before database/table/partition operations -->
+  <property>
+    <name>hive.metastore.pre.event.listeners</name>
+    <value>org.apache.hadoop.hive.ql.security.authorization.AuthorizationPreEventListener</value>
+    <description>Pre-event listener classes for metastore-side security.</description>
+  </property>
+
+  <!-- Enable HDFS operations to be executed with the user’s permissions -->
+  <property>
+    <name>hive.metastore.execute.setugi</name>
+    <value>true</value>
+    <description>Allow metastore to execute DFS operations using client user/group.</description>
+  </property>
+
+  <!-- Enable authorization checks for read operations in the metastore -->
+  <property>
+    <name>hive.security.metastore.authorization.auth.reads</name>
+    <value>true</value>
+    <description>Enable read access checks in metastore authorization.</description>
+  </property>
+
+  <!-- ================= DATANUCLEUS CONFIGURATION ================= -->
+  <!-- Controls how DataNucleus initializes the schema; "SchemaTable" is recommended -->
+  <property>
+    <name>datanucleus.autoStartMechanism</name>
+    <value>SchemaTable</value>
+    <description>Initialize on startup. Recommended for performance.</description>
+  </property>
+
+  <!-- ================= HIVESERVER2 CONFIGURATION ================= -->
+  <!-- Host on which HiveServer2 Thrift interface should bind -->
+  <property>
+    <name>hive.server2.thrift.bind.host</name>
+    <value>{{ groups['controllers'][0] }}</value>
+    <description>Bind host for HiveServer2 Thrift interface.</description>
+  </property>
+
+  <!-- Port number for HiveServer2 Thrift interface -->
+  <property>
+    <name>hive.server2.thrift.port</name>
+    <value>10000</value>
+    <description>Port number for HiveServer2 Thrift interface.</description>
+  </property>
+
+  <!-- ================= HIVESERVER2 SECURITY ================= -->
+  <!-- Authentication method for HiveServer2 (KERBEROS in this case) -->
+  <property>
+    <name>hive.server2.authentication</name>
+    <value>KERBEROS</value>
+    <description>Authentication mode. Options: NONE, NOSASL, KERBEROS, LDAP, PAM, CUSTOM</description>
+  </property>
+
+  <!-- Kerberos principal used by HiveServer2 -->
+  <property>
+    <name>hive.server2.authentication.kerberos.principal</name>
+    <value>hive/_HOST@{{ kerberos.realm }}</value>
+    <description>Kerberos principal for HiveServer2.</description>
+  </property>
+
+  <!-- Path to keytab file for Kerberos authentication for HiveServer2 -->
+  <property>
+    <name>hive.server2.authentication.kerberos.keytab</name>
+    <value>{{ kerberos.keytab_path }}/hive.service.keytab</value>
+    <description>Kerberos keytab for HiveServer2.</description>
+  </property>
+
+  <!-- Quality of Protection (QoP) for SASL. -->
+  <property>
+    <name>hive.server2.thrift.sasl.qop</name>
+    <value>auth</value>
+    <description>Quality of protection for SASL. Options: auth, auth-int, auth-conf</description>
+  </property>
+
+  <!-- Impersonate the connected user (use their permissions) -->
+  <property>
+    <name>hive.server2.enable.doAs</name>
+    <value>true</value>
+    <description>Enable user impersonation (doAs).</description>
+  </property>
+
+  <!-- ================= SSL CONFIGURATION ================= -->
+  <!-- Enable SSL for HiveServer2 communication -->
+  <property>
+    <name>hive.server2.use.SSL</name>
+    <value>true</value>
+  </property>
+
+  <!-- Path to the SSL keystore file -->
+  <property>
+    <name>hive.server2.keystore.path</name>
+    <value>{{ ssl.keystore_file }}</value>
+  </property>
+
+  <!-- Password for accessing the keystore -->
+  <property>
+    <name>hive.server2.keystore.password</name>
+    <value>{{ ssl.keystore_password }}</value>
+  </property>
+
+</configuration>

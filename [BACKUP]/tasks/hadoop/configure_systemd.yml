@@ -1,0 +1,77 @@
+# Configuring Systemd services
+- name: Configure systemd datanode service
+  become: true
+  template:
+    src: hadoop/hdfs-datanode.service.j2
+    dest: /etc/systemd/system/hdfs-datanode.service
+
+- name: Configure systemd namenode service
+  become: true
+  template:
+    src: hadoop/hdfs-namenode.service.j2
+    dest: /etc/systemd/system/hdfs-namenode.service
+
+- name: Configure systemd resourcemanager service
+  become: true
+  template:
+    src: hadoop/yarn-resourcemanager.service.j2
+    dest: /etc/systemd/system/yarn-resourcemanager.service
+
+- name: Configure systemd nodemanager service
+  become: true
+  template:
+    src: hadoop/yarn-nodemanager.service.j2
+    dest: /etc/systemd/system/yarn-nodemanager.service
+
+- name: Configure systemd historyserver service
+  become: true
+  template:
+    src: hadoop/yarn-historyserver.service.j2
+    dest: /etc/systemd/system/yarn-historyserver.service
+
+# Enable HDFS services
+- name: Enable namenode service
+  ansible.builtin.systemd_service:
+    name: hdfs-namenode
+    enabled: true
+    state: stopped
+    daemon_reload: true
+  when:
+    - inventory_hostname in groups["controllers"]
+
+- name: Enable datanode service
+  ansible.builtin.systemd_service:
+    name: hdfs-datanode
+    enabled: true
+    state: stopped
+    daemon_reload: true
+  when:
+    - inventory_hostname in groups["workernodes"]
+
+# Enable YARN Services
+- name: Enable resourcemanager service
+  ansible.builtin.systemd_service:
+    name: yarn-resourcemanager
+    enabled: true
+    state: stopped
+    daemon_reload: true
+  when:
+    - inventory_hostname in groups["controllers"]
+
+- name: Enable historyserver service
+  ansible.builtin.systemd_service:
+    name: yarn-historyserver
+    enabled: true
+    state: stopped
+    daemon_reload: true
+  when:
+    - inventory_hostname in groups["controllers"]
+
+- name: Enable nodemanager service
+  ansible.builtin.systemd_service:
+    name: yarn-nodemanager
+    enabled: true
+    state: stopped
+    daemon_reload: true
+  when:
+    - inventory_hostname in groups["workernodes"]

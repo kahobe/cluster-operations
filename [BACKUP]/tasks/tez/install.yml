@@ -1,0 +1,48 @@
+# Copy tez tarball
+- name: Copy tez tarball to remote host
+  ansible.builtin.copy:
+    src: "tez/{{ tez.binaries_file }}"
+    dest: "/tmp/{{ tez.binaries_file }}"
+
+- name: Extract Tez tarball
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ tez.binaries_file }}"
+    dest: "/opt/"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
+    mode: "u=rwx,g=rwx,o=rx"
+    remote_src: yes
+
+- name: Create a symbolic link
+  ansible.builtin.file:
+    src: /opt/apache-tez-{{ tez.version }}-bin
+    dest: /opt/tez
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
+    state: link
+
+# Removing slf4j jars
+# - name: Removing slf4j jars to avoid conflicts with hadoop
+#   shell: |
+#     rm /opt/apache-tez-0.10.3-bin/lib/slf4j-*.jar
+#   ignore_errors: true
+
+# Copy tez tarball into hdfs
+- name: Copy tez tarball into hdfs
+  become_user: "{{ service_users.hdfs.name }}"
+  shell: |
+    {{ hadoop.home_path }}/bin/hdfs dfs -mkdir -p {{ tez.hdfs_location}}
+    {{ hadoop.home_path }}/bin/hdfs dfs -put /tmp/{{ tez.binaries_file }} {{ tez.hdfs_location }}
+  ignore_errors: true
+  when:
+    - inventory_hostname in groups["controllers"]
+
+# setting hdfs permissions
+- name: Setting hdfs permissions
+  become_user: "{{ service_users.hdfs.name }}"
+  shell: |
+    {{ hadoop.home_path }}/bin/hdfs dfs -chmod 755 {{ tez.hdfs_location}}
+    {{ hadoop.home_path }}/bin/hdfs dfs -chmod 755 {{ tez.hdfs_location}}/{{ tez.binaries_file }}
+    {{ hadoop.home_path }}/bin/hdfs dfs -chown {{ service_users.hdfs.name }}:{{ service_users.hdfs.group }} {{ tez.hdfs_location }}
+  when:
+    - inventory_hostname in groups["controllers"]

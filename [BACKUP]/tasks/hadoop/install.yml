@@ -1,0 +1,100 @@
+# Copy and extract hadoop``
+- name: Copy Hadoop tarball to remote hosts
+  ansible.builtin.copy:
+    src: "hadoop/{{ hadoop.binaries_file }}"
+    dest: "/tmp/{{ hadoop.binaries_file }}"
+
+- name: Remove existing Hadoop directory
+  ansible.builtin.file:
+    path: /opt/hadoop-{{ hadoop.version }}
+    state: absent
+
+- name: Extract Hadoop tarball
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ hadoop.binaries_file }}"
+    dest: "/opt/"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
+    mode: "755"
+    remote_src: yes
+
+- name: Create a symbolic link
+  ansible.builtin.file:
+    force: yes
+    src: /opt/hadoop-{{ hadoop.version }}
+    dest: /opt/hadoop
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
+    state: link
+
+- name: Copy libssl
+  ansible.builtin.copy:
+    src: "hadoop/{{ hadoop.libssl_file }}"
+    dest: "/tmp/{{ hadoop.libssl_file }}"
+
+- name:  Install libssl
+  become: true
+  shell: |
+    dpkg -i /tmp/{{ hadoop.libssl_file }}
+
+# Setting up Directories
+- name: Create directories
+  loop: "{{ hadoop.dirs | dict2items }}"
+  ansible.builtin.file:
+    state: directory
+    path: "{{ item.value.path }}"
+    owner: "{{ item.value.owner }}"
+    group: "{{ item.value.group }}"
+    mode: "{{ item.value.mode }}"
+
+# Setting up environment Variables
+- name: Set HADOOP_HOME environment variable
+  lineinfile:
+    path: /etc/bash.bashrc
+    line: "export HADOOP_HOME={{ hadoop.home_path }}"
+  become: true
+
+- name: Set HADOOP_CONF_DIR environment variable
+  lineinfile:
+    path: /etc/bash.bashrc
+    line: "export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop"
+  become: true
+
+- name: Set YARN_CONF_DIR environment variable
+  lineinfile:
+    path: /etc/bash.bashrc
+    line: "export YARN_CONF_DIR=$HADOOP_CONF_DIR"
+  become: true
+
+- name: Add Hadoop to PATH for all Users
+  lineinfile:
+    path: /etc/bash.bashrc
+    line: "export PATH=$PATH:$HADOOP_HOME/bin"
+  become: true
+
+- name: Set JAVA_HOME in hadoop-env.sh
+  lineinfile:
+    path: "{{ hadoop.home_path }}/etc/hadoop/hadoop-env.sh"
+    search_string: "# export JAVA_HOME="
+    line: "export JAVA_HOME={{ linux.java8_home_path }}"
+
+- name: Set TEZ_CONF_DIR in hadoop-env.sh
+  lineinfile:
+    path: "{{ hadoop.home_path }}/etc/hadoop/hadoop-env.sh"
+    line: "export TEZ_CONF_DIR={{ hadoop.home_path }}/etc/hadoop/tez-site.xml"
+
+- name: Set TEZ_JARS in hadoop-env.sh
+  lineinfile:
+    path: "{{ hadoop.home_path }}/etc/hadoop/hadoop-env.sh"
+    line: "export TEZ_JARS={{ tez.home_path }}"
+
+- name: Set HADOOP_CLASSPATH in hadoop-env.sh
+  lineinfile:
+    path: "{{ hadoop.home_path }}/etc/hadoop/hadoop-env.sh"
+    line: "export HADOOP_CLASSPATH=${HADOOP_CLASSPATH}:${TEZ_CONF_DIR}:${TEZ_JARS}/*:${TEZ_JARS}/lib/*"
+
+- name: Set HADOOP_LOG_DIR in hadoop-env.sh User
+  lineinfile:
+    path: "{{ hadoop.home_path }}/etc/hadoop/hadoop-env.sh"
+    search_string: "# export HADOOP_LOG_DIR="
+    line: "export HADOOP_LOG_DIR={{ hadoop.dirs.logs.path }}"

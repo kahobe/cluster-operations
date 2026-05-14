@@ -1,0 +1,49 @@
+all:
+  children:
+    cluster:
+      hosts:
+        vm1:
+          ansible_host: 192.168.56.101
+        vm2:
+          ansible_host: 192.168.56.102
+        vm3:
+          ansible_host: 192.168.56.103
+
+    yarn_resource_manager:
+      hosts:
+        vm1:
+
+    yarn_job_history_server:
+      hosts:
+        vm1:
+
+    yarn_node_manager:
+      hosts:
+        vm2:
+        vm3:
+
+    hive_server:
+      hosts:
+        vm1:
+
+    hdfs_namenode:
+      hosts:
+        vm1:
+
+    hdfs_datanode:
+      hosts:
+        vm2:
+        vm3:
+
+    kafka_broker:
+      hosts:
+        vm1:
+        vm2:
+
+    kafka_controller:
+      hosts:
+        vm1:
+
+    kerberos_kdc:
+      hosts:
+        vm1:

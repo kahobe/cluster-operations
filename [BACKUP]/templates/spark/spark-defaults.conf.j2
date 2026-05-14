@@ -1,0 +1,4 @@
+spark.master                        yarn
+spark.yarn.archive                  hdfs://{{ hdfs.spark_dirs.spark_jar_archive_dir.path }}/spark-libs.jar
+spark.sql.catalogImplementation     hive
+spark.hadoop.hive.metastore.uris    thrift://{{ groups['controllers'][0] }}:9083

@@ -1,0 +1,4 @@
+yarn.nodemanager.linux-container-executor.group={{ service_users.hadoop.group }}
+allowed.system.users={{ service_users.yarn.name }},{{ service_users.mapred.name }},{{ service_users.hive.name }},{{ service_users.hdfs.name }}
+min.user.id=1000
+feature.terminal.enabled=1

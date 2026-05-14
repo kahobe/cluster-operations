@@ -1,0 +1,14 @@
+- name: "Ensure group is present: {{ user_group }}"
+  become: true
+  ansible.builtin.group:
+    name: "{{ user_group }}"
+    state: "present"
+
+- name: "Ensure user is present: {{ user_name }}"
+  become: true
+  ansible.builtin.user:
+    name: "{{ user_name }}"
+    group: "{{ user_group }}"
+    create_home: true
+    generate_ssh_key: "{{ generate_ssh_key }}"
+    shell: "/bin/bash"

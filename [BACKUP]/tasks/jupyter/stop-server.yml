@@ -1,0 +1,10 @@
+---
+- name: Stop Notebook Server
+  hosts: controllers
+  become: true
+
+  tasks:
+    - name: Stop Notebook Server
+      ansible.builtin.service:
+        name: jupyter-notebook.service
+        state: stopped

@@ -1,0 +1,11 @@
+- name: Ensure group "{{ new_user_group }}" exists
+  ansible.builtin.group:
+    name: "{{ new_user_group }}"
+    state: present
+
+- name: Create user '{{ new_user }}'
+  ansible.builtin.user:
+    name: "{{ new_user }}"
+    shell: /bin/bash
+    group: "{{ new_user_group }}"
+    create_home: true

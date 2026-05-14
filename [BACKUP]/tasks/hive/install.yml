@@ -1,0 +1,51 @@
+# Copy and extract hive
+- name: Ensure MySQL Service for Metastore is running
+  ansible.builtin.systemd_service:
+    name: mysql.service
+    state: started
+    enabled: true
+
+- name: Copy Hive tarball to remote hosts
+  ansible.builtin.copy:
+    src: "hive/{{ hive.binaries_file }}"
+    dest: "/tmp/{{ hive.binaries_file }}"
+
+- name: Remove existing Hive directory
+  ansible.builtin.file:
+    path: /opt/apache-hive-{{ hive.version }}-bin"
+    state: absent
+
+- name: Extract Hive tarball
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ hive.binaries_file }}"
+    dest: "/opt/"
+    owner: "{{ service_users.hive.name }}"
+    group: "{{ service_users.hive.group }}"
+    mode: "u=rwx,g=rwx,o=rx"
+    remote_src: yes
+
+- name: Create a symbolic link
+  ansible.builtin.file:
+    src: "/opt/apache-hive-{{ hive.version }}-bin"
+    dest: "{{ hive.home_path }}"
+    owner: "{{ service_users.hive.name }}"
+    group: "{{ service_users.hive.group }}"
+    state: link
+
+# Setting up environment Variables
+- name: Set HIVE_HOME environment variable
+  lineinfile:
+    path: /etc/bash.bashrc
+    line: "export HIVE_HOME={{ hive.home_path }}"
+  become: true
+
+- name: Add Hive to PATH for all Users
+  lineinfile:
+    path: /etc/bash.bashrc
+    line: "export PATH=$PATH:$HIVE_HOME/bin"
+  become: true
+
+- name: Copy MySQL JDBC Driver
+  ansible.builtin.copy:
+    src: "hive/{{ hive.jdbc_file }}"
+    dest: "{{ hive.home_path }}/lib/{{ hive.jdbc_file }}"

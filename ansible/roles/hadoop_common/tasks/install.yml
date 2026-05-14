@@ -1,0 +1,57 @@
+- name: "Copy Hadoop binaries archive to remote hosts"
+  become: true
+  ansible.builtin.copy:
+    src: "binaries/{{ ansible_facts['architecture'] }}/{{ hadoop.binaries_archive }}"
+    dest: "/tmp/{{ hadoop.binaries_archive }}"
+    mode: "0700"
+
+- name: "Remove existing Hadoop directory"
+  become: true
+  ansible.builtin.file:
+    path: "{{ hadoop.path }}"
+    state: absent
+
+- name: "Extract Hadoop binaries archive"
+  become: true
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ hadoop.binaries_archive }}"
+    dest: "/opt/"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
+    mode: "755"
+    remote_src: "yes"
+
+- name: "Create a symbolic link"
+  become: true
+  ansible.builtin.file:
+    force: "yes"
+    src: "{{ hadoop.path }}"
+    dest: "{{ hadoop.home_path }}"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
+    state: "link"
+
+- name: "Copy libssl"
+  when: ansible_facts["architecture"] == "aarch64"
+  become: true
+  ansible.builtin.copy:
+    src: "hadoop/{{ hadoop.libssl_file }}"
+    dest: "/tmp/{{ hadoop.libssl_file }}"
+    mode: "0700"
+
+- name: "Install libssl"
+  when: ansible_facts["architecture"] == "aarch64"
+  become: true
+  ansible.builtin.apt:
+    deb: /tmp/{{ hadoop.libssl_file }}
+
+# Setting up Directories
+- name: "Create directories"
+  become: true
+  loop: "{{ hadoop.dirs | dict2items }}"
+  ansible.builtin.file:
+    state: "directory"
+    path: "{{ item.value.path }}"
+    owner: "{{ item.value.owner }}"
+    group: "{{ item.value.group }}"
+    mode: "{{ item.value.mode }}"

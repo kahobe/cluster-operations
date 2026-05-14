@@ -1,0 +1,26 @@
+---
+- name: "System Setup"
+  hosts: "cluster"
+  roles:
+    - role: "system"
+
+- name: "Kerberos Setup"
+  hosts: "cluster"
+  roles:
+    - role: "kerberos_common"
+    - role: "kerberos_kdc"
+
+- name: "Kerberos KDC Setup"
+  hosts: "kerberos_kdc"
+  roles:
+    - role: "kerberos_kdc"
+
+- name: "Hadoop Setup"
+  hosts: ["yarn_resource_manager", "yarn_node_manager", "hdfs_namenode", "hdfs_datanode"]
+  roles:
+    - role: "hadoop_common"
+
+- name: "Create and Distribute Keytabs"
+  hosts: "cluster"
+  roles:
+    - role: "kerberos_keytab"

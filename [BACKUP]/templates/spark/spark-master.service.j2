@@ -1,0 +1,19 @@
+[Unit]
+Description=Spark Standalone Master
+After=syslog.target network.target remote-fs.target nss-lookup.target network-online.target
+Requires=network-online.target
+
+[Service]
+User=spark
+Group=spark
+Type=forking
+ExecStart=/opt/spark/sbin/start-master.sh -h {{ inventory_hostname }}
+ExecStop=/opt/spark/sbin/stop-master.sh
+WorkingDirectory=/opt/spark
+TimeoutStartSec=1min
+Restart=no
+RestartSec=30
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

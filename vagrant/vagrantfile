@@ -1,0 +1,53 @@
+Vagrant.configure("2") do |config|
+  # https://portal.cloud.hashicorp.com/vagrant/discover/ubuntu/jammy64
+  config.vm.box = "ubuntu/jammy64"
+
+  # Put your public SSH key here (or read from a file if you prefer)
+  ansible_pubkey = File.readlines("/home/bernhard/.ssh/id_ed25519.pub").first.strip
+
+  # Define cluster nodes
+  nodes = {
+    "vm1"  => "192.168.56.101",
+    "vm2" => "192.168.56.102",
+    "vm3" => "192.168.56.103"
+  }
+
+  nodes.each do |hostname, ip|
+    config.vm.define hostname do |node|
+      node.vm.hostname = hostname
+
+      # NAT adapter is included by default in Vagrant, no need to define
+
+      # Host-only adapter with static IP
+      node.vm.network "private_network", ip: ip
+
+      # Resources
+      node.vm.provider "virtualbox" do |vb|
+        vb.name = hostname
+        vb.memory = 12288
+        vb.cpus = 2
+      end
+
+      # Provision: create ansible user with sudo + SSH key
+      node.vm.provision "shell", inline: <<-SHELL
+        # Create ansible user if not exists
+        id -u ansible &>/dev/null || sudo useradd -m -s /bin/bash ansible
+
+        # Add to sudoers with no password
+        echo "ansible ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/ansible
+        sudo chmod 440 /etc/sudoers.d/ansible
+
+        # Set up SSH directory and authorized_keys
+        sudo mkdir -p /home/ansible/.ssh
+        echo "#{ansible_pubkey}" | sudo tee /home/ansible/.ssh/authorized_keys
+        sudo chmod 700 /home/ansible/.ssh
+        sudo chmod 600 /home/ansible/.ssh/authorized_keys
+        sudo chown -R ansible:ansible /home/ansible/.ssh
+
+        # Disable unattended upgrades which can cause "Unable to acquire the dpkg frontend lock" Errors
+        sudo systemctl stop unattended-upgrades
+        sudo apt purge --assume-yes unattended-upgrades
+      SHELL
+    end
+  end
+end

@@ -1,0 +1,13 @@
+- name: "Configure kdc.conf"
+  become: true
+  ansible.builtin.template:
+    src: "kdc.conf.j2"
+    dest: "/etc/krb5kdc/kdc.conf"
+    mode: "0644"
+
+- name: "Configure kadm5.acl"
+  become: true
+  ansible.builtin.template:
+    src: "kadm5.acl.j2"
+    dest: "/etc/krb5kdc/kadm5.acl"
+    mode: "0644"

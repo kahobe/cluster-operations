@@ -1,0 +1,28 @@
+- name: "Create /etc/security/hadoop/ directory"
+  become: true
+  ansible.builtin.file:
+    path: "/etc/security/hadoop/"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
+    mode: "775"
+    state: "directory"
+
+- name: "Copy Keystore"
+  become: true
+  become_user: "hadoop"
+  ansible.builtin.copy:
+    src: "{{ ssl.local_certs_dir }}/{{ inventory_hostname }}-keystore.jks"
+    dest: "{{ ssl.keystore_file }}"
+    mode: "640"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
+
+- name: Copy Trusstore
+  become: true
+  become_user: "hadoop"
+  ansible.builtin.copy:
+    src: "{{ ssl.local_certs_dir }}/truststore.jks"
+    dest: "{{ ssl.truststore_file }}"
+    mode: "644"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"

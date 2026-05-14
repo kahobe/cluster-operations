@@ -1,0 +1,16 @@
+- name: "Set Principal Variable"
+  ansible.builtin.set_fact:
+    kerberos_kdc_principal: "{{ primary }}{{ '/' + instance if instance is defined and instance | length > 0 else '' }}@{{ realm }}"
+
+- name: "Add Kerberos Principal {{ kerberos_kdc_principal }}"
+  ansible.builtin.expect:
+    command: kadmin.local -q "addprinc {{ kerberos_kdc_principal }}"
+    responses:
+      "Enter password for principal .*: ": "{{ password }}"
+      "Re-enter password for principal .*: ": "{{ password }}"
+  become: true
+  register: "kerberos_kdc_add_principal_result"
+
+- name: "Add Kerberos Principal Outpout [{{ kerberos_kdc_principal }}]"
+  ansible.builtin.debug:
+    var: "kerberos_kdc_add_principal_result.stdout_lines"

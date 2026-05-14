@@ -1,0 +1,48 @@
+- name: Stop Hadoop
+  tags:
+    - hadoop
+  hosts: controllers, workernodes
+  become: true
+  tasks:
+    - name: Stop Hadoop Services
+      ansible.builtin.include_tasks:
+        file: tasks/hadoop/stop_services.yml
+      vars:
+        service: "all"
+
+- name: Stop Hive
+  tags:
+    - hive
+  hosts: controllers, workernodes
+  become: true
+  tasks:
+    - name: Stop Hadoop Services
+      ansible.builtin.include_tasks:
+        file: tasks/hive/stop_services.yml
+      vars:
+        service: "all"
+
+- name: Stop Spark
+  tags:
+    - spark
+  hosts: controllers, workernodes
+  become: true
+  tasks:
+    - name: Stop Spark Services
+      ansible.builtin.include_tasks:
+        file: tasks/spark/stop_standalone_services.yml
+      vars:
+        service: "all"
+
+- name: Stop Kafka
+  tags:
+    - kafka
+  hosts: controllers, workernodes
+  become: true
+
+  tasks:
+    - name: Stop Kafka
+      ansible.builtin.include_tasks:
+        file: tasks/kafka/stop_services.yml
+      vars:
+        service: "all"

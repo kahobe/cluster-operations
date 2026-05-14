@@ -1,0 +1,4 @@
+- name: Start Broker Server
+  ansible.builtin.service:
+    name: kafka-broker.service
+    state: stopped

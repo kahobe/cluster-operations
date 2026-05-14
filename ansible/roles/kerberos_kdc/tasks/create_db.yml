@@ -1,0 +1,28 @@
+- name: "Check if Database exists"
+  become: true
+  ansible.builtin.stat:
+    path: "/var/lib/krb5kdc/principal"
+  register: "kerberos_kdc_kdb_file"
+
+- name: "Check Output"
+  ansible.builtin.debug:
+    var: "kerberos_kdc_kdb_file.stat"
+
+- name: "Create Kerberos Database"
+  become: true
+  ansible.builtin.expect:
+    command: "kdb5_util create -r {{ kerberos.realm }} -s"
+    responses:
+      "Enter KDC database master key: ": "{{ kerberos.password }}"
+      "Re-enter KDC database master key to verify: ": "{{ kerberos.password }}"
+  register: kerberos_kdc_create_db_result
+  when:
+    - kerberos_kdc_kdb_file is defined
+    - kerberos_kdc_kdb_file.stat is defined
+    - not kerberos_kdc_kdb_file.stat.exists
+
+- name: "Create Kerberos Database Output"
+  ansible.builtin.debug:
+    var: "kerberos_kdc_create_db_result"
+  when:
+    - kerberos_kdc_create_db_result is defined

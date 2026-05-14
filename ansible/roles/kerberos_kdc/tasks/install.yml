@@ -1,0 +1,6 @@
+- name: "Install krb5-kdc and krb5-admin-server"
+  become: true
+  ansible.builtin.apt:
+    update_cache: true
+    name: ["krb5-kdc", "krb5-admin-server"]
+    state: "present"

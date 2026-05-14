@@ -1,0 +1,9 @@
+- name: Start KDC
+  shell: krb5kdc
+  when:
+    - inventory_hostname in groups["controllers"]
+- name: Start Admin-Server
+  shell: kadmind
+  when:
+    - inventory_hostname in groups["controllers"]
+

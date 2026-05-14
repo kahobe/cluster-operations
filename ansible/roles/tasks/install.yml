@@ -1,0 +1,6 @@
+- name: "Install krb-user"
+  become: true
+  ansible.builtin.apt:
+    update_cache: true
+    name: "krb5-user"
+    state: "present"

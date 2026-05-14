@@ -1,0 +1,41 @@
+- name: Install krb5-kdc and krb5-admin-server
+  apt:
+    update_cache: true
+    name: ["krb5-kdc", "krb5-admin-server"]
+    state: present
+  when:
+    - inventory_hostname in groups["controllers"]
+
+- name: Install krb-user
+  apt:
+    update_cache: true
+    name: krb5-user
+    state: present
+  when:
+    - inventory_hostname in groups["workernodes"]
+
+- name: Configure kdc.conf
+  template:
+    src: kerberos/kdc.conf.j2
+    dest: /etc/krb5kdc/kdc.conf
+  when:
+    - inventory_hostname in groups["controllers"]
+  tags:
+    - configuration
+  become: true
+
+- name: Configure krb5.conf
+  template:
+    src: kerberos/krb5.conf.j2
+    dest: /etc/krb5.conf
+  tags:
+    - configuration
+
+- name: Configure kadm5.acl
+  template:
+    src: kerberos/kadm5.acl.j2
+    dest: /etc/krb5kdc/kadm5.acl
+  when:
+    - inventory_hostname in groups["controllers"]
+  tags:
+    - configuration

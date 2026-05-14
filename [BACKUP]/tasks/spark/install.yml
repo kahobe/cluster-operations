@@ -1,0 +1,67 @@
+- name: Copy Spark tarball to remote hosts
+  ansible.builtin.copy:
+    src: "spark/{{ spark.binaries_file }}"
+    dest: "/tmp/{{ spark.binaries_file }}"
+
+- name: Remove existing Spark directory
+  ansible.builtin.file:
+    path: "/opt/spark-{{ spark.version }}"
+    state: absent
+
+- name: Extract Spark tarball
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ spark.binaries_file }}"
+    dest: "/opt/"
+    owner: "{{ service_users.spark.name }}"
+    group: "{{ service_users.spark.group }}"
+    remote_src: yes
+
+- name: Create a symbolic link
+  ansible.builtin.file:
+    src: /opt/spark-{{ spark.version }}
+    dest: "{{ spark.home_path }}"
+    owner: "{{ service_users.spark.name }}"
+    group: "{{ service_users.spark.group }}"
+    state: link
+
+- name: Configure systemd Spark Master Service
+  template:
+    src: spark/spark-master.service.j2
+    dest: /etc/systemd/system/spark-master.service
+  tags:
+    - configuration
+  become: true
+  when:
+    - inventory_hostname in groups["controllers"]
+
+- name: Enable Spark Master Service
+  ansible.builtin.systemd_service:
+    name: spark-master
+    enabled: true
+    state: stopped
+    daemon_reload: true
+  tags:
+    - configuration
+  when:
+    - inventory_hostname in groups["controllers"]
+
+- name: Configure systemd Spark Worker Service
+  template:
+    src: spark/spark-worker.service.j2
+    dest: /etc/systemd/system/spark-worker.service
+  tags:
+    - configuration
+  become: true
+  when:
+    - inventory_hostname in groups["workernodes"]
+
+- name: Enable Spark Worker Service
+  ansible.builtin.systemd_service:
+    name: spark-worker
+    enabled: true
+    state: stopped
+    daemon_reload: true
+  tags:
+    - configuration
+  when:
+    - inventory_hostname in groups["workernodes"]

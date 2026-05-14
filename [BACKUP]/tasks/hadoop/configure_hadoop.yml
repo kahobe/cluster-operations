@@ -1,0 +1,76 @@
+# Configuring Hadoop
+- name: Configure Hadoop core-site.xml
+  vars:
+    aut_to_local_realm: "{{ kerberos.realm | replace('.','\\.') }}"
+  template:
+    src: hadoop/core-site.xml.j2
+    dest: "{{ hadoop.home_path }}/etc/hadoop/core-site.xml"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
+
+- name: Configure Hadoop hdfs-site.xml
+  template:
+    src: hadoop/hdfs-site.xml.j2
+    dest: "{{ hadoop.home_path }}/etc/hadoop/hdfs-site.xml"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
+
+- name: Configure Yarn yarn-site.xml
+  template:
+    src: hadoop/yarn-site.xml.j2
+    dest: "{{ hadoop.home_path }}/etc/hadoop/yarn-site.xml"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
+
+- name: Configure Hadoop mapred-site.xml
+  template:
+    src: hadoop/mapred-site.xml.j2
+    dest: "{{ hadoop.home_path }}/etc/hadoop/mapred-site.xml"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
+
+- name: Configure Hadoop ssl-server.xml
+  template:
+    src: hadoop/ssl-server.xml.j2
+    dest: "{{ hadoop.home_path }}/etc/hadoop/ssl-server.xml"
+    owner: "{{ service_users.hadoop.name }}"
+    group: "{{ service_users.hadoop.group }}"
+
+- name: Create hadoop-http-auth-signature-secret file
+  loop: "{{ service_users | dict2items}}"
+  copy:
+    owner: "{{ item.value.name }}"
+    mode: "700"
+    dest: "/home/{{ item.value.name }}/hadoop-http-auth-signature-secret"
+    content: |
+      {{ item.value.name }}
+
+- name: Add hosts to HADOOP_HOME/etc/hadoop/workers
+  lineinfile:
+    dest: "{{ hadoop.home_path }}/etc/hadoop/workers"
+    line: "{{ item }}"
+  loop: "{{ groups['workernodes'] }}"
+
+- name: Set Hadoop Home Direcotry Permissions
+  ansible.builtin.file:
+    path: "{{ hadoop.home_path }}"
+    recurse: true
+    state: directory
+    owner: "root"
+    group: "{{ service_users.hadoop.group }}"
+    mode: "755"
+
+- name: Set container-executor binary permissions
+  ansible.builtin.file:
+    path: "{{ hadoop.home_path }}/bin/container-executor"
+    owner: "root"
+    group: "{{ service_users.hadoop.group }}"
+    mode: "6050"
+
+- name: Configure yarn container-executor.cfg
+  template:
+    src: hadoop/container-executor.cfg.j2
+    dest: "{{ hadoop.home_path }}/etc/hadoop/container-executor.cfg"
+    owner: "root"
+    group: "{{ service_users.hadoop.group }}"
+    mode: "6050"

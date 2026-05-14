@@ -1,0 +1,71 @@
+#    ______                __          __ __           __        __
+#   / ____/_______  ____ _/ /____     / //_/__  __  __/ /_____ _/ /_  _____
+#  / /   / ___/ _ \/ __ `/ __/ _ \   / ,< / _ \/ / / / __/ __ `/ __ \/ ___/
+# / /___/ /  /  __/ /_/ / /_/  __/  / /| /  __/ /_/ / /_/ /_/ / /_/ (__  )
+# \____/_/   \___/\__,_/\__/\___/  /_/ |_\___/\__, /\__/\__,_/_.___/____/
+#                                            /____/
+
+- name: Creat Keytab File for each Service and Cluster Node
+  tags: ["kerberos_keytab", "kerberos_keytab_add"]
+  loop: "{{ groups['cluster'] | product(services) | list }}"
+  vars:
+    path: "/tmp/ansible_keytabs/{{ item[0] }}"
+    keytab_name: "{{ item[1].name }}.service.keytab"
+    principal: "{{ item[1].name }}/{{ item[0] }}@{{ kerberos.realm }} host/{{ item[0] }}@{{ kerberos.realm }}"
+  ansible.builtin.include_tasks:
+    file: "add_keytab.yml"
+    apply:
+      tags: ["kerberos_keytab", "kerberos_keytab_add"]
+  when:
+    - inventory_hostname in groups["kerberos_kdc"]
+
+#     ____  _      __       _ __          __          __ __           __        __
+#    / __ \(_)____/ /______(_) /_  __  __/ /____     / //_/__  __  __/ /_____ _/ /_  _____
+#   / / / / / ___/ __/ ___/ / __ \/ / / / __/ _ \   / ,< / _ \/ / / / __/ __ `/ __ \/ ___/
+#  / /_/ / (__  ) /_/ /  / / /_/ / /_/ / /_/  __/  / /| /  __/ /_/ / /_/ /_/ / /_/ (__  )
+# /_____/_/____/\__/_/  /_/_.___/\__,_/\__/\___/  /_/ |_\___/\__, /\__/\__,_/_.___/____/
+#                                                           /____/
+
+- name: "Copy temporary Keytab to local"
+  tags: ["kerberos_keytab", "kerberos_keytab_distribute"]
+  become: true
+  ansible.posix.synchronize:
+    src: "/tmp/ansible_keytabs/"
+    dest: "/tmp/ansible_keytabs"
+    mode: "pull"
+  when:
+    - inventory_hostname in groups["kerberos_kdc"]
+
+- name: "Delete existing Keytabs on all hosts"
+  tags: ["kerberos_keytab", "kerberos_keytab_distribute"]
+  become: true
+  ansible.builtin.file:
+    path: "{{ kerberos.keytab_path }}"
+    state: "absent"
+
+- name: "Distribute Keytabs"
+  tags: ["kerberos_keytab", "kerberos_keytab_distribute"]
+  become: true
+  ansible.posix.synchronize:
+    src: "/tmp/ansible_keytabs/{{ inventory_hostname }}/"
+    dest: "{{ kerberos.keytab_path }}"
+    mode: "push"
+
+- name: "Remove Tempory Keytab Dir on Kerberos Admin Server"
+  tags: ["kerberos_keytab", "kerberos_keytab_distribute"]
+  become: true
+  ansible.builtin.file:
+    path: "/tmp/ansible_keytabs/"
+    state: "absent"
+  when:
+    - inventory_hostname in groups["kerberos_kdc"]
+
+- name: "Change file ownership, group and permissions"
+  tags: ["kerberos_keytab", "kerberos_keytab_distribute"]
+  become: true
+  loop: "{{ services }}"
+  ansible.builtin.file:
+    path: "/etc/security/keytab/{{ item.name }}.service.keytab"
+    owner: "{{ item.user }}"
+    group: "{{ service_users.hadoop.group }}"
+    mode: "{{ '0440' if item.name == 'HTTP' else '0400' }}"

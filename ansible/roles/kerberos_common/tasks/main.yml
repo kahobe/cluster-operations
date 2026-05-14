@@ -1,0 +1,10 @@
+#     __        __    ______                         ____
+#    / /_______/ /_  / ____/       _________  ____  / __/
+#   / //_/ ___/ __ \/___ \        / ___/ __ \/ __ \/ /_
+#  / ,< / /  / /_/ /___/ /  _    / /__/ /_/ / / / / __/
+# /_/|_/_/  /_.___/_____/  (_)   \___/\____/_/ /_/_/
+#
+
+- name: "Create krb5.conf File"
+  tags: ["kerberos_common", "kerberos_common_conf"]
+  ansible.builtin.import_tasks: "configure.yml"

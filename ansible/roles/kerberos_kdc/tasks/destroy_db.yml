@@ -1,0 +1,27 @@
+- name: "Check if Database exists"
+  become: true
+  ansible.builtin.stat:
+    path: "/var/lib/krb5kdc/principal"
+  register: "kerberos_kdc_kdb_file"
+
+- name: "Check Output"
+  ansible.builtin.debug:
+    var: kerberos_kdc_kdb_file.stat
+
+- name: "Destroy Database"
+  become: true
+  ansible.builtin.command: "kdb5_util destroy -f {{ kerberos.realm }}"
+  when:
+    - kerberos_kdc_kdb_file is defined
+    - kerberos_kdc_kdb_file.stat is defined
+    - kerberos_kdc_kdb_file.stat.exists
+
+- name: "Re-Check if DB exists after deletion"
+  ansible.builtin.stat:
+    path: "/var/lib/krb5kdc/principal"
+  register: "kerberos_kdc_kdb_file"
+  become: true
+
+- name: "Re-Check Output"
+  ansible.builtin.debug:
+    var: kerberos_kdc_kdb_file.stat

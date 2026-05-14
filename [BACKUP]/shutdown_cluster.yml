@@ -1,0 +1,18 @@
+- name: Shutdown or Reboot Cluster
+  hosts: controllers, workernodes
+  gather_facts: yes
+  become: true
+  vars:
+    reboot: false
+
+  tasks:
+    - name: Shutdown or Reboot Cluster
+      ansible.builtin.shell: |
+        {% if reboot | bool %}
+        sudo shutdown
+        {% else %}
+        sudo shutdown
+        {% endif %}
+      args:
+        executable: /bin/bash
+      become: true

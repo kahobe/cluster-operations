@@ -1,0 +1,17 @@
+[libdefaults]
+	default_realm = {{ kerberos.realm }}
+	kdc_timesync = 1
+	ccache_type = 4
+	forwardable = true
+	proxiable = true
+	default_tgs_enctypes = aes256-cts-hmac-sha1-96 aes128-cts
+	default_tkt_enctypes = aes256-cts-hmac-sha1-96 aes128-cts
+	permitted_enctypes = aes256-cts-hmac-sha1-96 aes128-cts
+
+
+[realms]
+	{{ kerberos.realm }} = {
+		kdc = {{ groups['kerberos_kdc'][0] }}
+		admin_server = {{ groups['kerberos_kdc'][0] }}
+		default_domain = {{ kerberos.realm.lower() }}
+        }

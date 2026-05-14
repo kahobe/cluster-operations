@@ -1,0 +1,20 @@
+[Unit]
+Description=YARN History Server
+After=syslog.target network.target remote-fs.target nss-lookup.target network-online.target
+Requires=network-online.target
+
+[Service]
+User={{ service_users.mapred.name }}
+Group={{ service_users.hadoop.group }}
+Type=forking
+ExecStart={{ hadoop.home_path }}/bin/mapred --daemon start historyserver
+ExecStop={{ hadoop.home_path }}/bin/mapred --daemon stop historyserver
+ExecStopPost={{ hadoop.home_path }}/bin/mapred --daemon stop historyserver
+WorkingDirectory={{ hadoop.home_path }}
+TimeoutStartSec=1min
+Restart=no
+RestartSec=30
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

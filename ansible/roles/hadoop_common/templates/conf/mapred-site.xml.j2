@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+
+<configuration>
+
+    <!-- ================= MR YARN Application properties ================= -->
+    <property>
+        <name>mapreduce.framework.name</name>
+        <value>yarn-tez</value>
+        <description>The runtime framework for executing MapReduce jobs.
+        Can be one of local, classic or yarn.
+        </description>
+    </property>
+
+    <property>
+        <name>yarn.app.mapreduce.am.staging-dir</name>
+        <value>{{ hdfs.hadoop_dirs.yarn_mapreduce_am_staging_dir.path }}</value>
+        <description>The staging dir used while submitting jobs.
+        </description>
+    </property>
+
+    <!-- ================= Jobhistory Properties ================= -->
+    <property>
+        <name>mapreduce.jobhistory.intermediate-done-dir</name>
+        <value>{{ hdfs.hadoop_dirs.mapreduce_jobhistory_intermediate_done_dir.path }}</value>
+        <description></description>
+    </property>
+
+    <property>
+        <name>mapreduce.jobhistory.done-dir</name>
+        <value>{{ hdfs.hadoop_dirs.mapreduce_jobhistory_done_dir.path }}</value>
+        <description></description>
+    </property>
+
+    <property>
+        <name>mapreduce.jobhistory.address</name>
+        <value>{{ groups['yarn_job_history_server'][0] }}:10020</value>
+        <description>MapReduce JobHistory Server IPC host:port</description>
+    </property>
+
+    <property>
+        <name>mapreduce.jobhistory.principal</name>
+        <value>jhs/_HOST@{{ kerberos.realm }}</value>
+        <description>
+        Kerberos principal name for the MapReduce JobHistory Server.
+        </description>
+    </property>
+
+    <property>
+        <name>mapreduce.jobhistory.keytab</name>
+        <value>{{ kerberos.keytab_path }}/jhs.service.keytab</value>
+        <description>
+        Location of the kerberos keytab file for the MapReduce
+        JobHistory Server.
+        </description>
+    </property>
+
+
+    <!-- ================= Job Notification Configuration ================= -->
+    <property>
+        <name>mapreduce.application.classpath</name>
+        <value>/opt/hadoop/etc/hadoop:/opt/hadoop/share/hadoop/common/lib/*:/opt/hadoop/share/hadoop/common/*:/opt/hadoop/share/hadoop/hdfs:/opt/hadoop/share/hadoop/hdfs/lib/*:/opt/hadoop/share/hadoop/hdfs/*:/opt/hadoop/share/hadoop/mapreduce/*:/opt/hadoop/share/hadoop/yarn:/opt/hadoop/share/hadoop/yarn/lib/*:/opt/hadoop/share/hadoop/yarn/*</value>
+    </property>
+
+    <!-- ================= I/O properties ================= 
+    <property>
+        <name>mapreduce.map.memory.mb</name>
+        <value>-Xmx3686m</value>
+        <description>The amount of memory to request from the scheduler for each
+        map task. If this is not specified or is non-positive, it is inferred from
+        mapreduce.map.java.opts and mapreduce.job.heap.memory-mb.ratio.
+        If java-opts are also not specified, we set it to 1024.
+        </description>
+    </property>
+
+    <property>
+        <name>mapreduce.map.java.opts</name>
+        <value>-Xmx3686m</value>
+        <description>The amount of memory to request from the scheduler for each
+        map task. If this is not specified or is non-positive, it is inferred from
+        mapreduce.map.java.opts and mapreduce.job.heap.memory-mb.ratio.
+        If java-opts are also not specified, we set it to 1024.
+        </description>
+    </property>
+
+    <property>
+        <name>mapred.child.java.opts</name>
+        <value>-Xmx1024m -server</value>
+    </property>
+    -->
+    <!-- ================= overrides mapred.child.java.opts ================= 
+    <property>
+        <name>mapreduce.reduce.java.opts</name>
+        <value>-Xmx3686m</value>
+        <description>Java opts only for the child processes that are reduces. If set,
+        this will be used instead of mapred.child.java.opts. If -Xmx is not set,
+        it is inferred from mapreduce.reduce.memory.mb and
+        mapreduce.job.heap.memory-mb.ratio.
+        </description>
+    </property>
+
+    <property>
+        <name>mapreduce.reduce.memory.mb</name>
+        <value>4096</value>
+        <description>The amount of memory to request from the scheduler for each
+        reduce task. If this is not specified or is non-positive, it is inferred
+        from mapreduce.reduce.java.opts and mapreduce.job.heap.memory-mb.ratio.
+        If java-opts are also not specified, we set it to 1024.
+        </description>
+    </property>
+
+    <property>
+        <name>mapreduce.task.io.sort.mb</name>
+        <value>100</value>
+        <description>The total amount of buffer memory to use while sorting
+        files, in megabytes.  By default, gives each merge stream 1MB, which
+        should minimize seeks.</description>
+    </property> -->
+</configuration>

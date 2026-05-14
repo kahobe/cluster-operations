@@ -1,0 +1,34 @@
+- name: "Restart Namenode Service"
+  ansible.builtin.service:
+    name: hdfs-namenode.service
+    state: restarted
+  listen:
+    - "Start Hadoop Services"
+
+- name: "Restart Datanode Service"
+  ansible.builtin.service:
+    name: hdfs-datanode.service
+    state: restarted
+  listen:
+    - "Start Hadoop Services"
+
+- name: Start YARN Resource Manager Service
+  ansible.builtin.service:
+    name: yarn-resourcemanager.service
+    state: restarted
+  listen:
+    - "Start Hadoop Services"
+
+- name: Start YARN Node Manager Service
+  ansible.builtin.service:
+    name: yarn-nodemanager.service
+    state: restarted
+  listen:
+    - "Start Hadoop Services"
+
+- name: Start YARN History Server Service
+  ansible.builtin.service:
+    name: yarn-historyserver.service
+    state: restarted
+  listen:
+    - "Start Hadoop Services"

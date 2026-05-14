@@ -1,0 +1,7 @@
+KafkaServer {
+    com.sun.security.auth.module.Krb5LoginModule required
+    useKeyTab=true
+    storeKey=true
+    keyTab="{{ kerberos.keytab_path }}/{{ service_users.kafka.name }}.service.keytab"
+    principal="{{ service_users.kafka.name }}/{{ inventory_hostname }}@{{ kerberos.realm }}";
+};

@@ -1,0 +1,39 @@
+- name: Start NameNode Service
+  ansible.builtin.service:
+    name: hdfs-namenode.service
+    state: started
+  when:
+    - inventory_hostname in groups["controllers"]
+    - service == "hdfs" or service == "all"
+
+- name: Start DataNode Service
+  ansible.builtin.service:
+    name: hdfs-datanode.service
+    state: started
+  when:
+    - inventory_hostname in groups["workernodes"]
+    - service == "hdfs" or service == "all"
+
+- name: Start YARN ResourceManager Service
+  ansible.builtin.service:
+    name: yarn-resourcemanager.service
+    state: started
+  when:
+    - inventory_hostname in groups["controllers"]
+    - service == "yarn" or service == "all"
+
+- name: Start YARN NodeManager Service
+  ansible.builtin.service:
+    name: yarn-nodemanager.service
+    state: started
+  when:
+    - inventory_hostname in groups["workernodes"]
+    - service == "yarn" or service == "all"
+
+- name: Start YARN HistoryServer Service
+  ansible.builtin.service:
+    name: yarn-historyserver.service
+    state: started
+  when:
+    - inventory_hostname in groups["controllers"]
+    - service == "yarn" or service == "all"

@@ -1,0 +1,35 @@
+- name: Update apt package cache
+  apt:
+    update_cache: yes
+
+# ACL package is required for ansible to become another user.
+# other wise ruinning in following error
+# "Failed to set permissions on the temporary files Ansible needs to create when becoming an unprivileged user ... "
+- name: Install acl package
+  apt:
+    name: acl
+    state: present
+
+- name: Install pip
+  apt:
+    name: python3-pip
+    state: present
+  when:
+    - inventory_hostname in groups["controllers"]
+
+- name: Install venv
+  apt:
+    name: "python{{ linux.python_version }}-venv"
+    state: present
+  when:
+    - inventory_hostname in groups["controllers"]
+
+- name: Install Java 8
+  apt:
+    name: "{{ linux.java8_package }}"
+    state: present
+
+- name: Install Java 17
+  apt:
+    name: "{{ linux.java17_package }}"
+    state: present

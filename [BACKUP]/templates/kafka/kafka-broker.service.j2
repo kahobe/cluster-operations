@@ -1,0 +1,16 @@
+[Unit]
+Description=Kafka Broker
+After=syslog.target network.target remote-fs.target nss-lookup.target network-online.target
+Requires=network-online.target
+
+[Service]
+User={{ service_users.kafka.name }}
+Group={{ service_users.kafka.group }}
+Type=simple
+Environment=KAFKA_OPTS="-Djava.security.krb5.conf=/etc/krb5.conf -Djava.security.auth.login.config={{ kafka.home_path }}/config/kafka_server_jaas.conf"
+ExecStart={{ kafka.home_path}}/bin/kafka-server-start.sh {{ kafka.home_path}}/config/node.properties
+ExecStop={{ kafka.home_path}}/bin/kafka-server-stop.sh
+Restart=on-abnormal
+
+[Install]
+WantedBy=multi-user.target
