@@ -28,7 +28,8 @@ Adapt the hostnames in the script if required and run it.
 ## Generate Key and Trust Store
 Java is required to run this script, since it relies on `keytool` to be present.
 
-Run the script, it generates the certificates and java key stores in the `./certs` directory.
+The script generates the certificates and java key store files in the `./certs` directory.
+Adapt the hostnames in the script if required and run it.
 ```bash
 ./scripts/keystore_truststore_generator.sh
 ```
@@ -115,7 +116,7 @@ roles/system/files/
 - [Amazon Coretto JDK 8](https://docs.aws.amazon.com/corretto/latest/corretto-8-ug/downloads-list.html)
 - [Amazon Coretto JDK 17](https://docs.aws.amazon.com/corretto/latest/corretto-17-ug/downloads-list.html)
 
-The following command will download and rename the tarball to be architecture-agnostic. Ansible will semi-automatically select the correct file using the directory structure. Run the following commands in the root directory of the ansible project.
+The following command will download and rename the tarball. Ansible will semi-automatically select the correct file using the directory structure. Run the following commands in the root directory of the ansible project.
 
 For x64 architecture:
 
@@ -163,6 +164,8 @@ drwxr-xr-x  3 root root 4096 Sep  9 18:43 amazon-corretto-8.482.08.1-linux-x64/
 ```
 
 ## Hadoop
+
+Download the binaries into the appropriate directories.
 
 ```bash
 curl \
