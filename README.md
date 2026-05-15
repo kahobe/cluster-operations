@@ -5,7 +5,25 @@ tbd
 tbd
 
 # Development Environment
-tbd
+
+## Add Virtual Machines to your hosts file.
+
+```bash
+sudo tee -a /etc/hosts << \n
+# Cluster VM Hosts
+192.168.56.101  vm1
+192.168.56.102  vm2
+192.168.56.103  vm3
+EOF
+```
+
+## Add to Ansible Control Node to known hosts
+In order to passwordless ssh to the managed nodes we need to add each managed host to `known_hosts` file.
+
+Adapt the hostnames in the script if required.
+```bash
+./scripts/update_known_hosts.sh
+```
 
 # Project Setup
 
@@ -61,13 +79,13 @@ For x64 architecture:
 curl \
 --location https://corretto.aws/downloads/latest/amazon-corretto-8-x64-linux-jdk.tar.gz \
 --create-dirs \
---remote-name \ 
+--remote-name \
 --output-dir roles/system/files/jdk/x86_64/
 
 curl \
 --location https://corretto.aws/downloads/latest/amazon-corretto-17-x64-linux-jdk.tar.gz \
 --create-dirs \
---remote-name \ 
+--remote-name \
 --output-dir roles/system/files/jdk/x86_64/
 ```
 
@@ -77,13 +95,13 @@ For ARM architecture:
 curl \
 --location https://corretto.aws/downloads/latest/amazon-corretto-8-aarch64-linux-jdk.tar.gz \
 --create-dirs \
---remote-name \ 
+--remote-name \
 --output-dir roles/system/files/jdk/aarch64/
 
 curl \
 --location https://corretto.aws/downloads/latest/amazon-corretto-17-aarch64-linux-jdk.tar.gz \
 --create-dirs \
---remote-name \ 
+--remote-name \
 --output-dir roles/system/files/jdk/aarch64/
 ```
 
@@ -95,6 +113,23 @@ drwxr-xr-x  3 root root 4096 Sep  9 18:43 amazon-corretto-17.0.18.9.1-linux-x64/
 lrwxrwxrwx  1 root root   19 Sep  9 18:35 jdk-8 -> /opt/amazon-corretto-8.482.08.1-linux-x64/
 drwxr-xr-x  3 root root 4096 Sep  9 18:43 amazon-corretto-8.482.08.1-linux-x64/
 ```
+
+## Hadoop
+
+```bash
+curl \
+--location https://dlcdn.apache.org/hadoop/common/hadoop-3.5.0/hadoop-3.5.0.tar.gz \
+--create-dirs \
+--remote-name \
+--output-dir roles/hadoop_common/files/binaries/x86_64/
+
+curl \
+--location https://dlcdn.apache.org/hadoop/common/hadoop-3.5.0/hadoop-3.5.0-aarch64.tar.gz \
+--create-dirs \
+--remote-name \
+--output-dir roles/hadoop_common/files/binaries/aarch64/
+```
+
 
 ## Packages
 
