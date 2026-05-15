@@ -6,7 +6,7 @@ tbd
 
 # Development Environment
 
-## Add Virtual Machines to your hosts file.
+## Add Virtual Machines to /etc/hosts
 
 ```bash
 sudo tee -a /etc/hosts << \n
@@ -17,10 +17,10 @@ sudo tee -a /etc/hosts << \n
 EOF
 ```
 
-## Add to Ansible Control Node to known hosts
+## Add Ansible Managed Nodes to known hosts
 In order to passwordless ssh to the managed nodes we need to add each managed host to `known_hosts` file.
 
-Adapt the hostnames in the script if required.
+Adapt the hostnames in the script if required and run it.
 ```bash
 ./scripts/update_known_hosts.sh
 ```
@@ -28,6 +28,7 @@ Adapt the hostnames in the script if required.
 ## Generate Key and Trust Store
 Java is required to run this script, since it relies on `keytool` to be present.
 
+Run the script, it generates the certificates and java key stores in the `./certs` directory.
 ```bash
 ./scripts/keystore_truststore_generator.sh
 ```
@@ -38,7 +39,7 @@ Edit your local `/etc/krb5.conf` file to contain the correct configuration.
 
 Copy the content from the kerberos_common role and replace it with the values that would have been entered.
 For the VM Setup it would look something like this.
- 
+
 ```conf
 [libdefaults]
         default_realm = MYREALM.DEV
