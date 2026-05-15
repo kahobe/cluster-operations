@@ -25,6 +25,49 @@ Adapt the hostnames in the script if required.
 ./scripts/update_known_hosts.sh
 ```
 
+## Generate Key and Trust Store
+Java is required to run this script, since it relies on `keytool` to be present.
+
+```bash
+./scripts/keystore_truststore_generator.sh
+```
+
+## Kerberos Configuration
+Ensure that you have the kerberos client installed. (e.g. `pacman -S krb5`)
+Edit your local `/etc/krb5.conf` file to contain the correct configuration.
+
+Copy the content from the kerberos_common role and replace it with the values that would have been entered.
+For the VM Setup it would look something like this.
+ 
+```conf
+[libdefaults]
+        default_realm = MYREALM.DEV
+        kdc_timesync = 1
+        ccache_type = 4
+        forwardable = true
+        proxiable = true
+        default_tgs_enctypes = aes256-cts-hmac-sha1-96 aes128-cts
+        default_tkt_enctypes = aes256-cts-hmac-sha1-96 aes128-cts
+        permitted_enctypes = aes256-cts-hmac-sha1-96 aes128-cts
+
+
+[realms]
+        MYREALM.DEV = {
+                kdc = vm1
+                admin_server = vm1
+                default_domain = myrealm.dev
+        }
+
+```
+
+## FireFox Configuration
+To access the Web UIs FireFox must be configured to use Kerberos SSO.
+
+1. open `about:config`
+2. search for `negotiate`
+3. enter your cluster hostnames in `network.negotiate-auth.trusted-uris` as a comma seperated list (e.g `vm1,vm2,vm3`)
+4. enter your cluster hostnames in `network.negotiate-auth.delegation-uris entry` as a comma seperated list (e.g `vm1,vm2,vm3`)
+
 # Project Setup
 
 The steps in this section need to be done before running the ansible script.
@@ -79,12 +122,14 @@ For x64 architecture:
 curl \
 --location https://corretto.aws/downloads/latest/amazon-corretto-8-x64-linux-jdk.tar.gz \
 --create-dirs \
+--remote-header-name \
 --remote-name \
 --output-dir roles/system/files/jdk/x86_64/
 
 curl \
 --location https://corretto.aws/downloads/latest/amazon-corretto-17-x64-linux-jdk.tar.gz \
 --create-dirs \
+--remote-header-name \
 --remote-name \
 --output-dir roles/system/files/jdk/x86_64/
 ```
@@ -95,12 +140,14 @@ For ARM architecture:
 curl \
 --location https://corretto.aws/downloads/latest/amazon-corretto-8-aarch64-linux-jdk.tar.gz \
 --create-dirs \
+--remote-header-name \
 --remote-name \
 --output-dir roles/system/files/jdk/aarch64/
 
 curl \
 --location https://corretto.aws/downloads/latest/amazon-corretto-17-aarch64-linux-jdk.tar.gz \
 --create-dirs \
+--remote-header-name \
 --remote-name \
 --output-dir roles/system/files/jdk/aarch64/
 ```
@@ -118,13 +165,13 @@ drwxr-xr-x  3 root root 4096 Sep  9 18:43 amazon-corretto-8.482.08.1-linux-x64/
 
 ```bash
 curl \
---location https://dlcdn.apache.org/hadoop/common/hadoop-3.5.0/hadoop-3.5.0.tar.gz \
+--location https://dlcdn.apache.org/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz \
 --create-dirs \
 --remote-name \
 --output-dir roles/hadoop_common/files/binaries/x86_64/
 
 curl \
---location https://dlcdn.apache.org/hadoop/common/hadoop-3.5.0/hadoop-3.5.0-aarch64.tar.gz \
+--location https://dlcdn.apache.org/hadoop/common/hadoop-3.3.6/hadoop-3.3.6-aarch64.tar.gz \
 --create-dirs \
 --remote-name \
 --output-dir roles/hadoop_common/files/binaries/aarch64/
