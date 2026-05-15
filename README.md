@@ -116,7 +116,7 @@ roles/system/files/
 - [Amazon Coretto JDK 8](https://docs.aws.amazon.com/corretto/latest/corretto-8-ug/downloads-list.html)
 - [Amazon Coretto JDK 17](https://docs.aws.amazon.com/corretto/latest/corretto-17-ug/downloads-list.html)
 
-The following command will download and rename the tarball. Ansible will semi-automatically select the correct file using the directory structure. Run the following commands in the root directory of the ansible project.
+The following command will download the tarball. Ansible will semi-automatically select the correct file using the directory structure. Run the following commands in the root directory of the ansible project.
 
 For x64 architecture:
 
