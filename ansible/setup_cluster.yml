@@ -15,6 +15,11 @@
   roles:
     - role: "kerberos_kdc"
 
+- name: "Kerberos Keytabs"
+  hosts: "cluster"
+  roles:
+    - role: "kerberos_keytab"
+
 - name: "Hadoop Setup"
   hosts: ["yarn_resource_manager", "yarn_node_manager", "hdfs_namenode", "hdfs_datanode"]
   roles:

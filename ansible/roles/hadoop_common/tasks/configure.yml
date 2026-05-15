@@ -196,3 +196,45 @@
     owner: "root"
     group: "root"
     mode: "0644"
+
+# Enable HDFS services
+- name: "Enable namenode service"
+  become: true
+  ansible.builtin.systemd_service:
+    name: "hdfs-namenode"
+    enabled: true
+    state: "stopped"
+    daemon_reload: true
+
+- name: "Enable datanode service"
+  become: true
+  ansible.builtin.systemd_service:
+    name: "hdfs-datanode"
+    enabled: true
+    state: "stopped"
+    daemon_reload: true
+
+# Enable YARN Services
+- name: "Enable resourcemanager service"
+  become: true
+  ansible.builtin.systemd_service:
+    name: "yarn-resourcemanager"
+    enabled: true
+    state: "stopped"
+    daemon_reload: true
+
+- name: "Enable historyserver service"
+  become: true
+  ansible.builtin.systemd_service:
+    name: "yarn-historyserver"
+    enabled: true
+    state: stopped
+    daemon_reload: true
+
+- name: "Enable nodemanager service"
+  become: true
+  ansible.builtin.systemd_service:
+    name: "yarn-nodemanager"
+    enabled: true
+    state: "stopped"
+    daemon_reload: true

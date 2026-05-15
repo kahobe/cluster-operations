@@ -1,34 +1,112 @@
+#    _____ __             __     _____                 _
+#   / ___// /_____ ______/ /_   / ___/___  ______   __(_)_______  _____
+#   \__ \/ __/ __ `/ ___/ __/   \__ \/ _ \/ ___/ | / / / ___/ _ \/ ___/
+#  ___/ / /_/ /_/ / /  / /_    ___/ /  __/ /   | |/ / / /__/  __(__  )
+# /____/\__/\__,_/_/   \__/   /____/\___/_/    |___/_/\___/\___/____/
+
 - name: "Restart Namenode Service"
+  become: true
   ansible.builtin.service:
-    name: hdfs-namenode.service
-    state: restarted
+    name: "hdfs-namenode.service"
+    state: "restarted"
+  when:
+    - inventory_hostname in groups["hdfs_namenode"]
   listen:
     - "Start Hadoop Services"
 
 - name: "Restart Datanode Service"
+  become: true
   ansible.builtin.service:
-    name: hdfs-datanode.service
-    state: restarted
+    name: "hdfs-datanode.service"
+    state: "restarted"
+  when:
+    - inventory_hostname in groups["hdfs_datanode"]
   listen:
     - "Start Hadoop Services"
 
-- name: Start YARN Resource Manager Service
+- name: "Start YARN Resource Manager Service"
+  become: true
   ansible.builtin.service:
-    name: yarn-resourcemanager.service
-    state: restarted
+    name: "yarn-resourcemanager.service"
+    state: "restarted"
+  when:
+    - inventory_hostname in groups["yarn_resource_manager"]
   listen:
     - "Start Hadoop Services"
 
-- name: Start YARN Node Manager Service
+- name: "Start YARN Node Manager Service"
+  become: true
   ansible.builtin.service:
-    name: yarn-nodemanager.service
-    state: restarted
+    name: "yarn-nodemanager.service"
+    state: "restarted"
+  when:
+    - inventory_hostname in groups["yarn_node_manager"]
   listen:
     - "Start Hadoop Services"
 
-- name: Start YARN History Server Service
+- name: "Start YARN History Server Service"
+  become: true
   ansible.builtin.service:
-    name: yarn-historyserver.service
-    state: restarted
+    name: "yarn-historyserver.service"
+    state: "restarted"
+  when:
+    - inventory_hostname in groups["yarn_job_history_server"]
   listen:
     - "Start Hadoop Services"
+
+#    _____ __                 _____                 _
+#   / ___// /_____  ____     / ___/___  ______   __(_)_______  _____
+#   \__ \/ __/ __ \/ __ \    \__ \/ _ \/ ___/ | / / / ___/ _ \/ ___/
+#  ___/ / /_/ /_/ / /_/ /   ___/ /  __/ /   | |/ / / /__/  __(__  )
+# /____/\__/\____/ .___/   /____/\___/_/    |___/_/\___/\___/____/
+#               /_/
+
+- name: "Stop Namenode Service"
+  become: true
+  ansible.builtin.service:
+    name: "hdfs-namenode.service"
+    state: "stopped"
+  when:
+    - inventory_hostname in groups["hdfs_namenode"]
+  listen:
+    - "Stop Hadoop Services"
+
+- name: "Stop Datanode Service"
+  become: true
+  ansible.builtin.service:
+    name: "hdfs-datanode.service"
+    state: "stopped"
+  when:
+    - inventory_hostname in groups["hdfs_datanode"]
+  listen:
+    - "Stop Hadoop Services"
+
+- name: "Stop YARN Resource Manager Service"
+  become: true
+  ansible.builtin.service:
+    name: "yarn-resourcemanager.service"
+    state: "stopped"
+  when:
+    - inventory_hostname in groups["yarn_resource_manager"]
+  listen:
+    - "Stop Hadoop Services"
+
+- name: "Stop YARN Node Manager Service"
+  become: true
+  ansible.builtin.service:
+    name: "yarn-nodemanager.service"
+    state: "stopped"
+  when:
+    - inventory_hostname in groups["yarn_node_manager"]
+  listen:
+    - "Stop Hadoop Services"
+
+- name: "Stop YARN History Server Service"
+  become: true
+  ansible.builtin.service:
+    name: "yarn-historyserver.service"
+    state: "stopped"
+  when:
+    - inventory_hostname in groups["yarn_job_history_server"]
+  listen:
+    - "Stop Hadoop Services"

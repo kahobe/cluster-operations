@@ -1,0 +1,18 @@
+- name: "Stop Cluster"
+  ansible.builtin.debug:
+    msg:
+      - "Stopping Hadoop Services"
+  changed_when: true
+  notify: "Stop Hadoop Services"
+
+- name: "Format NameNode"
+  become_user: "{{ service_users.hdfs.name }}"
+  become: true
+  ansible.builtin.shell: |
+    {{ hadoop.home_path }}/bin/hdfs namenode -format -force -clusterId {{ hadoop.cluster_id }}
+  register: hadoop_common_namenode_format_result
+  changed_when: true
+
+- name: Display result
+  ansible.builtin.debug:
+    var: hadoop_common_namenode_format_result

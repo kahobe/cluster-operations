@@ -6,13 +6,12 @@ Requires=network-online.target
 [Service]
 User={{ service_users.yarn.name }}
 Group={{ service_users.hadoop.group }}
-Type=forking
-ExecStart={{ hadoop.home_path }}/bin/yarn --daemon start nodemanager
-ExecStop={{ hadoop.home_path }}/bin/yarn --daemon stop nodemanager
-ExecStopPost={{ hadoop.home_path }}/bin/yarn --daemon stop nodemanager
+Type=simple
+ExecStart={{ hadoop.home_path }}/bin/yarn nodemanager
+ExecStop=/bin/kill -15 $MAINPID
 WorkingDirectory={{ hadoop.home_path }}
 TimeoutStartSec=1min
-Restart=no
+Restart=on-failure
 RestartSec=30
 RemainAfterExit=yes
 

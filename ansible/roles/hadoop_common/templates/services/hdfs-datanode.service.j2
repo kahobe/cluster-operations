@@ -6,13 +6,12 @@ Requires=network-online.target
 [Service]
 User={{ service_users.hdfs.name }}
 Group={{ service_users.hadoop.group }}
-Type=forking
-ExecStart={{ hadoop.home_path }}/bin/hdfs --daemon start datanode
-ExecStop={{ hadoop.home_path }}/bin/hdfs --daemon stop datanode
-ExecStopPost={{ hadoop.home_path }}/bin/hdfs --daemon stop datanode
+Type=simple
+ExecStart={{ hadoop.home_path }}/bin/hdfs datanode
+ExecStop=/bin/kill -15 $MAINPID
 WorkingDirectory={{ hadoop.home_path }}
 TimeoutStartSec=1min
-Restart=no
+Restart=on-failure
 RestartSec=30
 RemainAfterExit=yes
 

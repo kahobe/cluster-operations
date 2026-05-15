@@ -6,13 +6,12 @@ Requires=network-online.target
 [Service]
 User={{ service_users.mapred.name }}
 Group={{ service_users.hadoop.group }}
-Type=forking
-ExecStart={{ hadoop.home_path }}/bin/mapred --daemon start historyserver
-ExecStop={{ hadoop.home_path }}/bin/mapred --daemon stop historyserver
-ExecStopPost={{ hadoop.home_path }}/bin/mapred --daemon stop historyserver
+Type=simple
+ExecStart={{ hadoop.home_path }}/bin/mapred historyserver
+ExecStop=/bin/kill -15 $MAINPID
 WorkingDirectory={{ hadoop.home_path }}
 TimeoutStartSec=1min
-Restart=no
+Restart=on-failure
 RestartSec=30
 RemainAfterExit=yes
 
